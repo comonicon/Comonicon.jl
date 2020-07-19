@@ -24,7 +24,7 @@ end
 
 Base.@kwdef struct EntryCommand <: AbstractCommand
     root
-    version::VersionNumber = v"0.1.0"
+    version::VersionNumber = v"0.0.0"
 end
 
 Base.@kwdef struct NodeCommand <: AbstractCommand
@@ -84,7 +84,10 @@ end
 
 function Base.show(io::IO, entry::EntryCommand)
     printstyled(io, cmd_name(entry); color=:light_blue, bold=true)
-    print(io, " ", entry.version)
+
+    if entry.version > v"0.0.0"
+        print(io, " ", entry.version)
+    end
 end
 
 function Base.show(io::IO, cmd::LeafCommand)
