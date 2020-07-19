@@ -1,6 +1,10 @@
-using CLITools
+using Comonicon
 using Test
 
-@testset "CLITools.jl" begin
-    # Write your own tests here.
+@testset "codegen" begin
+    include("codegen.jl")
+end
+
+@testset "parse" begin
+    include("parse.jl")
 end
