@@ -7,3 +7,5 @@
 Roger's magic book for command line interfaces.
 
 ## License
+
+MIT License
