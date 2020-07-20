@@ -9,7 +9,7 @@ Roger's magic book for command line interfaces.
 ## Installation
 
 <p>
-{{{PKG}}} is a &nbsp;
+Comonicon is a &nbsp;
     <a href="https://julialang.org">
         <img src="https://julialang.org/favicon.ico" width="16em">
         Julia Language
