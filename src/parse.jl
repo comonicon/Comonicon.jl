@@ -25,6 +25,9 @@ macro command_main(xs...)
     esc(command_main_m(__module__, xs...))
 end
 
+_version_number(x::String) = VersionNumber(x)
+_version_number(x::VersionNumber) = x
+
 function command_main_m(m, kwargs...)
     if !isempty(kwargs)
         ex = first(kwargs)
@@ -54,7 +57,7 @@ function command_main_m(m, kwargs...)
 
     if isdefined(m, :CASTED_COMMANDS)
         cmd = NodeCommand(configs[:name], collect(values(m.CASTED_COMMANDS)), configs[:doc])
-        return codegen(EntryCommand(cmd; version=configs[:version]))
+        return codegen(EntryCommand(cmd; version=_version_number(configs[:version])))
     end
 
     throw(Meta.ParseError("define commands using @cast first"))
@@ -78,8 +81,11 @@ function cast_m(m, alias::String, ex)
         push!(ret.args, :(const CASTED_COMMANDS = Dict{String, Any}()))
     end
 
+    casted_commands = GlobalRef(m, :CASTED_COMMANDS)
+
     if ex isa Symbol
-        push!(ret.args, :(set_cmd!(CASTED_COMMANDS, command($ex; name=$alias))))
+        push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(ex; name=alias)))
+        return ret
     end
 
     def = splitdef(ex; throw=false)
@@ -87,7 +93,7 @@ function cast_m(m, alias::String, ex)
     if def === nothing # not a function
         if ex.head === :module
             push!(ret.args, ex)
-            push!(ret.args, :(set_cmd!(CASTED_COMMANDS, command($(ex.args[2]); name=$alias))))
+            push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(ex.args[2]; name=alias)))
             return ret
         else
             throw(ParseError("invalid syntax $ex"))
@@ -100,7 +106,7 @@ function cast_m(m, alias::String, ex)
     args_types, kwargs_types = parse_command!(ret, m, def, ex)
 
     push!(ret.args, quote
-        CASTED_COMMANDS[$(string(def[:name]))] = command($(def[:name]), $args_types, $kwargs_types; name=$alias)
+        $casted_commands[$(string(def[:name]))] = $(xcommand(def[:name], args_types, kwargs_types; name=alias))
     end)
     return ret
 end
@@ -123,18 +129,24 @@ function scan_args_types(def)
     types = Expr(:vect)
     haskey(def, :args) || return types
 
-    # (name, type)
+    # (name, type, require)
     for each in def[:args]
-        if each isa Symbol
-            push!(types.args, Expr(:tuple, string(each), Any))
-        elseif each.head === :(::)
-            T = wrap_type(def, each.args[2])
-            push!(types.args, Expr(:tuple, string(each.args[1]), T))
-        else
-            throw(Meta.ParseError("invalid syntax for command line entry: $each"))
-        end
+        push!(types.args, Expr(:tuple, parse_arg(def, each)...))
     end
     return types
+end
+
+function parse_arg(def, arg)
+    if arg isa Symbol
+        return string(arg), Any, true
+    elseif arg.head === :(::)
+        return string(arg.args[1]), wrap_type(def, arg.args[2]), true
+    elseif arg.head === :kw
+        name, T, _ = parse_arg(def, arg.args[1])
+        return name, T, false
+    else
+        throw(Meta.ParseError("invalid syntax for command line entry: $arg"))
+    end
 end
 
 function scan_kwargs_types(def)
@@ -181,14 +193,14 @@ function wrap_type(def, type)
 end
 
 # module runtime parsing
-function command(m::Module; name="", doc=docstring(m))
+function command(m::Module; name="", doc=docstring(m))    
     if isempty(name) # force to have a valid name
         name = default_name(m)
     end
     NodeCommand(name, collect(values(m.CASTED_COMMANDS)), doc)
 end
 
-function command(f::Function, args::Vector{Tuple{String, DataType}}, kwargs::Vector{Tuple{String, DataType, Bool}}; name="")
+function command(f::Function, args, kwargs; name="")
     if isempty(name) # force to have a valid name
         name = default_name(f)
     end
@@ -206,7 +218,7 @@ function docstring(x)
     end
 end
 
-create_args(args, docs) = [Arg(name; type=type, doc=get(docs, name, "")) for (name, type) in args]
+create_args(args, docs) = [Arg(name; type=type, require=require, doc=get(docs, name, "")) for (name, type, require) in args]
 
 function create_options_and_flags(kwargs, option_docs, flag_docs)
     options = Option[]

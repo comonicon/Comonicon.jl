@@ -1,12 +1,16 @@
 mutable struct CmdCtx
     ptr::Int
     help::Symbol
+    version::Symbol
 end
 
-CmdCtx() = CmdCtx(1, gensym(:help))
+CmdCtx() = CmdCtx(1, gensym(:help), gensym(:version))
 
 help_str(x) = sprint(print_cmd, x; context=:color=>true)
 print_help(x) = :(print($(help_str(x))))
+print_version(cmd::EntryCommand) = :(println($(sprint(show, cmd; context=:color=>true))))
+
+hasparameters(cmd::LeafCommand) = (!isempty(cmd.flags)) || (!isempty(cmd.options))
 
 function read_arg(ctx)
     ex = :(ARGS[$(ctx.ptr)])
@@ -34,19 +38,83 @@ function print_error(cmd, msg)
 end
 
 function codegen(ctx, cmd::LeafCommand)
-    parameters = gensym(:parameters)
-    ex = Expr(:block)
+    return quote
+        $(codegen_help(ctx, cmd))
+        $(codegen_body(ctx, cmd))
+    end
+end
 
-    push!(ex.args, :(
-        if $(ctx.help) >= $(ctx.ptr)
-            $(print_help(cmd))
+function codegen(ctx, cmd::NodeCommand)
+    return quote
+        $(codegen_help(ctx, cmd))
+        $(codegen_body(ctx, cmd))
+    end
+end
+
+function codegen(ctx, cmd::EntryCommand)
+    quote
+        $(ctx.help) = -1
+        $(ctx.version) = -1
+        for i in 1:length(ARGS)
+            x = ARGS[i]
+            if x == "--help" || x == "-h"
+                $(ctx.help) = i
+                break
+            end
+
+            if x == "--version" || x == "-V"
+                $(ctx.version) = i
+                break
+            end
+        end
+
+        $(codegen_help(ctx, cmd.root, print_help(cmd)))
+        $(codegen_version(ctx, cmd.root, print_version(cmd)))
+        $(codegen_body(ctx, cmd.root))
+    end
+end
+
+function codegen_help(ctx, cmd::NodeCommand, msg=print_help(cmd))
+    return quote
+        if $(ctx.help) == $(ctx.ptr)
+            $msg
             return 0
         end
-    ))
+    end
+end
 
-    hasparameters = (!isempty(cmd.flags)) || (!isempty(cmd.options))
+function codegen_help(ctx, cmd::LeafCommand, msg=print_help(cmd))
+    return quote
+        if $(ctx.help) >= $(ctx.ptr)
+            $msg
+            return 0
+        end
+    end
+end
+
+function codegen_version(ctx, cmd::NodeCommand, msg)
+    return quote
+        if $(ctx.help) == $(ctx.ptr)
+            $msg
+            return 0
+        end
+    end
+end
+
+function codegen_version(ctx, cmd::LeafCommand, msg)
+    return quote
+        if $(ctx.help) >= $(ctx.ptr)
+            $msg
+            return 0
+        end
+    end
+end
+
+function codegen_body(ctx, cmd::LeafCommand)
+    parameters = gensym(:parameters)
+    ex = Expr(:block)
     
-    if hasparameters
+    if hasparameters(cmd)
         push!(ex.args, :($parameters = []))
     end
 
@@ -54,41 +122,74 @@ function codegen(ctx, cmd::LeafCommand)
         push!(ex.args, codegen_options_and_flags(ctx, parameters, cmd))
     end
 
-    err = print_error(cmd, :("command $($(cmd.name)) expect $($(length(cmd.args))) arguments, got $(length(ARGS) - $(ctx.ptr - 1))"))
+    n_args = gensym(:n_args)
+    push!(ex.args, :($n_args = length(ARGS) - $(ctx.ptr - 1)))
+
+    # Error: not enough arguments
+    nrequires = nrequired_args(cmd.args)
+    err = print_error(cmd, :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"))
     push!(ex.args, quote
-        if length(ARGS) - $(ctx.ptr - 1) != $(length(cmd.args))
+        if $n_args < $nrequires
             $err
         end
     end)
 
-    ex_call = Expr(:call, cmd.entry)
-
-    if hasparameters
-        push!(ex_call.args, Expr(:parameters, :($parameters...)))
-    end
-
-    for (i, arg) in enumerate(cmd.args)
-        if arg.type === Any
-            push!(ex_call.args, :(ARGS[$(ctx.ptr+i-1)]))
-        else
-            push!(ex_call.args, :(convert($(arg.type), Meta.parse(ARGS[$(ctx.ptr+i-1)]))))
+    # Error: too much arguments
+    nmost = length(cmd.args)
+    err = print_error(cmd, :("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
+    push!(ex.args, quote
+        if $n_args > $nmost
+            $err
         end
-    end
+    end)
+
+    ex_call = codegen_call(ctx, parameters, n_args, cmd)
 
     push!(ex.args, ex_call)
     push!(ex.args, :(return 0))
     return ex
 end
 
-function codegen(ctx, cmd::NodeCommand)
-    ex = Expr(:block)
-    push!(ex.args, :(
-        if $(ctx.help) == $(ctx.ptr)
-            $(print_help(cmd))
-            return 0
-        end
-    ))
+function codegen_call(ctx, parameters, n_args, cmd::LeafCommand)
+    ex_call = Expr(:call, cmd.entry)
+    if hasparameters(cmd)
+        push!(ex_call.args, Expr(:parameters, :($parameters...)))
+    end
 
+    for (i, arg) in enumerate(cmd.args)
+        if arg.require
+            push_arg!(ex_call, ctx, i, arg)
+        end
+    end
+
+    if all_required(cmd)
+        return ex_call
+    end
+
+    ex = Expr(:block)
+    # expand optionals
+    if cmd.nrequire > 0
+        push!(ex.args, Expr(:if, :($n_args == $(cmd.nrequire)), ex_call))
+    end
+
+    for i in cmd.nrequire+1:length(cmd.args)
+        push!(ex.args, Expr(:if, :($n_args == $i), push_arg!(copy(ex_call), ctx, i, cmd.args[i])))
+    end
+
+    return ex
+end
+
+function push_arg!(ex, ctx, i, arg)
+    if arg.type === Any
+        push!(ex.args, :(ARGS[$(ctx.ptr+i-1)]))
+    else
+        push!(ex.args, :(convert($(arg.type), Meta.parse(ARGS[$(ctx.ptr+i-1)]))))
+    end
+    return ex
+end
+
+function codegen_body(ctx, cmd::NodeCommand)
+    ex = Expr(:block)
     err_msg = "expect at least one argument for command $(cmd.name)"
     push!(ex.args, Expr(:if, :(length(ARGS) < $(ctx.ptr)), print_error(cmd, err_msg)))
 
@@ -102,20 +203,6 @@ function codegen(ctx, cmd::NodeCommand)
     err_msg = :("Error: unknown command $(ARGS[$(ctx.ptr)])")
     push!(ex.args, print_error(cmd, err_msg))
     return ex
-end
-
-function codegen(ctx, cmd::EntryCommand)
-    quote
-        $(ctx.help) = -1
-        for i in 1:length(ARGS)
-            x = ARGS[i]
-            if x == "--help" || x == "-h"
-                $(ctx.help) = i
-            end
-        end
-
-        $(codegen(ctx, cmd.root))
-    end
 end
 
 function codegen_options_and_flags(ctx, parameters, cmd::LeafCommand)

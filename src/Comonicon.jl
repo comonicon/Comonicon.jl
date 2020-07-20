@@ -9,11 +9,12 @@ using Pkg
 using Libdl
 using ExprTools
 
-include("utils.jl")
 include("command.jl")
+include("utils.jl")
+
 include("codegen.jl")
 include("build.jl")
-
+include("printings.jl")
 include("markdown.jl")
 include("parse.jl")
 include("validate.jl")

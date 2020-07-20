@@ -86,12 +86,20 @@ function parse_options(raw::Markdown.List)
     for each in raw.items
         name, doc = parse_item(each[1])
         m = match(r"^(-.*) +<(.+)>$", name)
-        m === nothing && throw(Meta.ParseError("invalid option: $name"))
+        
+        if m === nothing
+            err_m = match(r"^-.*$", strip(name))
+            if err_m === nothing
+                throw(Meta.ParseError("invalid option: $name"))
+            else
+                throw(Meta.ParseError("invalid option: $name, expect option argument doc, got only flag"))
+            end
+        end
 
         flags = split(m[1], ",")
         if length(flags) == 1
             startswith(name, "--") || throw(Meta.ParseError("invalid option/flag: $name"))
-            options[lstrip(name, "-")] = (m[2], doc, false)
+            options[lstrip(m[1], '-')] = (m[2], doc, false)
         elseif length(flags) == 2
             names = strip.(flags)
             name = startswith(names[1], "--") ? lstrip(names[1], '-') :
@@ -126,7 +134,7 @@ function parse_item(raw::Markdown.Paragraph)
 end
 
 function parse_docstring(doc::String)
-    m = match(r"^: *(.*)", doc)
+    m = match(r"^: *(.*)", strip(doc))
     m === nothing && throw(Meta.ParseError("invalid docstring format: $doc"))
     return String(m[1])
 end

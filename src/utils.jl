@@ -31,3 +31,109 @@ function get_version(m::Module)
     end
     return v"0.0.0"
 end
+
+module Snippet
+
+using ..Comonicon
+
+function call(m::Module, name::Union{Symbol, Expr}, xs...; kwargs...)
+    if isempty(kwargs)
+        return Expr(:call, GlobalRef(m, name), xs...)
+    else
+        params = Expr(:parameters)
+        for (key, value) in kwargs
+            push!(params.args, Expr(:kw, key, value))
+        end
+
+        return Expr(:call, GlobalRef(m, name), params, xs...)
+    end
+end
+
+function call(m::Module, name, xs...; kwargs...)
+    call(m, nameof(name), xs...; kwargs...)
+end
+
+call(name, xs...; kwargs...) = call(Comonicon, name, xs...; kwargs...)
+
+end
+
+xcommand(xs...; kwargs...) = Snippet.call(:command, xs...; kwargs...)
+
+cachefile(m::Module) = joinpath(dirname(pathof(m)), "comonicon.cmd.jl")
+
+function iscached(m::Module)
+    return ispath(cachefile(m))
+end
+
+function nrequired_args(args::Vector)
+    return count(args) do x
+        x.require == true
+    end
+end
+
+function all_required(args::Vector)
+    return all(args) do x
+        x.require == true
+    end
+end
+
+all_required(cmd::LeafCommand) = all_required(cmd.args)
+
+
+"""
+    splittext(s)
+
+Split the text in string `s` into an array, but keep all the separators
+attached to the preceding word.
+
+!!! note
+
+    this is copied from Luxor/text.jl
+"""
+function splittext(s)
+    # split text into array, keeping all separators
+    # hyphens stay with first word
+    result = Array{String, 1}()
+    iobuffer = IOBuffer()
+    for c in s
+        if isspace(c)
+            push!(result, String(take!(iobuffer)))
+            iobuffer = IOBuffer()
+        elseif c == '-' # hyphen splits words but needs keeping
+            print(iobuffer, c)
+            push!(result, String(take!(iobuffer)))
+            iobuffer = IOBuffer()
+        else
+            print(iobuffer, c)
+        end
+    end
+    push!(result, String(take!(iobuffer)))
+    return result
+end
+
+function splitlines(s, width=80)
+    words = splittext(s)
+    lines = String[]
+    current_line = String[]
+    space_left = width
+    for word in words
+        word == "" && continue
+        word_width = length(word)
+
+        if space_left < word_width
+            # start a new line
+            push!(lines, strip(join(current_line)))
+            current_line = String[]
+            space_left = width
+        elseif endswith(word, "-")
+            push!(current_line, word)
+            space_left -= word_width
+        else
+            push!(current_line, word * " ")
+            space_left -= word_width + 1
+        end
+    end
+
+    isempty(current_line) || push!(lines, strip(join(current_line)))
+    return lines
+end
