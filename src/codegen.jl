@@ -127,12 +127,15 @@ function codegen_body(ctx, cmd::LeafCommand)
 
     # Error: not enough arguments
     nrequires = nrequired_args(cmd.args)
-    err = print_error(cmd, :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"))
-    push!(ex.args, quote
-        if $n_args < $nrequires
-            $err
-        end
-    end)
+
+    if nrequires > 0
+        err = print_error(cmd, :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"))
+        push!(ex.args, quote
+            if $n_args < $nrequires
+                $err
+            end
+        end)
+    end
 
     # Error: too much arguments
     nmost = length(cmd.args)
@@ -168,7 +171,7 @@ function codegen_call(ctx, parameters, n_args, cmd::LeafCommand)
 
     ex = Expr(:block)
     # expand optionals
-    if cmd.nrequire > 0
+    if cmd.nrequire >= 0
         push!(ex.args, Expr(:if, :($n_args == $(cmd.nrequire)), ex_call))
     end
 
