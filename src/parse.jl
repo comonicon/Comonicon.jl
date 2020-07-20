@@ -28,12 +28,7 @@ macro command_main(xs...)
         return quote
             $(command_main_m(__module__, xs...))
 
-            function _command_precompile_()
-                ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
-                precompile(Tuple{typeof($(__module__).command_main), Array{String, 1}})
-            end
-
-            _command_precompile_()
+            precompile(Tuple{typeof($($__module__).command_main), Array{String, 1}})
         end |> esc
     end
 end

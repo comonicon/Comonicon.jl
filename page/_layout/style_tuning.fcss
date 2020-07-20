@@ -1,0 +1,50 @@
+.bg-primary {
+  background-color: {{header_color}} !important;
+}
+
+a {
+  color: {{link_color}};
+}
+
+a:hover {
+  color: {{link_hover_color}};
+}
+
+.section-bg-color {
+  background-color: {{section_bg_color}};
+}
+
+footer a {
+  color: {{footer_link_color}};
+}
+
+{{if use_hero}}
+.jumbotron {
+  width: {{hero_width}};
+}
+
+header {
+  margin-top: {{hero_margin_top}} !important;
+}
+{{else}}
+header {
+  margin-top: {{header_margin_top}} !important;
+}
+{{end}}
+
+{{if use_header_img}}
+.jumbotron {
+  background-image: {{header_img_path}};
+  background-repeat: repeat;
+}
+{{end}}
+
+/* CODE ADJUSTMENTS */
+
+pre code.hljs {
+  border-radius: {{code_border_radius}};
+}
+
+pre code.hljs.plaintext {
+  margin-left: {{code_output_indent}};
+}

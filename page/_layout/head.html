@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- META -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="{{authors}}">
+  <title>{{title}}</title>
+
+  <link rel="icon" type="image/png"  href="/assets/favicon.ico">
+
+  <!-- CSS -->
+  {{if hasmath}} {{insert head_katex.html }}     {{end}}
+  {{if hascode}} {{insert head_highlight.html }}   {{end}}
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>{{insert style_tuning.fcss}}</style>
+  <link rel="stylesheet" href="/css/custom.css">
+
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+<body id="page-top">
+  {{insert nav.html}}
+  {{insert header.html}}
+  <!-- Content appended here -->

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- META -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Xiu-Zhe (Roger) Luo and contributors">
+  <title>Comonicon.jl</title>
+
+  <link rel="icon" type="image/png"  href="/assets/favicon.ico">
+
+  <!-- CSS -->
+  
+   <link rel="stylesheet" href="/libs/highlight/styles/atom-one-dark.css">
+   
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>.bg-primary {
+  background-color: #3f6388 !important;
+}
+
+a {
+  color: #2669DD;
+}
+
+a:hover {
+  color: teal;
+}
+
+.section-bg-color {
+  background-color: #f6f8fa;
+}
+
+footer a {
+  color: cornflowerblue;
+}
+
+
+header {
+  margin-top: 55px !important;
+}
+
+
+
+.jumbotron {
+  background-image: url("assets/diagonal-lines.svg");
+  background-repeat: repeat;
+}
+
+
+/* CODE ADJUSTMENTS */
+
+pre code.hljs {
+  border-radius: 10px;
+}
+
+pre code.hljs.plaintext {
+  margin-left: 15px;
+}
+</style>
+  <link rel="stylesheet" href="/css/custom.css">
+
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+<body id="page-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+  <div class="container">
+    <span class="navbar-brand">
+      
+        <img src="/assets/logo.svg" class="img-fluid" style="max-height:     25px;
+padding-right:  10px;
+" alt="Logo"/>
+      
+      <a href="#page-top">Comonicon.jl</a>
+      
+      ｜ <a href="https://yaoquantum.org/" target="_blank">Docs</a>
+      
+    </span>
+    <input type="checkbox" id="navbar-toggler-cbox" class="d-none" />
+    <label for="navbar-toggler-cbox" class="navbar-toggler" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </label>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="#getting_started">Getting started</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="#workflow">Workflow</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <header class="text-white text-center">
+  
+    <div class="jumbotron jumbotron-fluid container-fluid bg-primary">
+  
+    <h1>Comonicon.jl</h1>
+    <div class="lead">all terminal lines are under my command.
+</div>
+    
+      <a class="github-button" href="https://github.com/Roger-luo/Comonicon.jl" data-size="large" aria-label="View Comonicon.jl on GitHub">View on GitHub</a>
+    
+    
+      <a class="github-button" href="https://github.com/Roger-luo/Comonicon.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star Comonicon.jl on GitHub">Star</a>
+    
+  </div>
+</header>
+
+  <!-- Content appended here -->
+<div class="franklin-content"><section id="about" class="scrollspy section-bg-color">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>
+          About this Package
+        </h2>
+
+<div class="lead">Comonicon.jl is a Command Line Interface &#40;CLI&#41; generator that aims to provide simple, powerful and fast CLI experience in Julia language</div>
+<ul>
+<li><p><strong>minimal user input</strong>:</p>
+<ul>
+<li><p>python-fire like workflow turns your functions and modules into CLIs.</p>
+</li>
+<li><p>directly parse your function docstring to annotate your CLI commands, arguments and options.</p>
+</li>
+</ul>
+</li>
+<li><p><strong>zero dependency</strong>. you can dump the generated entry function into script and remove the dependency of Comonicon itself.</p>
+</li>
+<li><p><strong>colorful</strong> help string and builtin <strong>help message composition</strong> &#40;copied and modified from <a href="https://github.com/JuliaGraphics/Luxor.jl">Luxor.jl</a>&#41;</p>
+</li>
+<li><p><strong>fast&#33;</strong></p>
+<ul>
+<li><p><code>command_main</code> can be easily precompiled by Julia compiler</p>
+</li>
+<li><p>Comonicon also ships a set of tools to help you compile/interpret your script</p>
+</li>
+</ul>
+</li>
+</ul>
+<div style="text-align:center;"> <figure class="figure">
+  <img src="/assets/ion.png" alt="A command line package manager ion built using Comonicon" class="figure-img img-fluid " width="100%" style="border-radius:5px;">
+  <figcaption class="figure-caption ">
+A command line package manager ion built using Comonicon
+</figcaption>
+
+</figure>
+</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="getting_started" class="scrollspy">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>
+          Getting started
+        </h2>
+
+<p>In order to get started, just add the package &#40;with <strong>Julia ≥ 1.3</strong>&#41;</p>
+<pre><code class="language-julia-repl">pkg> add Comonicon</code></pre>
+<p>and create your first command line script</p>
+<pre><code class="language-julia">using Comonicon
+
+"""
+ArgParse example implemented in Comonicon.
+
+# Arguments
+
+- `x`: an argument
+
+# Options
+
+- `--opt1 <arg>`: an option
+- `-o, --opt2 <arg>`: another option
+
+# Flags
+
+- `-f, --flag`: a flag
+"""
+@command_main function main(x; opt1=1, opt2::Int=2, flag=false)
+    println("Parsed args:")
+    println("flag=>", flag)
+    println("arg=>", x)
+    println("opt1=>", opt1)
+    println("opt2=>", opt2)
+end
+
+command_main()</code></pre>       </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow" class="scrollspy section-bg-color">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>
+          Workflow
+        </h2>
+
+<p>However, since this is not created inside a project, Julia will not cache the compilation. A better workflow is to create CLI as Julia projects.</p>
+<pre><code class="language-julia">module Dummy
+using Comonicon
+
+"""
+foo foo
+
+# Arguments
+
+- `x`: an argument
+
+# Options
+
+- `--foo <foo>`: foo foo
+"""
+@cast function foo(x::Int, y; foo::Int=1, hulu::Float64=2.0, flag::Bool=false) where T
+    @show x
+    @show y
+    @show foo
+    @show hulu
+    @show flag
+end
+
+"""
+tick tick.
+
+# Arguments
+
+- `xx`: xxxxxxxxxxxx
+- `yy`: yyyyyyyyyyyy
+"""
+@cast function tick(xx::Int, yy::Float64=1.0)
+    @show xx
+    @show yy
+end
+
+@command_main name="main" doc="""
+dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
+sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
+"""
+end # Dummy</code></pre>
+<p>Then you can write a <code>deps/build.jl</code> script to install your CLI to <code>.julia/bin</code>
+<pre><code class="language-julia">using Comonicon, IonCLI
+Comonicon.install(Dummy, "dummy")</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="py-5 bg-dark">
+  <div class="container">
+    <p class="m-0 text-center text-white">&copy; Xiu-Zhe (Roger) Luo and contributors. Website powered by <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a>, <a href="https://github.com/tlienart/PkgPage.jl">PkgPage.jl</a> and the <a href="https://julialang.org">Julia</a> programming language.</p>
+  </div>
+</footer>
+</div><!-- CONTENT ENDS HERE -->
+  
+  
+      <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+  
+  <script src="/libs/simple-scrollspy.min.js"></script>
+  <script>
+  window.onload = function () {
+    scrollSpy('#navbarResponsive', {
+      sectionClass: '.scrollspy',
+      menuActiveTarget: '.nav-link',
+      offset: 100
+    })
+  }
+  </script>
+  </body>
+</html>
