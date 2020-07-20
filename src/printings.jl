@@ -64,7 +64,7 @@ function print_cmd(io::IO, cmd::EntryCommand)
 
     print_section(io, "Usage")
     println(io, " "^INDENT, cmd.root, "\n")
-    print_body(io, cmd.root)
+    print_body(io, cmd.root, true)
 end
 
 function print_cmd(io::IO, cmd::NodeCommand)
@@ -97,16 +97,18 @@ function print_cmd(io::IO, x::Arg)
     end
 end
 
-function print_help_and_version(io::IO, x)
+function print_help(io::IO)
     doc_indent = first_line_doc_indent(io, HELP_FLAG)
     print(io, " "^get(io, :indent, 0))
     print_option_or_flag(io, HELP_FLAG)
-    print(io, " "^doc_indent, HELP_FLAG_DOC, "\n")
+    print(io, " "^doc_indent, HELP_FLAG_DOC, "\n\n")
+end
 
+function print_version(io::IO)
     doc_indent = first_line_doc_indent(io, VERSION_FLAG)
     print(io, " "^get(io, :indent, 0))
     print_option_or_flag(io, VERSION_FLAG)
-    print(io, " "^doc_indent, VERSION_FLAG_DOC, "\n")
+    print(io, " "^doc_indent, VERSION_FLAG_DOC, "\n\n")
 end
 
 function partition(io, cmd, xs...; width=80)
@@ -176,15 +178,17 @@ function print_title(io::IO, x)
     println(io)
 end
 
-function print_body(io::IO, cmd::NodeCommand)
+function print_body(io::IO, cmd::NodeCommand, isentry=false)
     io = wrap_io(io, cmd)
     print_list(io, "Commands", cmd.subcmds)
 
     print_section(io, "Flags")
-    print_help_and_version(io, cmd)
+    print_help(io)
+    isentry && print_version(io)
+    println(io)
 end
 
-function print_body(io::IO, cmd::LeafCommand)
+function print_body(io::IO, cmd::LeafCommand, isentry=false)
     io = wrap_io(io, cmd, false)
     if !isempty(cmd.args)
         print_list(io, "Args", cmd.args)
@@ -192,15 +196,18 @@ function print_body(io::IO, cmd::LeafCommand)
 
     if !isempty(cmd.flags)
         print_list(io, "Flags", cmd.flags)
-        print_help_and_version(io, cmd)
+        print_help(io)
+        isentry && print_version(io)
     else
         print_section(io, "Flags")
-        print_help_and_version(io, cmd)
+        print_help(io)
+        isentry && print_version(io)
     end
 
     if !isempty(cmd.options)
         print_list(io, "Options", cmd.options)
     end
+    println(io)
 end
 
 function print_section(io::IO, sec)
@@ -212,7 +219,6 @@ function print_list(io::IO, title, list)
     print_section(io, title)
     for x in list
         print_cmd(io, x)
-        println(io)
+        print(io, "\n\n")
     end
-    println(io)
 end
