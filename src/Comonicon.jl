@@ -8,6 +8,7 @@ using Markdown
 using Pkg
 using Libdl
 using ExprTools
+using PackageCompiler
 
 include("command.jl")
 include("utils.jl")
