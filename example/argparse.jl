@@ -1,17 +1,22 @@
-# using Comonicon
+using Comonicon
 
-# @command_main function foo(x; opt1=1, opt2::Int=2, flag=false)
-#     println("Parsed args:")
-#     println("flag=>", flag)
-#     println("arg=>", x)
-#     println("opt1=>", opt1)
-#     println("opt2=>", opt2)
-# end
+"""
+ArgParse example implemented in Comonicon.
 
-# command_main()
+# Arguments
 
+- `x`: an argument
 
-function foo(x; opt1=1, opt2::Int=2, flag=false)
+# Options
+
+- `--opt1 <arg>`: an option
+- `-o, --opt2 <arg>`: another option
+
+# Flags
+
+- `-f, --flag`: a flag
+"""
+@command_main function main(x; opt1=1, opt2::Int=2, flag=false)
     println("Parsed args:")
     println("flag=>", flag)
     println("arg=>", x)
@@ -19,10 +24,4 @@ function foo(x; opt1=1, opt2::Int=2, flag=false)
     println("opt2=>", opt2)
 end
 
-# @command_main
-
-# command_main()
-
-# write("cmd.jl", Comonicon.main())
-
-include("cmd.jl")
+command_main()
