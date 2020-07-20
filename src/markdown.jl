@@ -10,6 +10,7 @@ end
 rm_format(x::Markdown.Paragraph) = join(map(rm_format, x.content))
 rm_format(x::Markdown.Code) = x.code
 rm_format(x::String) = x
+rm_format(x::Markdown.MD) = rm_format(x.content[1])
 
 function parse_doc(md::Markdown.MD)
     intro = parse_intro(md)

@@ -2,7 +2,7 @@
 const DEFAULT_SYSIMG = joinpath(dirname(pathof(Comonicon)), "..", "deps", "lib", "libcomonicon.$(Libdl.dlext)")
 
 default_exename() = joinpath(Sys.BINDIR, Base.julia_exename())
-default_project(mod) = dirname(pathof(mod))
+default_project(mod) = dirname(dirname(pathof(mod)))
 
 function cmd_script(mod; exename=default_exename(), project=default_project(mod), sysimg=DEFAULT_SYSIMG, compile=nothing, optimize=2)
     shebang = "#!$exename -J$sysimg --project=$project"
@@ -12,7 +12,7 @@ function cmd_script(mod; exename=default_exename(), project=default_project(mod)
 
     shebang *= " -O$optimize"
     return """$shebang
-    using $mod; $mod.command_line_main()
+    using $mod; $mod.command_main()
     """
 end
 

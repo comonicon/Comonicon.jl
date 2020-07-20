@@ -34,8 +34,8 @@ function command_main_m(m, kwargs...)
         def = splitdef(ex; throw=false)
         if def !== nothing
             ret = Expr(:block)
-            push!(ret.args, Expr(:meta, :doc))
             push!(ret.args, ex)
+            push!(ret.args, :(Core.@__doc__ $(def[:name])))
         
             args_types, kwargs_types = parse_command!(ret, m, def, ex)
         
@@ -162,10 +162,15 @@ function scan_kwargs_types(def)
             if name isa Symbol
                 push!(types.args, Expr(:tuple, string(name), Any, false))
             elseif name.head === :(::)
-                # `Bool` kwarg with false as default
-                # value will be treated as flags
-                if (name.args[2] === :Bool) && (each.args[2] == false)
-                    push!(types.args, Expr(:tuple, string(name.args[1]), Bool, true))
+                # `Bool` kwarg must use false as default
+                # and will be treated as flags
+                if (name.args[2] === :Bool)
+                    if each.args[2] == false
+                        push!(types.args, Expr(:tuple, string(name.args[1]), Bool, true))
+                    else
+                        msg = "Boolean options must use false as default value, and will be parsed as flags. got $name"
+                        throw(Meta.ParseError(msg))
+                    end
                 else
                     T = wrap_type(def, name.args[2])
                     push!(types.args, Expr(:tuple, string(name.args[1]), T, false))
