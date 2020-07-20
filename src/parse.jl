@@ -22,7 +22,20 @@ macro cast(alias::String, ex)
 end
 
 macro command_main(xs...)
-    esc(command_main_m(__module__, xs...))
+    if __module__ == Main
+        return esc(command_main_m(__module__, xs...))
+    else
+        return quote
+            $(command_main_m(__module__, xs...))
+
+            function _command_precompile_()
+                ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
+                precompile(Tuple{typeof($(__module__).command_main), Array{String, 1}})
+            end
+
+            _command_precompile_()
+        end |> esc
+    end
 end
 
 _version_number(x::String) = VersionNumber(x)

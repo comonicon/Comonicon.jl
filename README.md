@@ -43,7 +43,7 @@ to create more complicated command line interfaces. You can check the example `I
 
 ## Features
 ### Zero Duplication
-The frontend `@command_main` and `@cast` will try to parse everything you typed and turn them into
+The frontend `@command_main` and `@cast` will try to **parse everything you typed** and turn them into
 part of your command line. This includes your function or module docstrings, your argument and keyword
 argument names, types and default values.
 
@@ -74,8 +74,9 @@ ArgParse example implemented in Comonicon.
 end
 ```
 
-We don't want to compromise on writing DRY code. If you have mentioned it in the documentation, you shouldn't write
-about it again in your code. This is like Python [docopt](https://github.com/docopt/docopt) but with [Fire](https://github.com/google/python-fire) and in Julia.
+We don't want to compromise on writing DRY code. If you have mentioned it in the documentation or somewhere in your script, you shouldn't write about it again in your code. 
+
+This is like Python [docopt](https://github.com/docopt/docopt) but with [Fire](https://github.com/google/python-fire) and in Julia.
 
 ### Zero Overhead
 The backend code generator will generate Julia ASTs directly to parse your command line inputs all in one
