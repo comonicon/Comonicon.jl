@@ -1,0 +1,7 @@
+.DS_Store
+/dev/
+/deps/build.log
+/deps/lib
+.vscode
+/bin/
+Manifest.toml
