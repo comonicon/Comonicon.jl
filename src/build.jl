@@ -1,11 +1,27 @@
 
-const DEFAULT_SYSIMG = joinpath(dirname(pathof(Comonicon)), "..", "deps", "lib", "libcomonicon.$(Libdl.dlext)")
+function project(xs...)
+    joinpath(dirname(dirname(pathof(Comonicon))), xs...)
+end
+
+function default_sysimg()
+    lib = project("deps", "lib", "libcomonicon.$(Libdl.dlext)")
+    if isfile(lib)
+        return lib
+    else
+        return
+    end
+end
 
 default_exename() = joinpath(Sys.BINDIR, Base.julia_exename())
 default_project(mod) = dirname(dirname(pathof(mod)))
 
-function cmd_script(mod; exename=default_exename(), project=default_project(mod), sysimg=DEFAULT_SYSIMG, compile=nothing, optimize=2)
-    shebang = "#!$exename -J$sysimg --project=$project"
+function cmd_script(mod; exename=default_exename(), project=default_project(mod), sysimg=default_sysimg(), compile=nothing, optimize=2)
+    shebang = "#!$exename --project=$project"
+
+    if sysimg !== nothing
+        shebang *= "-J$sysimg"
+    end
+
     if compile in [:yes, :no, :all, :min]
         shebang *= " --compile=$compile"
     end
@@ -20,7 +36,7 @@ function install(mod::Module, name;
         bin=joinpath(first(DEPOT_PATH), "bin"),
         exename=default_exename(),
         project=default_project(mod),
-        sysimg=DEFAULT_SYSIMG,
+        sysimg=default_sysimg(),
         compile=nothing,
         optimize=2)
 
@@ -28,9 +44,11 @@ function install(mod::Module, name;
     file = joinpath(bin, name)
 
     if !ispath(bin)
+        @info "cannot find Julia bin folder creating .julia/bin"
         mkpath(bin)
     end
 
+    @info "generating $file"
     open(file, "w+") do f
         println(f, script)
     end
@@ -45,10 +63,6 @@ function Base.write(io::IO, x::EntryCommand; exec=false)
     if exec
         println(io, "command_main()")
     end
-end
-
-function project(xs...)
-    joinpath(dirname(dirname(pathof(Comonicon))), xs...)
 end
 
 function build()
