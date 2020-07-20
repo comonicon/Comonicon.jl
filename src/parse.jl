@@ -28,7 +28,7 @@ macro command_main(xs...)
         return quote
             $(command_main_m(__module__, xs...))
 
-            precompile(Tuple{typeof($($__module__).command_main), Array{String, 1}})
+            precompile(Tuple{typeof($(__module__).command_main), Array{String, 1}})
         end |> esc
     end
 end
