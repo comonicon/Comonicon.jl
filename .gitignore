@@ -3,5 +3,5 @@
 /deps/build.log
 /deps/lib
 .vscode
-
+page/__site
 Manifest.toml
