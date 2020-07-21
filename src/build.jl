@@ -34,6 +34,25 @@ function cmd_script(mod; exename=PATH.default_exename(), project=PATH.project(mo
     """
 end
 
+function precompile_script(mod::Module)
+    script = "using $mod; $mod.command_main([\"-h\"]);\n"
+ 
+    if isdefined(mod, :CASTED_COMMANDS)
+        for (name, cmd) in mod.CASTED_COMMAND
+            script *= precompile_script(mod, cmd)
+        end
+    end
+    return script
+end
+
+function precompile_script(mod, cmd::LeafCommand)
+    return "$mod.command_main([\"$(cmd_name(cmd))\", \"-h\"]);\n"
+end
+
+function precompile_script(mod, cmd::NodeCommand)
+    return join(map(x->precompile_script(mod, x), cmd.subcmds))
+end
+
 function install(mod::Module, name=default_name(mod);
         bin=joinpath(first(DEPOT_PATH), "bin"),
         exename=PATH.default_exename(),
@@ -49,7 +68,7 @@ function install(mod::Module, name=default_name(mod);
 
         precompile_file = PATH.project(mod, "deps", "precompile.jl")
         open(precompile_file, "w+") do f
-            println(f, "using $mod; $mod.command_main([\"-h\"])")
+            print(f, precompile_script(mod))
         end
 
         sysimg_path = PATH.project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
