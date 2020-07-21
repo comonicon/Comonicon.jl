@@ -21,7 +21,7 @@ The latter allows you to plug in values that you would have defined here.
 @def title       = "Comonicon.jl"
 @def prepath     = "Comonicon.jl"
 @def description = """
-                   all terminal lines are under my command.
+                   all terminals are under my command.
                    """
 @def authors     = "Xiu-Zhe (Roger) Luo and contributors"
 
