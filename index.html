@@ -91,6 +91,10 @@ padding-right:  10px;
         </li>
         
         <li class="nav-item">
+          <a class="nav-link" href="#conventions">Conventions</a>
+        </li>
+        
+        <li class="nav-item">
           <a class="nav-link" href="#workflow">Workflow</a>
         </li>
         
@@ -202,7 +206,67 @@ command_main()</code></pre>       </div>
   </div>
 </section>
 
-<section id="workflow" class="scrollspy">
+<section id="conventions" class="scrollspy">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>
+          Conventions
+        </h2>
+
+<div class="lead">The frontend of Comonicon uses the following convention to map your Julia script to a CLI.</div>
+<p>Comonicon&#39;s frontend restricts the convention to a less flexible but powerful enough semantic, this is a design choice. For more complicated and customized CLI, you should refer to the documentation and use the CLI constructors directly.</p>
+<h3 id="functions"><a href="#functions">Functions</a></h3>
+<p>functions are converted as <code>LeafCommand</code>, which is always the last command in your CLI.</p>
+<pre><code class="julia hljs"><span class="hljs-meta">@cast</span> <span class="hljs-keyword">function</span> command(arg1, arg2=<span class="hljs-string">&quot;name&quot;</span>; opt1::<span class="hljs-built_in">Float64</span>=<span class="hljs-number">0.1</span>, flag::<span class="hljs-built_in">Bool</span>=<span class="hljs-literal">false</span>)
+<span class="hljs-keyword">end</span></code></pre>
+<ul>
+<li><p>function arguments <code>arg1</code> and <code>arg2</code> are treated as command arguments</p>
+</li>
+<li><p>function keyword arguments are mapped via the following rules:</p>
+<ul>
+<li><p>if the keyword argument is a <code>Bool</code> with default value <code>false</code>, it will be treated as a flag &#40;e.g the <code>flag</code> above&#41;</p>
+</li>
+<li><p>keyword argument of <code>Bool</code> type with default value <code>true</code> is not allowed</p>
+</li>
+<li><p>other kinds of keyword arguments are treated as options by default unless you mentioned it is a flag in the docstring.</p>
+</li>
+<li><p>short options are enabled by declaring it in docstring</p>
+</li>
+<li><p>all flags have short options</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="modules"><a href="#modules">Modules</a></h3>
+<p>modules are converted to <code>NodeCommand</code>, it must contain either <code>NodeCommand</code> or <code>LeafCommand</code>, e.g</p>
+<pre><code class="sh hljs">git remote add origin &lt;url&gt;</code></pre>
+<p>here <code>remote</code> is a <code>NodeCommand</code> and <code>add</code> is a <code>LeafCommand</code>.</p>
+<h3 id="doc_strings"><a href="#doc_strings">Doc Strings</a></h3>
+<p>There are only three sections of the doc string will be parsed as annotations, a typical doc string of a Comonicon command looks like following</p>
+<pre><code class="julia hljs"><span class="hljs-string">&quot;&quot;&quot;
+command description.
+
+# Arguments
+
+- `arg1`: description of the first argument
+- `arg2`: description of the second argument
+
+# Options
+
+- `-o,--opt1 &lt;name&gt;`: description of the first option
+
+# Flags
+
+- `-f,--flag`: description of the flag
+&quot;&quot;&quot;</span></code></pre>
+<p>You can still have other sections in the docstring, but these sections will be skipped in your CLI help doc currently.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow" class="scrollspy section-bg-color">
   <div class="container">
     <div class="row">
       <div class="col-lg-10 mx-auto">
