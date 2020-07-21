@@ -1,0 +1,54 @@
+html { scroll-behavior: smooth; }
+header { margin: 0; padding: 0;}
+section { padding: 75px 0; }
+.jumbotron { margin-bottom: 0;}
+
+/* NAVBAR */
+
+#navbar-toggler-cbox:checked ~ .collapse { display:block; }
+.navbar-nav .active { color: #fff; }
+
+.navbar-brand a { color: ghostwhite; }
+.navbar-brand a:hover {
+  color: rgba(255,255,255,.5);
+  text-decoration: none;
+}
+
+a.nav-link.active { color: #fff !important; }
+
+/* FORMATTING */
+
+section h2 { margin-bottom: 1em;}
+
+.lead {
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 30px;
+  margin-bottom: 1em;
+  margin-top: 0;
+}
+
+.franklin-content ul li p { margin: 0; }
+
+.katex { font-size: 1em !important;}
+
+a.anchor {
+    display: block;
+    position: relative;
+    top: -150px;
+    visibility: hidden;
+}
+
+/* CODE */
+
+pre { margin-bottom: 0.5em; }
+pre code.hljs {
+	padding-left: 20px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+pre code.hljs.plaintext {
+	margin-bottom: 1em;
+}
+
+/* ADD ANY SPECIFIC TWEAKS YOU MIGHT WANT HERE */
