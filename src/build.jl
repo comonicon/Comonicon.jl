@@ -1,5 +1,6 @@
 module PATH
 using Libdl
+using ..Comonicon
 
 project(m::Module, xs...) = joinpath(dirname(dirname(pathof(m))), xs...)
 project(xs...) = project(Comonicon, xs...)
