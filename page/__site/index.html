@@ -247,7 +247,7 @@ dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
 sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
 """
 end # Dummy</code></pre>
-<p>Then you can write a <code>deps/build.jl</code> script to install your CLI to <code>.julia/bin</code>
+<p>When called inside a project module &#40;not <code>Main</code>&#41;, the <code>@command_main</code> macro will generate a precompile statement for your CLI entry, so the entry will get precompiled while precompiling the project. Then you can write a <code>deps/build.jl</code> script to install your CLI to <code>.julia/bin</code>
 <pre><code class="language-julia">using Comonicon, IonCLI
 Comonicon.install(Dummy, "dummy")</code></pre>
       </div>

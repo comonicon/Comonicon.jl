@@ -115,7 +115,10 @@ sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
 end # Dummy
 ```
 
-Then you can write a `deps/build.jl` script to install your CLI to `.julia/bin`
+When called inside a project module (not `Main`), the `@command_main` macro will
+generate a precompile statement for your CLI entry, so the entry will get precompiled
+while precompiling the project. Then you can write a `deps/build.jl` script to
+install your CLI to `.julia/bin`
 
 ```julia
 using Comonicon, IonCLI
