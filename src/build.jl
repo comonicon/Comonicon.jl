@@ -59,6 +59,7 @@ function install(mod::Module, name=default_name(mod);
         exename=PATH.default_exename(),
         project=PATH.project(mod),
         sysimg::Bool=false,
+        incremental::Bool=false,
         compile=nothing,
         optimize=2)
 
@@ -74,7 +75,7 @@ function install(mod::Module, name=default_name(mod);
 
         sysimg_path = PATH.project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
         create_sysimage(nameof(mod);
-            sysimage_path=sysimg_path,
+            sysimage_path=sysimg_path, incremental=incremental,
             project=project, precompile_execution_file=precompile_jl
         )
     else
