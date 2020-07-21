@@ -136,7 +136,7 @@ in your CLI help doc currently.
 \begin{:section, title="Workflow"}
 
 However, since this is not created inside a project, Julia will not cache the compilation.
-A better workflow is to create CLI as Julia projects. You can find demo project Ion [here](https://github.com/Roger-luo/Comonicon.jl/tree/master/example/Ion)
+A better workflow is to create CLI as Julia projects. You can find demo project **Ion** [here](https://github.com/Roger-luo/Comonicon.jl/tree/master/example/Ion)
 
 ```julia
 module Dummy
