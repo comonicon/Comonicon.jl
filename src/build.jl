@@ -22,7 +22,7 @@ function cmd_script(mod; exename=PATH.default_exename(), project=PATH.project(mo
     shebang = "#!$exename --project=$project"
 
     if sysimg !== nothing
-        shebang *= "-J$sysimg"
+        shebang *= " -J$sysimg"
     end
 
     if compile in [:yes, :no, :all, :min]
@@ -40,18 +40,18 @@ function precompile_script(mod::Module)
  
     if isdefined(mod, :CASTED_COMMANDS)
         for (name, cmd) in mod.CASTED_COMMANDS
-            script *= precompile_script(mod, cmd)
+            script *= "$mod.command_main([$(precompile_script(mod, cmd))]);\n"
         end
     end
     return script
 end
 
 function precompile_script(mod, cmd::LeafCommand)
-    return "$mod.command_main([\"$(cmd_name(cmd))\", \"-h\"]);\n"
+    return "\"$(cmd_name(cmd))\", \"-h\""
 end
 
 function precompile_script(mod, cmd::NodeCommand)
-    return join(map(x->precompile_script(mod, x), cmd.subcmds))
+    return join(map(x->"\"$(cmd_name(cmd))\", " * precompile_script(mod, x), cmd.subcmds))
 end
 
 function install(mod::Module, name=default_name(mod);
@@ -67,15 +67,15 @@ function install(mod::Module, name=default_name(mod);
             mkpath(PATH.project(mod, "deps", "lib"))
         end
 
-        precompile_file = PATH.project(mod, "deps", "precompile.jl")
-        open(precompile_file, "w+") do f
+        precompile_jl = PATH.project(mod, "deps", "precompile.jl")
+        open(precompile_jl, "w+") do f
             print(f, precompile_script(mod))
         end
 
         sysimg_path = PATH.project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
         create_sysimage(nameof(mod);
             sysimage_path=sysimg_path,
-            project=project, precompile_execution_file=precompile_file
+            project=project, precompile_execution_file=precompile_jl
         )
     else
         sysimg_path = nothing
