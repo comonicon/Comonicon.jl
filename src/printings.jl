@@ -224,7 +224,8 @@ end
 
 function print_list(io::IO, title, list)
     print_section(io, title)
-    for x in list
+
+    for x in sort(list; by=x->first(cmd_name(x)))
         print_cmd(io, x)
         print(io, "\n\n")
     end

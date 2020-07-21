@@ -128,16 +128,14 @@ function cast_m(m, alias::String, ex)
 
     args_types, kwargs_types = parse_command!(ret, m, def, ex)
 
-    push!(ret.args, quote
-        $casted_commands[$(string(def[:name]))] = $(xcommand(def[:name], args_types, kwargs_types; name=alias))
-    end)
+    push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(def[:name], args_types, kwargs_types; name=alias)) )
     return ret
 end
 
 function parse_command!(ret, m, def, ex)
     haskey(def, :name) || error("command entry cannot be annoymous")
     def[:name] isa Symbol || error("command name should be a Symbol")
-    !isdefined(m, def[:name]) || error("command entry cannot be overloaded")
+    # !isdefined(m, def[:name]) || error("command entry cannot be overloaded")
 
     # create command
     ## scan argument types
