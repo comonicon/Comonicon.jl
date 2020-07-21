@@ -80,15 +80,7 @@ end
 LeafCommand(f; kwargs...) = LeafCommand(;entry=f, kwargs...)
 
 cmd_name(cmd::EntryCommand) = cmd_name(cmd.root)
-cmd_name(cmd::NodeCommand) = cmd.name
-cmd_name(cmd::LeafCommand) = cmd.name
-cmd_name(x::Option) = x.name
-cmd_name(x::Flag) = x.name
+cmd_name(cmd) = cmd.name
 
 cmd_doc(cmd::EntryCommand) = cmd_doc(cmd.root)
-cmd_doc(cmd::AbstractCommand) = cmd.doc
-
-cmd_doc(cmd::Option) = cmd.doc
-cmd_doc(cmd::Flag) = cmd.doc
-cmd_doc(cmd::Arg) = cmd.doc
-
+cmd_doc(cmd) = cmd.doc
