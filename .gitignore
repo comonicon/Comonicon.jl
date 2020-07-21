@@ -5,3 +5,7 @@
 .vscode
 page/__site
 Manifest.toml
+/docs/build/
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
