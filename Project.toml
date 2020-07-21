@@ -1,6 +1,6 @@
 name = "Comonicon"
 uuid = "863f3e99-da2a-4334-8734-de3dacbe5542"
-authors = ["Roger-luo"]
+authors = ["Roger-luo and contributors"]
 version = "0.1.0"
 
 [deps]
