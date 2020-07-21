@@ -66,6 +66,72 @@ command_main()
 ```
 \end{:section}
 
+\begin{:section, title="Conventions"}
+
+\lead{
+  The frontend of Comonicon uses the following convention to map your Julia script to a CLI.
+}
+
+Comonicon's frontend restricts the convention to a less flexible but powerful enough
+semantic, this is a design choice. For more complicated and customized CLI, you should
+refer to the documentation and use the CLI constructors directly.
+
+### Functions
+
+functions are converted as `LeafCommand`, which is always the last command in your CLI.
+
+```julia
+@cast function command(arg1, arg2="name"; opt1::Float64=0.1, flag::Bool=false)
+end
+```
+
+- function arguments `arg1` and `arg2` are treated as command arguments
+- function keyword arguments are mapped via the following rules:
+  - if the keyword argument is a `Bool` with default value `false`, it will be treated as a flag (e.g the `flag` above)
+  - keyword argument of `Bool` type with default value `true` is not allowed
+  - other kinds of keyword arguments are treated as options by default unless you mentioned it is a flag in the docstring.
+  - short options are enabled by declaring it in docstring
+  - all flags have short options
+
+
+### Modules
+
+modules are converted to `NodeCommand`, it must contain either `NodeCommand` or `LeafCommand`, e.g
+
+```sh
+git remote add origin <url>
+```
+
+here `remote` is a `NodeCommand` and `add` is a `LeafCommand`.
+
+### Doc Strings
+
+There are only three sections of the doc string will be parsed as annotations, a typical
+doc string of a Comonicon command looks like following
+
+```julia
+"""
+command description.
+
+# Arguments
+
+- `arg1`: description of the first argument
+- `arg2`: description of the second argument
+
+# Options
+
+- `-o,--opt1 <name>`: description of the first option
+
+# Flags
+
+- `-f,--flag`: description of the flag
+"""
+```
+
+You can still have other sections in the docstring, but these sections will be skipped
+in your CLI help doc currently.
+
+\end{:section}
 
 \begin{:section, title="Workflow"}
 
