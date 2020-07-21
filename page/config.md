@@ -35,7 +35,7 @@ The latter allows you to plug in values that you would have defined here.
   - nav_logo_path: where the logo is
 -->
 @def add_docs  = true
-@def docs_url  = "https://yaoquantum.org/"
+@def docs_url  = "https://rogerluo.me/Comonicon.jl/dev/"
 @def docs_name = "Docs"
 
 @def add_nav_logo   = true
