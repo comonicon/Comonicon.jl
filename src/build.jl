@@ -48,7 +48,7 @@ function install(mod::Module, name=default_name(mod);
         end
 
         precompile_file = PATH.project(mod, "deps", "precompile.jl")
-        open(precompile_file) do f
+        open(precompile_file, "w+") do f
             println(f, "using $mod; $mod.command_main([\"-h\"])")
         end
 
