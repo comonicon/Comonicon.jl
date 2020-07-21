@@ -12,7 +12,12 @@
 #     @cast sin(x) = x
 #     @cast cos(x) = x
 # end
+"""
+    @cast <expr>
 
+Cast a Julia expression to a CLI command. Valid Julia expression can
+be functions or modules.
+"""
 macro cast(ex)
     esc(cast_m(__module__, "", ex))
 end
@@ -21,6 +26,16 @@ macro cast(alias::String, ex)
     esc(cast_m(__module__, alias, ex))
 end
 
+"""
+    @command_main [name=<default name>] [version="0.0.0"] [doc=""]
+
+The main entry of your command.
+
+    @command_main <function expr>
+
+When use in front of a function expression it will treat this function
+as the only command you want to cast and it behaves like `@cast`.
+"""
 macro command_main(xs...)
     if __module__ == Main
         return esc(command_main_m(__module__, xs...))
@@ -206,6 +221,33 @@ function wrap_type(def, type)
 end
 
 # module runtime parsing
+"""
+    command(module; name="", doc=docstring(m))
+
+Convert a module to a CLI command [`NodeCommand`](@ref).
+
+    command(f::Function, args, kwargs; name="")
+
+Convert a function to a CLI command [`LeafCommand`](@ref).
+It requires a `Vector` of function arguments and
+a `Vector` of function kwargs.
+
+The element of arguments vector is a tuple
+(name, type, require):
+
+- `name::String` is the name of argument
+- `type::DataType` is the type of this argument, can be `Any` if you don't want to specify
+- `require::Bool` indicates the whether this argument is required.
+
+The element of kwargs vector is also a tuple
+(name, type, short):
+
+- `name::String` is the name of kwarg
+- `type::DataType` is the type of this kwarg, can be `Any` if you don't want to specify
+- `short::Bool` is a flag that indicates whether this kwarg has short option.
+"""
+function command end
+
 function command(m::Module; name="", doc=docstring(m))    
     if isempty(name) # force to have a valid name
         name = default_name(m)

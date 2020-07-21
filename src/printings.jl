@@ -1,3 +1,10 @@
+"""
+    print_cmd([io, ]cmd)
+
+Print a command object. This is used to generate command help.
+"""
+function print_cmd end
+
 function Base.show(io::IO, cmd::NodeCommand)
     printstyled(io, cmd_name(cmd); color=:light_blue, bold=true)
     printstyled(io, " <command>", color=:light_blue)

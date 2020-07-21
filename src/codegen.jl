@@ -18,6 +18,12 @@ function read_arg(ctx)
     return ex
 end
 
+"""
+    codegen(x)
+
+Generates Julia AST and wrap them in the entry function `command_main`
+for the given command object `x`.
+"""
 function codegen(x)
     ctx = CmdCtx()
     defs = Dict{Symbol, Any}()
