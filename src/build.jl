@@ -1,7 +1,8 @@
+module PATH
+using Libdl
 
-function project(xs...)
-    joinpath(dirname(dirname(pathof(Comonicon))), xs...)
-end
+project(m::Module, xs...) = joinpath(dirname(dirname(pathof(m))), xs...)
+project(xs...) = project(Comonicon, xs...)
 
 function default_sysimg()
     lib = project("deps", "lib", "libcomonicon.$(Libdl.dlext)")
@@ -13,9 +14,10 @@ function default_sysimg()
 end
 
 default_exename() = joinpath(Sys.BINDIR, Base.julia_exename())
-default_project(mod) = dirname(dirname(pathof(mod)))
 
-function cmd_script(mod; exename=default_exename(), project=default_project(mod), sysimg=default_sysimg(), compile=nothing, optimize=2)
+end
+
+function cmd_script(mod; exename=PATH.default_exename(), project=PATH.project(mod), sysimg=PATH.default_sysimg(), compile=nothing, optimize=2)
     shebang = "#!$exename --project=$project"
 
     if sysimg !== nothing
@@ -32,15 +34,34 @@ function cmd_script(mod; exename=default_exename(), project=default_project(mod)
     """
 end
 
-function install(mod::Module, name;
+function install(mod::Module, name=default_name(mod);
         bin=joinpath(first(DEPOT_PATH), "bin"),
-        exename=default_exename(),
-        project=default_project(mod),
-        sysimg=default_sysimg(),
+        exename=PATH.default_exename(),
+        project=PATH.project(mod),
+        sysimg::Bool=false,
         compile=nothing,
         optimize=2)
 
-    script = cmd_script(mod; exename=exename, project=project, sysimg=sysimg, compile=compile, optimize=optimize)
+    if sysimg
+        if !ispath(PATH.project(mod, "deps", "lib"))
+            mkpath(PATH.project(mod, "deps", "lib"))
+        end
+
+        precompile_file = PATH.project(mod, "deps", "precompile.jl")
+        open(precompile_file) do f
+            println(f, "using $mod; $mod.command_main([\"-h\"])")
+        end
+
+        sysimg_path = PATH.project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
+        create_sysimage(nameof(mod);
+            sysimage_path=sysimg_path,
+            project=project, precompile_execution_file=precompile_file
+        )
+    else
+        sysimg_path = nothing
+    end
+
+    script = cmd_script(mod; exename=exename, project=project, sysimg=sysimg_path, compile=compile, optimize=optimize)
     file = joinpath(bin, name)
 
     if !ispath(bin)
@@ -73,5 +94,5 @@ function build()
     create_sysimage([:Comonicon, :Test];
         sysimage_path=project("deps", "lib", "libcomonicon.$(Libdl.dlext)"),
         project=project(), precompile_execution_file=project("test", "runtests.jl")
-    )        
+    )
 end
