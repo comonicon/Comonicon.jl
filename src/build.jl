@@ -61,22 +61,29 @@ function install(mod::Module, name=default_name(mod);
         sysimg::Bool=false,
         incremental::Bool=false,
         compile=nothing,
+        filter_stdlibs=false,
+        lib_path=PATH.project(mod, "deps", "lib"),
         optimize=2)
 
     if sysimg
-        if !ispath(PATH.project(mod, "deps", "lib"))
-            mkpath(PATH.project(mod, "deps", "lib"))
+        if !ispath(lib_path)
+            @info "creating library path: $lib_path"
+            mkpath(lib_path)
         end
 
         precompile_jl = PATH.project(mod, "deps", "precompile.jl")
+        @info "generating precompile execution file: $precompile_jl"
         open(precompile_jl, "w+") do f
             print(f, precompile_script(mod))
         end
 
+        @info "compile under project: $project"
+        @info "incremental: $incremental"
+        @info "filter stdlibs: $filter_stdlibs"
         sysimg_path = PATH.project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
         create_sysimage(nameof(mod);
             sysimage_path=sysimg_path, incremental=incremental,
-            project=project, precompile_execution_file=precompile_jl
+            project=project, precompile_execution_file=precompile_jl, filter_stdlibs=filter_stdlibs,
         )
     else
         sysimg_path = nothing
