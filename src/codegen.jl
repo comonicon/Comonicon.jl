@@ -312,7 +312,7 @@ function read_match(parameters, it, option::Option)
     type = option.arg.type
     if type === Any
         m -> quote
-            $(push_x(parameters, option, :($m[1])))
+            $(push_x(parameters, option, :(String($m[1]))))
             deleteat!(ARGS, $it)
             $it = $it - 1
         end
