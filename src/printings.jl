@@ -6,12 +6,12 @@ Print a command object. This is used to generate command help.
 function print_cmd end
 
 function Base.show(io::IO, cmd::NodeCommand)
-    printstyled(io, cmd_name(cmd); color=:light_blue, bold=true)
-    printstyled(io, " <command>", color=:light_blue)
+    printstyled(io, cmd_name(cmd); color = :light_blue, bold = true)
+    printstyled(io, " <command>", color = :light_blue)
 end
 
 function Base.show(io::IO, entry::EntryCommand)
-    printstyled(io, cmd_name(entry); color=:light_blue, bold=true)
+    printstyled(io, cmd_name(entry); color = :light_blue, bold = true)
 
     if entry.version > v"0.0.0"
         print(io, " v", entry.version)
@@ -19,14 +19,14 @@ function Base.show(io::IO, entry::EntryCommand)
 end
 
 function Base.show(io::IO, cmd::LeafCommand)
-    printstyled(io, cmd_name(cmd); color=:light_blue, bold=true)
+    printstyled(io, cmd_name(cmd); color = :light_blue, bold = true)
 
     if !isempty(cmd.options)
-        printstyled(io, " [options...]"; color=:light_cyan)
+        printstyled(io, " [options...]"; color = :light_cyan)
     end
 
     if !isempty(cmd.flags)
-        printstyled(io, " [flags...]"; color=:light_cyan)
+        printstyled(io, " [flags...]"; color = :light_cyan)
     end
 
     if !isempty(cmd.args)
@@ -39,7 +39,7 @@ function Base.show(io::IO, opt::Option)
     if opt.short
         print_option_or_flag(io, "-", first(opt.name), ", ")
     end
-    print_option_or_flag(io,  "--", opt.name)
+    print_option_or_flag(io, "--", opt.name)
     print(io, " ", opt.arg)
 end
 
@@ -92,7 +92,7 @@ function print_cmd(io::IO, cmd::LeafCommand)
     end
 end
 
-function print_cmd(io::IO, x::Union{Option, Flag})
+function print_cmd(io::IO, x::Union{Option,Flag})
     partition(io, x, cmd_doc(x))
 end
 
@@ -118,7 +118,7 @@ function print_version(io::IO)
     print(io, " "^doc_indent, VERSION_FLAG_DOC, "\n\n")
 end
 
-function partition(io, cmd, xs...; width=80)
+function partition(io, cmd, xs...; width = 80)
     doc_indent = get(io, :doc_indent, -1)
     doc_width = width - doc_indent
     first_line_indent = first_line_doc_indent(io, cmd)
@@ -135,7 +135,7 @@ function partition(io, cmd, xs...; width=80)
     end
 end
 
-function scan_indent(x::NodeCommand, min_indent=4)
+function scan_indent(x::NodeCommand, min_indent = 4)
     indent = min_indent
     indent = max(indent, length(HELP_FLAG) + min_indent)
     indent = max(indent, length(VERSION_FLAG) + min_indent)
@@ -146,13 +146,13 @@ function scan_indent(x::NodeCommand, min_indent=4)
     return indent
 end
 
-function scan_indent(x::LeafCommand, min_indent=4)
+function scan_indent(x::LeafCommand, min_indent = 4)
     indent = min_indent
     indent = max(indent, length(HELP_FLAG) + min_indent)
     indent = max(indent, length(VERSION_FLAG) + min_indent)
 
     for arg in x.args
-        arg_str = sprint(print, arg; context=:notation=>false)
+        arg_str = sprint(print, arg; context = :notation => false)
         indent = max(indent, length(arg_str) + min_indent)
     end
 
@@ -169,12 +169,18 @@ end
 function first_line_doc_indent(io::IO, x)
     doc_indent = get(io, :doc_indent, -1)
     notation = get(io, :notation, true)
-    x_str = sprint(print, x; context=:notation=>notation)
+    x_str = sprint(print, x; context = :notation => notation)
     return doc_indent > 0 ? doc_indent - length(x_str) : 4
 end
 
-function wrap_io(io::IO, x, notation=true)
-    return IOContext(io, :indent=>INDENT, :doc_indent=>scan_indent(x), :inline=>true, :notation=>notation)
+function wrap_io(io::IO, x, notation = true)
+    return IOContext(
+        io,
+        :indent => INDENT,
+        :doc_indent => scan_indent(x),
+        :inline => true,
+        :notation => notation,
+    )
 end
 
 function print_title(io::IO, x)
@@ -185,7 +191,7 @@ function print_title(io::IO, x)
     println(io)
 end
 
-function print_body(io::IO, cmd::NodeCommand, isentry=false)
+function print_body(io::IO, cmd::NodeCommand, isentry = false)
     io = wrap_io(io, cmd)
     print_list(io, "Commands", cmd.subcmds)
 
@@ -195,7 +201,7 @@ function print_body(io::IO, cmd::NodeCommand, isentry=false)
     println(io)
 end
 
-function print_body(io::IO, cmd::LeafCommand, isentry=false)
+function print_body(io::IO, cmd::LeafCommand, isentry = false)
     io = wrap_io(io, cmd, false)
     if !isempty(cmd.args)
         print_list(io, "Args", cmd.args)
@@ -218,14 +224,14 @@ function print_body(io::IO, cmd::LeafCommand, isentry=false)
 end
 
 function print_section(io::IO, sec)
-    printstyled(io, sec; bold=true)
+    printstyled(io, sec; bold = true)
     print(io, "\n\n")
 end
 
 function print_list(io::IO, title, list)
     print_section(io, title)
 
-    for x in sort(list; by=x->first(cmd_name(x)))
+    for x in sort(list; by = x -> first(cmd_name(x)))
         print_cmd(io, x)
         print(io, "\n\n")
     end
