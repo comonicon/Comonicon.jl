@@ -1,8 +1,8 @@
 function content(md)
     (md isa Markdown.MD) &&
-    (md.content[1] isa Markdown.MD) &&
-    (md.content[1].content[1] isa Markdown.MD) &&
-    return md.content[1].content[1].content
+        (md.content[1] isa Markdown.MD) &&
+        (md.content[1].content[1] isa Markdown.MD) &&
+        return md.content[1].content[1].content
 
     return []
 end
@@ -55,11 +55,11 @@ function parse_intro(md::Markdown.MD)
     return join(map(rm_format, intro), "\n")
 end
 
-parse_flags(::Nothing) = Dict{String, Tuple{String, Bool}}()
-parse_options(::Nothing) = Dict{String, Tuple{String, String, Bool}}()
+parse_flags(::Nothing) = Dict{String,Tuple{String,Bool}}()
+parse_options(::Nothing) = Dict{String,Tuple{String,String,Bool}}()
 
 function parse_flags(raw::Markdown.List)
-    options = Dict{String, Tuple{String, Bool}}()
+    options = Dict{String,Tuple{String,Bool}}()
     # (name, doc, short)
     for each in raw.items
         name, doc = parse_item(each[1])
@@ -72,7 +72,7 @@ function parse_flags(raw::Markdown.List)
             name = startswith(names[1], "--") ? lstrip(names[1], '-') :
                 startswith(names[2], "--") ? lstrip(names[2], '-') :
                 throw(Meta.ParseError("invalid flag: $name"))
-            
+
             options[name] = (doc, true)
         else
             throw(Meta.ParseError("invalid flag syntax: $name"))
@@ -82,12 +82,12 @@ function parse_flags(raw::Markdown.List)
 end
 
 function parse_options(raw::Markdown.List)
-    options = Dict{String, Tuple{String, String, Bool}}()
+    options = Dict{String,Tuple{String,String,Bool}}()
     # (name, doc, short)
     for each in raw.items
         name, doc = parse_item(each[1])
         m = match(r"^(-.*) +<(.+)>$", name)
-        
+
         if m === nothing
             err_m = match(r"^-.*$", strip(name))
             if err_m === nothing
@@ -115,10 +115,10 @@ function parse_options(raw::Markdown.List)
     return options
 end
 
-parse_args(::Nothing) = Dict{String, String}()
+parse_args(::Nothing) = Dict{String,String}()
 
 function parse_args(raw::Markdown.List)
-    args = Dict{String, String}()
+    args = Dict{String,String}()
     for each in raw.items
         name, doc = parse_item(each[1])
         args[name] = doc
@@ -128,7 +128,8 @@ end
 
 function parse_item(raw::Markdown.Paragraph)
     length(raw.content) == 2 || throw(Meta.ParseError("invalid command entry argument doc syntax"))
-    raw.content[1] isa Markdown.Code || throw(Meta.ParseError("command argument name should be marked by inline code"))
+    raw.content[1] isa Markdown.Code ||
+        throw(Meta.ParseError("command argument name should be marked by inline code"))
     name = raw.content[1].code
     doc = parse_docstring(raw.content[2])
     return name, doc

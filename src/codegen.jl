@@ -6,9 +6,9 @@ end
 
 CmdCtx() = CmdCtx(1, gensym(:help), gensym(:version))
 
-help_str(x) = sprint(print_cmd, x; context=:color=>true)
+help_str(x) = sprint(print_cmd, x; context = :color => true)
 print_help(x) = :(print($(help_str(x))))
-print_version(cmd::EntryCommand) = :(println($(sprint(show, cmd; context=:color=>true))))
+print_version(cmd::EntryCommand) = :(println($(sprint(show, cmd; context = :color => true))))
 
 hasparameters(cmd::LeafCommand) = (!isempty(cmd.flags)) || (!isempty(cmd.options))
 
@@ -26,7 +26,7 @@ for the given command object `x`.
 """
 function codegen(x)
     ctx = CmdCtx()
-    defs = Dict{Symbol, Any}()
+    defs = Dict{Symbol,Any}()
     defs[:name] = :command_main
     defs[:args] = [Expr(:kw, :(ARGS::Vector{String}), :ARGS)]
     defs[:body] = codegen(ctx, x)
@@ -35,8 +35,8 @@ end
 
 function print_error(cmd, msg)
     quote
-        printstyled("Error: "; color=:red, bold=true)
-        printstyled($msg; color=:red)
+        printstyled("Error: "; color = :red, bold = true)
+        printstyled($msg; color = :red)
         println()
         $(print_help(cmd))
         return 1
@@ -80,7 +80,7 @@ function codegen(ctx, cmd::EntryCommand)
     end
 end
 
-function codegen_help(ctx, cmd::NodeCommand, msg=print_help(cmd))
+function codegen_help(ctx, cmd::NodeCommand, msg = print_help(cmd))
     return quote
         if $(ctx.help) == $(ctx.ptr)
             $msg
@@ -89,7 +89,7 @@ function codegen_help(ctx, cmd::NodeCommand, msg=print_help(cmd))
     end
 end
 
-function codegen_help(ctx, cmd::LeafCommand, msg=print_help(cmd))
+function codegen_help(ctx, cmd::LeafCommand, msg = print_help(cmd))
     return quote
         if $(ctx.help) >= $(ctx.ptr)
             $msg
@@ -119,7 +119,7 @@ end
 function codegen_body(ctx, cmd::LeafCommand)
     parameters = gensym(:parameters)
     ex = Expr(:block)
-    
+
     if hasparameters(cmd)
         push!(ex.args, :($parameters = []))
     end
@@ -135,7 +135,10 @@ function codegen_body(ctx, cmd::LeafCommand)
     nrequires = nrequired_args(cmd.args)
 
     if nrequires > 0
-        err = print_error(cmd, :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"))
+        err = print_error(
+            cmd,
+            :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"),
+        )
         push!(ex.args, quote
             if $n_args < $nrequires
                 $err
@@ -145,7 +148,10 @@ function codegen_body(ctx, cmd::LeafCommand)
 
     # Error: too much arguments
     nmost = length(cmd.args)
-    err = print_error(cmd, :("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
+    err = print_error(
+        cmd,
+        :("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"),
+    )
     push!(ex.args, quote
         if $n_args > $nmost
             $err
@@ -192,7 +198,7 @@ function push_arg!(ex, ctx, i, arg)
     if arg.type in [Any, String, AbstractString]
         push!(ex.args, :(ARGS[$(ctx.ptr+i-1)]))
     else
-        push!(ex.args, :(convert($(arg.type), Meta.parse(ARGS[$(ctx.ptr+i-1)]))))
+        push!(ex.args, :(convert($(arg.type), Meta.parse(ARGS[$(ctx.ptr + i - 1)]))))
     end
     return ex
 end
@@ -204,7 +210,7 @@ function codegen_body(ctx, cmd::NodeCommand)
 
     start = ctx.ptr
     for subcmd in cmd.subcmds
-        push!(ex.args, Expr(:if, :($(read_arg(ctx)) == $(subcmd.name)), codegen(ctx, subcmd)) )
+        push!(ex.args, Expr(:if, :($(read_arg(ctx)) == $(subcmd.name)), codegen(ctx, subcmd)))
         # reset ptr
         ctx.ptr = start
     end
@@ -215,21 +221,22 @@ function codegen_body(ctx, cmd::NodeCommand)
 end
 
 function codegen_options_and_flags(ctx, parameters, cmd::LeafCommand)
-    regexes = []; actions = []
+    regexes = []
+    actions = []
     arg = gensym(:arg)
     it = gensym(:it)
 
     for opt in cmd.options
         push!(regexes, Regex("^--$(cmd_name(opt))=(.*)"))
         push!(regexes, regex_flag(opt))
-    
+
         push!(actions, read_match(parameters, it, opt))
         push!(actions, read_forward(parameters, it, opt))
 
         if opt.short
             push!(regexes, Regex("^-$(first(cmd_name(opt)))(.*)"))
             push!(regexes, short_regex_flag(opt))
-    
+
             push!(actions, read_match(parameters, it, opt))
             push!(actions, read_forward(parameters, it, opt))
         end
@@ -237,12 +244,12 @@ function codegen_options_and_flags(ctx, parameters, cmd::LeafCommand)
 
     for flag in cmd.flags
         push!(regexes, regex_flag(flag))
-    
+
         push!(actions, read_flag(parameters, it, flag))
 
         if flag.short
             push!(regexes, short_regex_flag(flag))
-    
+
             push!(actions, read_flag(parameters, it, flag))
         end
     end
@@ -272,7 +279,12 @@ function generate_match(i, regexes, actions, arg, it, cmd)
 
         return quote
             $m = match($regex, $arg)
-            $(Expr(:if, :($m === nothing), generate_match(i+1, regexes, actions, arg, it, cmd), action(m)))
+            $(Expr(
+                :if,
+                :($m === nothing),
+                generate_match(i + 1, regexes, actions, arg, it, cmd),
+                action(m),
+            ))
         end
     else
         err_msg = :("unknown option $($arg)")
@@ -288,7 +300,7 @@ function read_forward(parameters, it, option::Option)
         push_ex = push_x(parameters, option, :(convert($type, Meta.parse(ARGS[$it+1]))))
     end
 
-    return m->quote
+    return m -> quote
         $it < length(ARGS) || error("expect an argument")
         $push_ex
         deleteat!(ARGS, ($it, $it + 1))
@@ -299,13 +311,13 @@ end
 function read_match(parameters, it, option::Option)
     type = option.arg.type
     if type === Any
-        m->quote
+        m -> quote
             $(push_x(parameters, option, :($m[1])))
             deleteat!(ARGS, $it)
             $it = $it - 1
         end
     else
-        return m->quote
+        return m -> quote
             $(push_x(parameters, option, :(convert($type, Meta.parse($m[1])))))
             deleteat!(ARGS, $it)
             $it = $it - 1
@@ -314,7 +326,7 @@ function read_match(parameters, it, option::Option)
 end
 
 function read_flag(parameters, it, flag)
-    m->quote
+    m -> quote
         $(push_x(parameters, flag, true))
         deleteat!(ARGS, $it)
         $it = $it - 1
