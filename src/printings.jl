@@ -55,7 +55,7 @@ function Base.show(io::IO, arg::Arg)
     show_notation = notation && !arg.require
     show_notation && print_args(io, "[")
 
-    if arg.type === Any
+    if arg.type in [Any, String] || arg.type <: AbstractString
         print_args(io, "<", arg.name, ">")
     else
         print_args(io, "<", arg.name, "::", arg.type, ">")
