@@ -36,7 +36,7 @@ module Snippet
 
 using ..Comonicon
 
-function call(m::Module, name::Union{Symbol, Expr}, xs...; kwargs...)
+function call(m::Module, name::Union{Symbol,Expr}, xs...; kwargs...)
     if isempty(kwargs)
         return Expr(:call, GlobalRef(m, name), xs...)
     else
@@ -93,7 +93,7 @@ attached to the preceding word.
 function splittext(s)
     # split text into array, keeping all separators
     # hyphens stay with first word
-    result = Array{String, 1}()
+    result = Array{String,1}()
     iobuffer = IOBuffer()
     for c in s
         if isspace(c)
@@ -111,7 +111,7 @@ function splittext(s)
     return result
 end
 
-function splitlines(s, width=80)
+function splitlines(s, width = 80)
     words = splittext(s)
     lines = String[]
     current_line = String[]

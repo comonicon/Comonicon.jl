@@ -17,7 +17,7 @@ create a project or package.
 
 - `-i, --interactive`: enable to start interactive configuration interface.
 """
-@cast function create(path; interactive::Bool=false)
+@cast function create(path; interactive::Bool = false)
     fullpath = project_path(path)
 
     if ispath(fullpath)
@@ -25,13 +25,13 @@ create a project or package.
     end
 
     if interactive
-        t = Template(;dir=dirname(fullpath), interactive=true)
+        t = Template(; dir = dirname(fullpath), interactive = true)
         t(basename(path))
     end
 
     # TODO: use .ionrc to save user configuration
     # and reuse it next time
-    t = Template(;dir=dirname(fullpath))
+    t = Template(; dir = dirname(fullpath))
     t(basename(path))
     return
 end
@@ -54,7 +54,7 @@ clone a package repo to a local directory.
 - `to` : a local position, default to be the repository name (without .jl)
 
 """
-@cast function clone(url, to=default_clone_name(url); credential="")
+@cast function clone(url, to = default_clone_name(url); credential = "")
     LibGit2.clone(url, to)
     return
 end
@@ -77,7 +77,13 @@ add package/project to the closest project.
 - `-g, --glob`: add package to global shared environment.
 
 """
-@cast function add(url; version::String="", rev::String="", subdir::String="", glob::Bool=false)
+@cast function add(
+    url;
+    version::String = "",
+    rev::String = "",
+    subdir::String = "",
+    glob::Bool = false,
+)
     kwargs = []
     if isurl(url)
         push!(kwargs, "url=\"$url\"")
@@ -103,7 +109,7 @@ add package/project to the closest project.
     if glob
         run(`$(Base.julia_cmd()) $cmd`)
     else
-        withenv("JULIA_PROJECT"=>"@.") do
+        withenv("JULIA_PROJECT" => "@.") do
             run(`$(Base.julia_cmd()) $cmd`)
         end
     end
@@ -124,10 +130,10 @@ to the dev folder of the current project. You can specify `--shared` flag to use
 - `-s, --shared`: controls whether to use the shared develop folder.
 
 """
-@cast function dev(url; shared::Bool=false)
+@cast function dev(url; shared::Bool = false)
     shared_flag = shared ? "--shared" : "--local"
     cmd = Cmd(["-e", "using Pkg; pkg\"dev $shared_flag $url\" "])
-    withenv("JULIA_PROJECT"=>"@.") do
+    withenv("JULIA_PROJECT" => "@.") do
         run(`$(Base.julia_cmd()) $cmd`)
     end
 end
@@ -139,24 +145,22 @@ Update a package. If no posistional argument is given, update all packages in cu
 
 - `pkg`: package name.
 """
-@cast function update(pkg="")
+@cast function update(pkg = "")
     if isempty(pkg)
         cmd = Cmd(["-e", "using Pkg; pkg\"up\" "])
     else
         cmd = Cmd(["-e", "using Pkg; pkg\"up $pkg\" "])
     end
-    withenv("JULIA_PROJECT"=>"@.") do
+    withenv("JULIA_PROJECT" => "@.") do
         run(`$(Base.julia_cmd()) $cmd`)
     end
 end
 
-@doc Docs.doc(update)
-@cast up(pkg="") = update(pkg)
+@doc Docs.doc(update) @cast up(pkg = "") = update(pkg)
 
 """
 """
-@cast function build(pkg=""; verbose::Bool=false)
-end
+@cast function build(pkg = ""; verbose::Bool = false) end
 
 # @cast function register()
 # end

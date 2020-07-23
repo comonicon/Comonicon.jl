@@ -20,9 +20,9 @@ include("markdown.jl")
 include("parse.jl")
 include("validate.jl")
 
-function main(m::Module=Main; name=default_name(m), doc="", version=get_version(m))
+function main(m::Module = Main; name = default_name(m), doc = "", version = get_version(m))
     cmd = NodeCommand(name, collect(values(m.CASTED_COMMANDS)), doc)
-    return EntryCommand(cmd; version=version)
+    return EntryCommand(cmd; version = version)
 end
 
 include("precompile.jl")

@@ -43,7 +43,7 @@ macro command_main(xs...)
         return quote
             $(command_main_m(__module__, xs...))
 
-            precompile(Tuple{typeof($(__module__).command_main), Array{String, 1}})
+            precompile(Tuple{typeof($(__module__).command_main),Array{String,1}})
         end |> esc
     end
 end
@@ -54,20 +54,26 @@ _version_number(x::VersionNumber) = x
 function command_main_m(m, kwargs...)
     if !isempty(kwargs)
         ex = first(kwargs)
-        def = splitdef(ex; throw=false)
+        def = splitdef(ex; throw = false)
         if def !== nothing
             ret = Expr(:block)
             push!(ret.args, ex)
             push!(ret.args, :(Core.@__doc__ $(def[:name])))
-        
+
             args_types, kwargs_types = parse_command!(ret, m, def, ex)
-        
-            push!(ret.args, :(Base.eval($m, codegen(EntryCommand(command($(def[:name]), $args_types, $kwargs_types))))))
+
+            push!(
+                ret.args,
+                :(Base.eval(
+                    $m,
+                    codegen(EntryCommand(command($(def[:name]), $args_types, $kwargs_types))),
+                )),
+            )
             return ret
         end
     end
 
-    configs = Dict{Symbol, Any}(:name=>default_name(m), :version=>get_version(m), :doc=>"")
+    configs = Dict{Symbol,Any}(:name => default_name(m), :version => get_version(m), :doc => "")
     for kw in kwargs
         kw isa Expr && kw.head == :(=) || throw(ParseError("expect keyword argument"))
 
@@ -80,7 +86,7 @@ function command_main_m(m, kwargs...)
 
     if isdefined(m, :CASTED_COMMANDS)
         cmd = NodeCommand(configs[:name], collect(values(m.CASTED_COMMANDS)), configs[:doc])
-        return codegen(EntryCommand(cmd; version=_version_number(configs[:version])))
+        return codegen(EntryCommand(cmd; version = _version_number(configs[:version])))
     end
 
     throw(Meta.ParseError("define commands using @cast first"))
@@ -101,22 +107,25 @@ function cast_m(m, alias::String, ex)
     ret = Expr(:block)
     if !isdefined(m, :CASTED_COMMANDS)
         # create registry
-        push!(ret.args, :(const CASTED_COMMANDS = Dict{String, Any}()))
+        push!(ret.args, :(const CASTED_COMMANDS = Dict{String,Any}()))
     end
 
     casted_commands = GlobalRef(m, :CASTED_COMMANDS)
 
     if ex isa Symbol
-        push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(ex; name=alias)))
+        push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(ex; name = alias)))
         return ret
     end
 
-    def = splitdef(ex; throw=false)
+    def = splitdef(ex; throw = false)
 
     if def === nothing # not a function
         if ex.head === :module
             push!(ret.args, ex)
-            push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(ex.args[2]; name=alias)))
+            push!(
+                ret.args,
+                Snippet.call(set_cmd!, casted_commands, xcommand(ex.args[2]; name = alias)),
+            )
             return ret
         else
             throw(ParseError("invalid syntax $ex"))
@@ -128,7 +137,14 @@ function cast_m(m, alias::String, ex)
 
     args_types, kwargs_types = parse_command!(ret, m, def, ex)
 
-    push!(ret.args, Snippet.call(set_cmd!, casted_commands, xcommand(def[:name], args_types, kwargs_types; name=alias)) )
+    push!(
+        ret.args,
+        Snippet.call(
+            set_cmd!,
+            casted_commands,
+            xcommand(def[:name], args_types, kwargs_types; name = alias),
+        ),
+    )
     return ret
 end
 
@@ -246,14 +262,14 @@ The element of kwargs vector is also a tuple
 """
 function command end
 
-function command(m::Module; name="", doc=docstring(m))    
+function command(m::Module; name = "", doc = docstring(m))
     if isempty(name) # force to have a valid name
         name = default_name(m)
     end
     NodeCommand(name, collect(values(m.CASTED_COMMANDS)), doc)
 end
 
-function command(f::Function, args, kwargs; name="")
+function command(f::Function, args, kwargs; name = "")
     if isempty(name) # force to have a valid name
         name = default_name(f)
     end
@@ -262,16 +278,19 @@ function command(f::Function, args, kwargs; name="")
     intro, doc_args, option_docs, flag_docs = parse_doc(md)
     args = create_args(args, doc_args)
     options, flags = create_options_and_flags(kwargs, option_docs, flag_docs)
-    LeafCommand(f; name=name, args=args, options=options, flags=flags, doc=intro)
+    LeafCommand(f; name = name, args = args, options = options, flags = flags, doc = intro)
 end
 
 function docstring(x)
-    return sprint(Base.Docs.doc(x); context=:color=>true) do io, x
+    return sprint(Base.Docs.doc(x); context = :color => true) do io, x
         show(io, MIME"text/plain"(), x)
     end
 end
 
-create_args(args, docs) = [Arg(name; type=type, require=require, doc=get(docs, name, "")) for (name, type, require) in args]
+create_args(args, docs) = [
+    Arg(name; type = type, require = require, doc = get(docs, name, ""))
+    for (name, type, require) in args
+]
 
 function create_options_and_flags(kwargs, option_docs, flag_docs)
     options = Option[]
@@ -279,16 +298,16 @@ function create_options_and_flags(kwargs, option_docs, flag_docs)
     for (name, type, short) in kwargs
         if haskey(option_docs, name)
             arg, doc, doc_short = option_docs[name]
-            push!(options, Option(name, Arg(arg; type=type), doc, doc_short || short))
+            push!(options, Option(name, Arg(arg; type = type), doc, doc_short || short))
         elseif haskey(flag_docs, name)
             doc, doc_short = flag_docs[name]
             push!(flags, Flag(name, doc, doc_short || short))
         else
             # by default, short options are flags
             if short
-                push!(flags, Flag(name; short=short))
+                push!(flags, Flag(name; short = short))
             else
-                push!(options, Option(name, Arg("::$type"; type=type); short=short))
+                push!(options, Option(name, Arg("::$type"; type = type); short = short))
             end
         end
     end
