@@ -191,7 +191,7 @@ function create_entry(m, kwargs...)
 
     push!(ret.args, :($var_cmd = $cmd))
     push!(ret.args, :($var_entry = $entry))
-    push!(ret.args, xcall(set_cmd!, casted_commands(m), var_entry))
+    push!(ret.args, xcall(set_cmd!, casted_commands(m), var_entry, "main"))
     push!(ret.args, precompile_or_exec(m, var_entry))
     return ret
 end

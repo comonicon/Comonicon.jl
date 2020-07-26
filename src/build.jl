@@ -44,7 +44,7 @@ function cmd_script(
 end
 
 function precompile_script(mod::Module)
-    script = "using $mod; $mod.command_main([\"-h\"]);\n"
+    script = "using $mod;\n$mod.command_main([\"-h\"]);\n"
 
     if isdefined(mod, :CASTED_COMMANDS)
         for (name, cmd) in mod.CASTED_COMMANDS
