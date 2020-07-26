@@ -99,7 +99,7 @@ end
 
 function codegen_version(ctx::ASTCtx, cmd::NodeCommand, msg)
     return quote
-        if $(ctx.help) == $(ctx.ptr)
+        if $(ctx.version) == $(ctx.ptr)
             $msg
             return 0
         end
@@ -108,7 +108,7 @@ end
 
 function codegen_version(ctx::ASTCtx, cmd::LeafCommand, msg)
     return quote
-        if $(ctx.help) >= $(ctx.ptr)
+        if $(ctx.version) >= $(ctx.ptr)
             $msg
             return 0
         end
@@ -182,7 +182,7 @@ function codegen_params(ctx::ASTCtx, params::Symbol, cmd::LeafCommand)
 
         if opt.short
             push!(regexes, regex_short_option(opt))
-            push!(regexes, short_regex_flag(opt))
+            push!(regexes, regex_short_flag(opt))
 
             push!(actions, read_match(params, it, opt))
             push!(actions, read_forward(params, it, opt))
@@ -194,7 +194,7 @@ function codegen_params(ctx::ASTCtx, params::Symbol, cmd::LeafCommand)
         push!(actions, read_flag(params, it, flag))
 
         if flag.short
-            push!(regexes, short_regex_flag(flag))
+            push!(regexes, regex_short_flag(flag))
             push!(actions, read_flag(params, it, flag))
         end
     end

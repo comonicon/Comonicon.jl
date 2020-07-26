@@ -14,10 +14,14 @@ include("codegen/codegen.jl")
 include("parse/parse.jl")
 
 
+
 export @cast, @main
 
 using .Types
 using .Parse
+using .CodeGen
+
+using .Parse: main
 
 include("build.jl")
 include("precompile.jl")

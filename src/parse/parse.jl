@@ -3,11 +3,13 @@ module Parse
 using ExprTools
 using Markdown
 using Pkg
+using CRC32c
 using MatchCore
 using Comonicon.Types
 using Comonicon.CodeGen
 
-export @cast, @main, read_doc, command, rm_lineinfo, default_name, get_version
+export @cast, @main, read_doc, command, rm_lineinfo, default_name,
+    get_version, iscached, cachefile
 
 include("cast.jl")
 include("markdown.jl")
