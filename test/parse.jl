@@ -44,8 +44,6 @@ goo asdas dasd assadas
 - `-f,--flag`: dadsa fasf gas
 """
 @cast function goo(ala::Int, gaga; giao = "Bob", flag::Bool = false)
-    println("ala=", ala, ", gaga=", gaga, " giao=", giao, ", flag=", flag)
-    @show typeof(giao)
     @test ala == 1
     @test gaga == "2.0"
     @test giao == "Sam"
@@ -81,3 +79,30 @@ end
 )
 @test Dummy.command_main(String["tick", "1.0", "2.0"]) == 0
 @test Dummy.command_main(String["tick", "1.0"]) == 0
+
+
+empty!(ARGS)
+append!(ARGS, ["2", "--opt1", "3"])
+
+"""
+ArgParse example implemented in Comonicon.
+
+# Arguments
+
+- `x`: an argument
+
+# Options
+
+- `--opt1 <arg>`: an option
+- `-o, --opt2 <arg>`: another option
+
+# Flags
+
+- `-f, --flag`: a flag
+"""
+@main function main(x; opt1 = 1, opt2::Int = 2, flag = false)
+    @test flag == false
+    @test x == "2"
+    @test opt1 == "3"
+    @test opt2 == 2
+end

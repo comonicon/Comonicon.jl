@@ -116,7 +116,8 @@ function main_m(m, ex::Expr)
 
     if def === nothing
         ex.head === :module || throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
-        push!(ret.args, :($var_cmd = $(xcall(command, ex.args[2]; name="main"))))
+        cmd = xcall(command, ex.args[2]; name="main")
+        push!(ret.args, :($var_cmd = $cmd))
     else
         push!(ret.args, :(Core.@__doc__ $(def[:name])))
         cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); name="main")

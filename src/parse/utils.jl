@@ -8,8 +8,16 @@ end
 
 xcall(m::Module, name::Function, xs...; kwargs...) = xcall(m, nameof(name), xs...; kwargs...)
 xcall(m::Module, name::Symbol, xs...; kwargs...) = xcall(GlobalRef(m, name), xs...; kwargs...)
-xcall(ref::GlobalRef, xs...; kwargs...) = :($ref($(xs...); $(kwargs...)))
-xcall(name, xs...) = xcall(Parse, name, xs...)
+xcall(name, xs...; kwargs...) = xcall(Parse, name, xs...; kwargs...)
+
+function xcall(ref::GlobalRef, xs...; kwargs...)
+    params = Expr(:parameters)
+    for (key, value) in kwargs
+        push!(params.args, Expr(:kw, key, value))
+    end
+
+    return Expr(:call, ref, params, xs...)
+end
 
 function get_version(m::Module)
     # project module
