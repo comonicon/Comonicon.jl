@@ -1,4 +1,4 @@
-using Comonicon.CLICommands
+using Comonicon.Types
 using Comonicon.CodeGen
 using Test
 
