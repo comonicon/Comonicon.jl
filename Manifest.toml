@@ -34,6 +34,11 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
+[[MatchCore]]
+git-tree-sha1 = "c4b9f2f81cb7dbe22540df3a084de380f3cef6c4"
+uuid = "5dd3f0b1-72a9-48ad-ae6e-79f673da005f"
+version = "0.1.0"
+
 [[PackageCompiler]]
 deps = ["Libdl", "Pkg", "UUIDs"]
 git-tree-sha1 = "98aa9c653e1dc3473bb5050caf8501293db9eee1"

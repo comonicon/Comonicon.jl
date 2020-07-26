@@ -1,4 +1,5 @@
 using Comonicon
+using Comonicon.Types
 using Test
 
 module Dummy
@@ -64,7 +65,7 @@ tick tick.
     @test yy in [1.0, 2.0]
 end
 
-@command_main name = "main" doc = """
+@main name = "main" doc = """
     dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
     sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
     """
