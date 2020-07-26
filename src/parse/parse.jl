@@ -9,7 +9,7 @@ using Comonicon.Types
 using Comonicon.CodeGen
 
 export @cast, @main, read_doc, command, rm_lineinfo, default_name,
-    get_version, iscached, cachefile
+    get_version, iscached, cachefile, create_cache, enable_cache, disable_cache
 
 include("cast.jl")
 include("markdown.jl")

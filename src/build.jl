@@ -48,10 +48,16 @@ function precompile_script(mod::Module)
 
     if isdefined(mod, :CASTED_COMMANDS)
         for (name, cmd) in mod.CASTED_COMMANDS
-            script *= "$mod.command_main([$(precompile_script(mod, cmd))]);\n"
+            if name != "main" # skip main command
+                script *= "$mod.command_main([$(precompile_script(mod, cmd))]);\n"
+            end
         end
     end
     return script
+end
+
+function precompile_script(mod, cmd::EntryCommand)
+    return precompile_script(mod, cmd.root)
 end
 
 function precompile_script(mod, cmd::LeafCommand)

@@ -1,5 +1,17 @@
+const CACHE_FLAG = Ref{Bool}(true)
+
+function enable_cache()
+    CACHE_FLAG[] = true
+    return
+end
+
+function disable_cache()
+    CACHE_FLAG[] = false
+    return
+end
+
 macro cast(ex)
-    if iscached()
+    if CACHE_FLAG[] && iscached()
         return esc(ex)
     else
         return esc(cast_m(__module__, ex))
@@ -9,6 +21,11 @@ end
 function cast_m(m, ex)
     ret = Expr(:block)
     pushmaybe!(ret, create_casted_commands(m))
+
+    if ex isa Symbol
+        push!(ret.args, parse_module(m, ex))
+        return ret
+    end
 
     def = splitdef(ex; throw=false)
     if def === nothing
@@ -111,7 +128,7 @@ macro main(xs...)
 end
 
 function main_m(m, ex::Expr)
-    if iscached()
+    if CACHE_FLAG[] && iscached()
         return quote
             Core.@__doc__ $ex
             include($(cachefile()[1]))
@@ -141,7 +158,7 @@ function main_m(m, ex::Expr)
 end
 
 function main_m(m, ex::Symbol)
-    iscached() && return :(include($(cachefile()[1])))
+    CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry =gensym(:cmd), gensym(:entry)
     quote
         $var_cmd = $(xcall(command, ex; name="main"))
@@ -151,7 +168,7 @@ function main_m(m, ex::Symbol)
 end
 
 function main_m(m, kwargs...)
-    iscached() && return :(include($(cachefile()[1])))
+    CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     return create_entry(m, kwargs...)
 end
 
@@ -180,10 +197,15 @@ function create_entry(m, kwargs...)
 end
 
 function precompile_or_exec(m, entry)
-    if m == Main # in scripts
+    if m == Main && CACHE_FLAG[]
         return quote
             $create_cache($entry)
             include($(cachefile()[1]))
+        end
+    elseif m == Main
+        return quote
+            $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
+            command_main()
         end
     else
         quote
