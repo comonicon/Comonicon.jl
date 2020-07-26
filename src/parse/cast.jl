@@ -180,7 +180,7 @@ function create_entry(m, kwargs...)
 end
 
 function precompile_or_exec(m, entry)
-    if m == Main
+    if m == Main # in scripts
         return quote
             $create_cache($entry)
             include($(cachefile()[1]))
