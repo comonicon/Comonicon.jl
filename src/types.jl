@@ -1,3 +1,109 @@
+module Types
+
+# types
+export Arg, Option, Flag, EntryCommand, NodeCommand, LeafCommand, AbstractCommand
+
+# interfaces
+export print_cmd, cmd_doc, cmd_name, cmd_sym
+
+const MAX_DOC_WIDTH = 28
+const INDENT = 2
+const HELP_FLAG = "-h, --help"
+const VERSION_FLAG = "-V, --version"
+const HELP_FLAG_DOC = "print this help message"
+const VERSION_FLAG_DOC = "print version information"
+const PRESERVED = ["h", "help"]
+
+"""
+    AbstractCommand
+
+abstract type for commands.
+"""
+abstract type AbstractCommand end
+
+Base.@kwdef struct Arg
+    name::String = "argument"
+    doc::String = "positional argument"
+    require::Bool = true
+    type = Any
+end
+
+Base.@kwdef struct Option
+    name::String
+    arg::Arg = Arg()
+    doc::String = ""
+    short::Bool = false
+end
+
+Base.@kwdef struct Flag
+    name::String
+    doc::String = ""
+    short::Bool = true
+end
+
+Base.@kwdef struct EntryCommand <: AbstractCommand
+    root::Any
+    version::VersionNumber = v"0.0.0"
+end
+
+struct NodeCommand <: AbstractCommand
+    name::String
+    subcmds::Vector{Any}
+    doc::String
+
+    function NodeCommand(name, subcmds, doc)
+        new(name, subcmds, strip(doc))
+    end
+end
+
+struct LeafCommand <: AbstractCommand
+    entry::Any # a callable
+    name::String
+    args::Vector{Arg}
+    nrequire::Int
+    options::Vector{Option}
+    flags::Vector{Flag}
+    doc::String
+
+    function LeafCommand(entry, name, args, options, flags, doc)
+        check_duplicate_short_options(options, flags)
+        nrequire = check_required_args(args)
+        new(entry, name, args, nrequire, options, flags, strip(doc))
+    end
+end
+
+Arg(name; kwargs...) = Arg(; name = name, kwargs...)
+Option(name, arg = Arg(); kwargs...) = Option(; name = name, arg = arg, kwargs...)
+Flag(name; kwargs...) = Flag(; name = name, kwargs...)
+EntryCommand(root; kwargs...) = EntryCommand(; root = root, kwargs...)
+NodeCommand(name, cmds; doc = "") = NodeCommand(name, cmds, doc)
+NodeCommand(; name, cmds, doc = "") = NodeCommand(name, cmds, doc)
+
+function LeafCommand(entry;
+    name::String = string(nameof(entry)),
+    args::Vector{Arg} = Arg[],
+    options::Vector{Option} = Option[],
+    flags::Vector{Flag} = Flag[],
+    doc::String = "",
+)
+
+    LeafCommand(entry, name, args, options, flags, doc)
+end
+
+cmd_name(cmd::EntryCommand) = cmd_name(cmd.root)
+cmd_name(cmd) = cmd.name
+
+cmd_doc(cmd::EntryCommand) = cmd_doc(cmd.root)
+cmd_doc(cmd) = cmd.doc
+
+cmd_sym(cmd) = Symbol(cmd_name(cmd))
+
+# Printings
+
+print_option_or_flag(io::IO, xs...) = printstyled(io, xs...; color = :light_cyan)
+print_args(io::IO, xs...) = printstyled(io, xs...; color = :light_magenta)
+
+
 """
     print_cmd([io, ]cmd)
 
@@ -135,6 +241,65 @@ function partition(io, cmd, xs...; width = 80)
     end
 end
 
+"""
+    splittext(s)
+
+Split the text in string `s` into an array, but keep all the separators
+attached to the preceding word.
+
+!!! note
+
+    this is copied from Luxor/text.jl
+"""
+function splittext(s)
+    # split text into array, keeping all separators
+    # hyphens stay with first word
+    result = Array{String,1}()
+    iobuffer = IOBuffer()
+    for c in s
+        if isspace(c)
+            push!(result, String(take!(iobuffer)))
+            iobuffer = IOBuffer()
+        elseif c == '-' # hyphen splits words but needs keeping
+            print(iobuffer, c)
+            push!(result, String(take!(iobuffer)))
+            iobuffer = IOBuffer()
+        else
+            print(iobuffer, c)
+        end
+    end
+    push!(result, String(take!(iobuffer)))
+    return result
+end
+
+function splitlines(s, width = 80)
+    words = splittext(s)
+    lines = String[]
+    current_line = String[]
+    space_left = width
+    for word in words
+        word == "" && continue
+        word_width = length(word)
+
+        if space_left < word_width
+            # start a new line
+            push!(lines, strip(join(current_line)))
+            current_line = String[]
+            space_left = width
+        elseif endswith(word, "-")
+            push!(current_line, word)
+            space_left -= word_width
+        else
+            push!(current_line, word * " ")
+            space_left -= word_width + 1
+        end
+    end
+
+    isempty(current_line) || push!(lines, strip(join(current_line)))
+    return lines
+end
+
+
 function scan_indent(x::NodeCommand, min_indent = 4)
     indent = min_indent
     indent = max(indent, length(HELP_FLAG) + min_indent)
@@ -236,3 +401,53 @@ function print_list(io::IO, title, list)
         print(io, "\n\n")
     end
 end
+
+# validate
+function check_duplicate_short_options(options, flags)
+    flags_and_options = Iterators.flatten((options, flags))
+
+    for cmd in flags_and_options
+        if cmd_name(cmd) in PRESERVED
+            error("$cmd is preserved")
+        end
+
+        n_duplicate = count(flags_and_options) do x
+            cmd_name(x) == cmd_name(cmd)
+        end
+
+        if n_duplicate > 1
+            error("$cmd is duplicated, found $n_duplicate")
+        end
+
+        if cmd.short
+            first_letter = string(first(cmd_name(cmd)))
+            if first_letter in PRESERVED
+                error("$cmd cannot use short version since -$first_letter is preserved.")
+            end
+
+            n_duplicate = count(flags_and_options) do x
+                x.short && string(first(cmd_name(x))) == first_letter
+            end
+
+            if n_duplicate > 1
+                error("the short version of $cmd is duplicated, $n_duplicate found")
+            end
+        end
+    end
+    return
+end
+
+function check_required_args(args)
+    count = 0
+    prev_require = 0
+    for (i, arg) in enumerate(args)
+        if arg.require
+            prev_require + 1 == i || error("optional positional arguments must occur at end")
+            count += 1
+            prev_require = i
+        end
+    end
+    return count
+end
+
+end # module

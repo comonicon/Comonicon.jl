@@ -1,4 +1,5 @@
-using Comonicon
+using Comonicon.Types
+using Comonicon.CodeGen
 using Test
 
 function test_sin(theta; foo = 1.0)
