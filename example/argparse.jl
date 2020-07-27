@@ -1,25 +1,32 @@
-using Comonicon
+using ArgParse
 
-"""
-ArgParse example implemented in Comonicon.
+function parse_commandline()
+    s = ArgParseSettings()
 
-# Arguments
+    @add_arg_table! s begin
+        "--opt1"
+        help = "an option with an argument"
+        "--opt2", "-o"
+        help = "another option with an argument"
+        arg_type = Int
+        default = 0
+        "--flag1"
+        help = "an option without argument, i.e. a flag"
+        action = :store_true
+        "arg1"
+        help = "a positional argument"
+        required = true
+    end
 
-- `x`: an argument, an argument
-
-# Options
-
-- `--opt1 <arg>`: an option
-- `-o, --opt2 <arg>`: another option
-
-# Flags
-
-- `-f, --flag`: a flag
-"""
-@main function main(x; opt1 = 1, opt2::Int = 2, flag = false)
-    println("Parsed args:")
-    println("flag=>", flag)
-    println("arg=>", x)
-    println("opt1=>", opt1)
-    println("opt2=>", opt2)
+    return parse_args(s)
 end
+
+function main()
+    parsed_args = parse_commandline()
+    println("Parsed args:")
+    for (arg, val) in parsed_args
+        println("  $arg  =>  $val")
+    end
+end
+
+main()
