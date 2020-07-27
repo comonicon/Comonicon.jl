@@ -41,11 +41,29 @@ Base.@kwdef struct Flag
     short::Bool = true
 end
 
+"""
+    EntryCommand <: AbstractCommand
+
+`EntryCommand` describes the entry of the CLI. It contains
+an actual root command (either [`LeafCommand`](@ref) or [`NodeCommand`](@ref))
+of the entire CLI and a version number. The version number is `v"0.0.0"` by default.
+"""
 Base.@kwdef struct EntryCommand <: AbstractCommand
     root::Any
     version::VersionNumber = v"0.0.0"
 end
 
+"""
+    NodeCommand <: AbstractCommand
+
+`NodeCommand` describes the command in the middle of a CLI, e.g
+in the following `remote` is a `NodeCommand`, it will dispatch
+the call to its sub-command `show`. See also [`LeafCommand`](@ref).
+
+```sh
+git remote show origin
+```
+"""
 struct NodeCommand <: AbstractCommand
     name::String
     subcmds::Vector{Any}
@@ -56,6 +74,17 @@ struct NodeCommand <: AbstractCommand
     end
 end
 
+"""
+    LeafCommand <: AbstractCommand
+
+`LeafCommand` describes the command at the end of a CLI, e.g
+in the following `show` is `LeafCommand`, it is the command
+that actually executes things. See also [`NodeCommand`](@ref).
+
+```sh
+git remote show origin
+```
+"""
 struct LeafCommand <: AbstractCommand
     entry::Any # a callable
     name::String

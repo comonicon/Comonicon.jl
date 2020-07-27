@@ -1,3 +1,8 @@
+"""
+    default_name(x)
+
+Return the lowercase of `nameof(x)` in `String`.
+"""
 default_name(x) = lowercase(string(nameof(x)))
 
 function docstring(x)
@@ -19,6 +24,13 @@ function xcall(ref::GlobalRef, xs...; kwargs...)
     return Expr(:call, ref, params, xs...)
 end
 
+"""
+    get_version(m::Module)
+
+Get the version of a given module. It will try to find the version
+of `Project.toml` if the given module is a project module. If fails,
+it returns `v"0.0.0"`.
+"""
 function get_version(m::Module)
     # project module
     path = pathof(m)
@@ -36,11 +48,24 @@ function get_version(m::Module)
     return v"0.0.0"
 end
 
+"""
+    cache_file([file=Base.PROGRAM_FILE])
+
+Return the files that will be cached:
+
+1. `cmd.jl`: a julia script that contains the generated CLI code.
+2. `checksum`: a checksum file for checking if the generated CLI code matches the original file.
+"""
 function cachefile(file=Base.PROGRAM_FILE)
     dir = cachedir(file)
     return joinpath(dir, "cmd.jl"), joinpath(dir, "checksum")
 end
 
+"""
+    cachedir([file=Base.PROGRAM_FILE])
+
+Return the cache directory.
+"""
 function cachedir(file=Base.PROGRAM_FILE)
     name, _ = splitext(basename(file))
     dir = joinpath(dirname(file), "." * name * ".cmd")
@@ -48,6 +73,11 @@ function cachedir(file=Base.PROGRAM_FILE)
     return dir
 end
 
+"""
+    iscached([file=Base.PROGRAM_FILE])
+
+Check if the given file is cached or not.
+"""
 function iscached(file=Base.PROGRAM_FILE)
     cache_file, crc = cachefile(file)
     isfile(crc) || return false
@@ -69,6 +99,11 @@ function checksum(filename, blocksize=16384)
     return crc
 end
 
+"""
+    create_cache(cmd[, file=Base.PROGRAM_FILE])
+
+Create cache for given command `cmd` at file location `file`.
+"""
 function create_cache(cmd, file=Base.PROGRAM_FILE)
     isempty(file) && return
     dir = cachedir(file)

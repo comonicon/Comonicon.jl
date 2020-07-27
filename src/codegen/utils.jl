@@ -4,6 +4,12 @@ help_str(x; color=true) = sprint(print_cmd, x; context = :color => color)
 xprint_help(x; color=true) = :(print($(help_str(x; color=color))))
 xprint_version(cmd::EntryCommand; color=true) = :(println($(sprint(show, cmd; context = :color => color))))
 
+"""
+    xerror(msg)
+
+Create an expression that contains error message, automatically merge
+interpolation expressions.
+"""
 function xerror(msg::String)
     msg = "Error: $msg, use -h or --help to check more detailed help info"
     return :(error($msg))
@@ -45,6 +51,13 @@ function xparse(type, str)
     end
 end
 
+"""
+    xmatch(regexes, actions, str[, st = 1])
+
+Generate a long ifelse expression that acts like a pattern
+matching expression that match given regex list and do the
+corresponding actions.
+"""
 function xmatch(regexes, actions, str, st = 1)
     if st <= length(regexes)
         m = gensym(:m)
@@ -77,6 +90,11 @@ function nrequired_args(args::Vector)
     end
 end
 
+"""
+    rm_lineinfo(ex)
+
+Remove `LineNumberNode` in a given expression
+"""
 function rm_lineinfo(ex)
     if ex isa Expr
         args = []
@@ -91,6 +109,12 @@ function rm_lineinfo(ex)
     end
 end
 
+"""
+    prettify(ex)
+
+Prettify given expression, remove all `LineNumberNode` and
+extra code blocks.
+"""
 prettify(x) = x
 
 function prettify(ex::Expr)
@@ -121,6 +145,12 @@ function eat_blocks(ex::Expr)
     return Expr(:block, args...)
 end
 
+"""
+    push!(args, item)
+
+Push an item to the expression or list. Do nothing
+if the item is `nothing`.
+"""
 pushmaybe!(args, item) = push!(args, item)
 pushmaybe!(args, ::Nothing) = args
 pushmaybe!(ex::Expr, item) = push!(ex.args, item)

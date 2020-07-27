@@ -1,15 +1,55 @@
 const CACHE_FLAG = Ref{Bool}(true)
 
+"""
+    enable_cache()
+
+Enable command compile cache. See also [`disable_cache`](@ref).
+"""
 function enable_cache()
     CACHE_FLAG[] = true
     return
 end
 
+"""
+    disable_cache()
+
+Disable command compile cache. See also [`enable_cache`](@ref).
+"""
 function disable_cache()
     CACHE_FLAG[] = false
     return
 end
 
+"""
+    @cast <function expr>
+    @cast <module expr>
+    @cast <function name>
+    @cast <module name>
+
+Cast a Julia object to a command object. `@cast` will
+always execute the given expression, and only create and
+register an command object via [`command`](@ref) after
+analysing the given expression.
+
+# Example
+
+The most basic way is to use `@cast` on a function as your command
+entry.
+
+```julia
+@cast function your_command(arg1, arg2::Int)
+    # your processing code
+end
+```
+
+This will create a [`LeafCommand`](@ref) object and register it
+to the current module's `CASTED_COMMANDS` constant. You can access
+this object via `MODULE_NAME.CASTED_COMMANDS["your_command"]`.
+
+Note this will not create a functional CLI, to create a function
+CLI you need to create an entry point, which can be declared by
+[`@main`](@ref).
+"""
 macro cast(ex)
     if CACHE_FLAG[] && iscached()
         return esc(ex)
@@ -123,6 +163,23 @@ end
 casted_commands(m) = GlobalRef(m, :CASTED_COMMANDS)
 
 # Entry
+"""
+    @main <function expr>
+    @main [options...]
+
+Create an `EntryCommand` and use it as the entry of the entire CLI.
+If you only have one function to cast to a CLI, you can use `@main`
+instead of `@cast` so it will create both the command object and
+the entry.
+
+If you have declared commands via `@cast`, you can create the entry
+via `@main [options...]`, available options are:
+
+- `name`: default is the current module name in lowercase.
+- `version`: default is the current project version or `v"0.0.0"`. If
+    it's `v"0.0.0"`, the version will not be printed.
+- `doc`: a description of the entry command.
+"""
 macro main(xs...)
     return esc(main_m(__module__, xs...))
 end

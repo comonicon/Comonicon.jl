@@ -1,3 +1,8 @@
+"""
+    ASTCtx
+
+AST code generation context.
+"""
 mutable struct ASTCtx
     ptr::Int
     help::Symbol
@@ -6,6 +11,11 @@ end
 
 ASTCtx() = ASTCtx(1, gensym(:help), gensym(:version))
 
+"""
+    read_arg(ctx::ASTCtx)
+
+Return the expression that read the next argument from ARGS.
+"""
 function read_arg(ctx::ASTCtx)
     ex = :(ARGS[$(ctx.ptr)])
     ctx.ptr += 1
