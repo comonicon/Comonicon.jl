@@ -142,11 +142,22 @@ pre code.hljs.plaintext {
 <ul>
 <li><p><code>command_main</code> can be easily precompiled by Julia compiler</p>
 </li>
+<li><p>scripts created using Comonicon will be cached for CLI compile result &#40;result in 5x speedup comparing to ArgParse&#41;</p>
+</li>
 <li><p>Comonicon also ships a set of tools to help you compile/interpret your script</p>
 </li>
 </ul>
 </li>
 </ul>
+<pre><code class="sh hljs">➜  Comonicon git:(master) hyperfine <span class="hljs-string">&quot;julia --project example/comonicon.jl 2&quot;</span>
+Benchmark <span class="hljs-comment">#1: julia --project example/comonicon.jl 2</span>
+  Time (mean ± σ):     781.2 ms ±   4.3 ms    [User: 926.5 ms, System: 132.4 ms]
+  Range (min … max):   773.1 ms … 787.5 ms    10 runs
+
+➜  Comonicon git:(master) hyperfine <span class="hljs-string">&quot;julia --project example/argparse.jl 2&quot;</span>
+Benchmark <span class="hljs-comment">#1: julia --project example/argparse.jl 2</span>
+  Time (mean ± σ):      3.885 s ±  0.038 s    [User: 3.997 s, System: 0.159 s]
+  Range (min … max):    3.839 s …  3.964 s    10 runs</code></pre>
 <div style="text-align:center;"> <figure class="figure">
   <img src="/Comonicon.jl/assets/ion.png" alt="A command line package manager ion built using Comonicon" class="figure-img img-fluid " width="100%" style="border-radius:5px;">
   <figcaption class="figure-caption ">
