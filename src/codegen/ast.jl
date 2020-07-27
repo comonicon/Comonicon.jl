@@ -29,7 +29,7 @@ function codegen(cmd::AbstractCommand)
     defs = Dict{Symbol,Any}()
     defs[:name] = :command_main
     defs[:args] = [Expr(:kw, :(ARGS::Vector{String}), :ARGS)]
-    
+
     ctx = ASTCtx()
     defs[:body] = quote
         $(codegen_scan_glob(ctx))
@@ -142,7 +142,9 @@ function codegen_body(ctx::ASTCtx, cmd::LeafCommand)
     pushmaybe!(ret, codegen_params(ctx, parameters, cmd))
 
     if nrequires > 0
-        err = xerror(:("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"))
+        err = xerror(
+            :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"),
+        )
         push!(validate_ex.args, quote
             if $n_args < $nrequires
                 $err
@@ -221,7 +223,7 @@ function codegen_call(ctx::ASTCtx, params::Symbol, n_args::Symbol, cmd::LeafComm
 
     for (i, arg) in enumerate(cmd.args)
         if arg.require
-            push!(ex_call.args, xparse_args(arg.type, ctx.ptr+i-1))
+            push!(ex_call.args, xparse_args(arg.type, ctx.ptr + i - 1))
         end
     end
 
@@ -235,7 +237,7 @@ function codegen_call(ctx::ASTCtx, params::Symbol, n_args::Symbol, cmd::LeafComm
 
     for i in cmd.nrequire+1:length(cmd.args)
         call_ex = copy(ex_call)
-        expanded_call = push!(call_ex.args, xparse_args(cmd.args[i].type, ctx.ptr+i-1))
+        expanded_call = push!(call_ex.args, xparse_args(cmd.args[i].type, ctx.ptr + i - 1))
         push!(ex.args, Expr(:if, :($n_args == $i), expanded_call))
     end
     return ex

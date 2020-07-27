@@ -27,7 +27,7 @@ function cast_m(m, ex)
         return ret
     end
 
-    def = splitdef(ex; throw=false)
+    def = splitdef(ex; throw = false)
     if def === nothing
         push!(ret.args, parse_module(m, ex))
         return ret
@@ -44,12 +44,17 @@ function parse_function(m, ex, def)
     return quote
         $ex
         Core.@__doc__ $(def[:name])
-        $(xcall(set_cmd!, casted_commands(m), xcall(command, def[:name], parse_args(def), parse_kwargs(def))))
+        $(xcall(
+            set_cmd!,
+            casted_commands(m),
+            xcall(command, def[:name], parse_args(def), parse_kwargs(def)),
+        ))
     end
 end
 
 function parse_module(m, ex::Expr)
-    ex.head === :module || throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
+    ex.head === :module ||
+        throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
 
     return quote
         $ex
@@ -98,8 +103,10 @@ function to_option_or_flag(ex)
         Expr(:kw, name::Symbol, value) => (string(name), Any, false)
         Expr(:kw, :($name::Bool), false) => (string(name), Bool, true)
         Expr(:kw, :($name::$type), value) => (string(name), type, false)
-        Expr(:kw, :($name::Bool), true) => throw(Meta.ParseError("Boolean options must use false as default value, and will be parsed as flags. got $name"))
-        ::Symbol || :($name::$type) => throw(Meta.ParseError("options should have default values or make it a positional argument"))
+        Expr(:kw, :($name::Bool), true) =>
+            throw(Meta.ParseError("Boolean options must use false as default value, and will be parsed as flags. got $name"))
+        ::Symbol || :($name::$type) =>
+            throw(Meta.ParseError("options should have default values or make it a positional argument"))
         _ => throw(Meta.ParseError("invalid syntax: $ex"))
     end
 end
@@ -138,17 +145,18 @@ function main_m(m, ex::Expr)
     ex.head === :(=) && return create_entry(m, ex)
 
     ret = Expr(:block)
-    def = splitdef(ex; throw=false)
+    def = splitdef(ex; throw = false)
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     push!(ret.args, ex)
 
     if def === nothing
-        ex.head === :module || throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
-        cmd = xcall(command, ex.args[2]; name="main")
+        ex.head === :module ||
+            throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
+        cmd = xcall(command, ex.args[2]; name = "main")
         push!(ret.args, :($var_cmd = $cmd))
     else
         push!(ret.args, :(Core.@__doc__ $(def[:name])))
-        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); name="main")
+        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); name = "main")
         push!(ret.args, :($var_cmd = $cmd))
     end
 
@@ -159,9 +167,9 @@ end
 
 function main_m(m, ex::Symbol)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
-    var_cmd, var_entry =gensym(:cmd), gensym(:entry)
+    var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     quote
-        $var_cmd = $(xcall(command, ex; name="main"))
+        $var_cmd = $(xcall(command, ex; name = "main"))
         $var_entry = $(xcall(Types, :EntryCommand, var_cmd))
         $(precompile_or_exec(m, var_entry))
     end
@@ -184,9 +192,15 @@ function create_entry(m, kwargs...)
 
     ret = Expr(:block)
     pushmaybe!(ret.args, create_casted_commands(m))
-    
-    var_cmd, var_entry =gensym(:cmd), gensym(:entry)
-    cmd = xcall(Types, :NodeCommand, configs[:name], :(collect(values($m.CASTED_COMMANDS))), configs[:doc])
+
+    var_cmd, var_entry = gensym(:cmd), gensym(:entry)
+    cmd = xcall(
+        Types,
+        :NodeCommand,
+        configs[:name],
+        :(collect(values($m.CASTED_COMMANDS))),
+        configs[:doc],
+    )
     entry = xcall(Types, :EntryCommand, var_cmd, configs[:version])
 
     push!(ret.args, :($var_cmd = $cmd))

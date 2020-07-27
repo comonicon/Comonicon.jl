@@ -79,7 +79,8 @@ EntryCommand(root; kwargs...) = EntryCommand(; root = root, kwargs...)
 NodeCommand(name, cmds; doc = "") = NodeCommand(name, cmds, doc)
 NodeCommand(; name, cmds, doc = "") = NodeCommand(name, cmds, doc)
 
-function LeafCommand(entry;
+function LeafCommand(
+    entry;
     name::String = string(nameof(entry)),
     args::Vector{Arg} = Arg[],
     options::Vector{Option} = Option[],
