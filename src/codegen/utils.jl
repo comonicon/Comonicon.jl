@@ -30,7 +30,7 @@ hasparameters(cmd::LeafCommand) = (!isempty(cmd.flags)) || (!isempty(cmd.options
 short_name(x) = string(first(cmd_name(x)))
 
 regex_flag(x) = Regex("^--$(cmd_name(x))\$")
-short_regex_flag(x) = Regex("^-$(short_name(x))\$")
+regex_short_flag(x) = Regex("^-$(short_name(x))\$")
 
 regex_option(x) = Regex("^--$(cmd_name(x))=(.*)")
 regex_short_option(x) = Regex("^-$(short_name(x))(.*)")

@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.com/Roger-luo/Comonicon.jl.svg?branch=master)](https://travis-ci.com/Roger-luo/Comonicon.jl)
 [![][docs-dev-img]][docs-dev-url]
+[![Coveralls](https://coveralls.io/repos/github/Roger-luo/Comonicon.jl/badge.svg?branch=master)](https://coveralls.io/github/Roger-luo/Comonicon.jl?branch=master)
 
 Roger's magic book for command line interfaces.
 

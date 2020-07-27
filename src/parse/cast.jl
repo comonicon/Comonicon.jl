@@ -1,10 +1,31 @@
+const CACHE_FLAG = Ref{Bool}(true)
+
+function enable_cache()
+    CACHE_FLAG[] = true
+    return
+end
+
+function disable_cache()
+    CACHE_FLAG[] = false
+    return
+end
+
 macro cast(ex)
-    esc(cast_m(__module__, ex))
+    if CACHE_FLAG[] && iscached()
+        return esc(ex)
+    else
+        return esc(cast_m(__module__, ex))
+    end
 end
 
 function cast_m(m, ex)
     ret = Expr(:block)
     pushmaybe!(ret, create_casted_commands(m))
+
+    if ex isa Symbol
+        push!(ret.args, parse_module(m, ex))
+        return ret
+    end
 
     def = splitdef(ex; throw=false)
     if def === nothing
@@ -107,6 +128,13 @@ macro main(xs...)
 end
 
 function main_m(m, ex::Expr)
+    if CACHE_FLAG[] && iscached()
+        return quote
+            Core.@__doc__ $ex
+            include($(cachefile()[1]))
+        end
+    end
+
     ex.head === :(=) && return create_entry(m, ex)
 
     ret = Expr(:block)
@@ -125,22 +153,22 @@ function main_m(m, ex::Expr)
     end
 
     push!(ret.args, :($var_entry = $(xcall(Types, :EntryCommand, var_cmd))))
-    push!(ret.args, xcall(m, :eval, xcall(CodeGen, codegen, var_entry)))
-    push!(ret.args, precompile_or_exec(m))
+    push!(ret.args, precompile_or_exec(m, var_entry))
     return ret
 end
 
 function main_m(m, ex::Symbol)
+    CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry =gensym(:cmd), gensym(:entry)
     quote
         $var_cmd = $(xcall(command, ex; name="main"))
         $var_entry = $(xcall(Types, :EntryCommand, var_cmd))
-        $(xcall(m, :eval, xcall(CodeGen, :codegen, var_entry)))
-        $(precompile_or_exec(m))
+        $(precompile_or_exec(m, var_entry))
     end
 end
 
 function main_m(m, kwargs...)
+    CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     return create_entry(m, kwargs...)
 end
 
@@ -163,16 +191,26 @@ function create_entry(m, kwargs...)
 
     push!(ret.args, :($var_cmd = $cmd))
     push!(ret.args, :($var_entry = $entry))
-    push!(ret.args, xcall(set_cmd!, casted_commands(m), var_entry))
-    push!(ret.args, xcall(m, :eval, xcall(CodeGen, :codegen, var_entry)))
-    push!(ret.args, precompile_or_exec(m))
+    push!(ret.args, xcall(set_cmd!, casted_commands(m), var_entry, "main"))
+    push!(ret.args, precompile_or_exec(m, var_entry))
     return ret
 end
 
-function precompile_or_exec(m)
-    if m == Main
-        xcall(m, :command_main)
+function precompile_or_exec(m, entry)
+    if m == Main && CACHE_FLAG[]
+        return quote
+            $create_cache($entry)
+            include($(cachefile()[1]))
+        end
+    elseif m == Main
+        return quote
+            $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
+            command_main()
+        end
     else
-        :(precompile(Tuple{typeof($m.command_main),Array{String,1}}))
+        quote
+            $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
+            precompile(Tuple{typeof($m.command_main),Array{String,1}})
+        end
     end
 end

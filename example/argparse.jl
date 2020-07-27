@@ -5,7 +5,7 @@ ArgParse example implemented in Comonicon.
 
 # Arguments
 
-- `x`: an argument
+- `x`: an argument, an argument
 
 # Options
 
