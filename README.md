@@ -67,7 +67,7 @@ ArgParse example implemented in Comonicon.
 
 - `-f, --flag`: a flag
 """
-@command_main function main(x; opt1=1, opt2::Int=2, flag=false)
+@main function main(x; opt1=1, opt2::Int=2, flag=false)
     println("Parsed args:")
     println("flag=>", flag)
     println("arg=>", x)
