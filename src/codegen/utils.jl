@@ -1,8 +1,9 @@
-help_str(x; color=true) = sprint(print_cmd, x; context = :color => color)
+help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
 
 # printing in expression
-xprint_help(x; color=true) = :(print($(help_str(x; color=color))))
-xprint_version(cmd::EntryCommand; color=true) = :(println($(sprint(show, cmd; context = :color => color))))
+xprint_help(x; color = true) = :(print($(help_str(x; color = color))))
+xprint_version(cmd::EntryCommand; color = true) =
+    :(println($(sprint(show, cmd; context = :color => color))))
 
 """
     xerror(msg)
@@ -123,7 +124,7 @@ function prettify(ex::Expr)
 
     if any(ex.args) do x
         x isa Expr && x.head === :block
-        end
+    end
 
         return prettify(eat_blocks(ex))
     end

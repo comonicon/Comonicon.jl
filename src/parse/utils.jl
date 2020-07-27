@@ -82,14 +82,14 @@ function iscached(file=Base.PROGRAM_FILE)
     cache_file, crc = cachefile(file)
     isfile(crc) || return false
     isfile(cache_file) || return false
-    if read(crc, String) == string(checksum(file), base=16)
+    if read(crc, String) == string(checksum(file), base = 16)
         return true
     end
     return false
 end
 
 # taken from Steven G Johnson
-function checksum(filename, blocksize=16384)
+function checksum(filename, blocksize = 16384)
     crc = zero(UInt32)
     open(filename, "r") do f
         while !eof(f)
@@ -113,6 +113,6 @@ function create_cache(cmd, file=Base.PROGRAM_FILE)
 
     cache_file, crc = cachefile(file)
     write(cache_file, cmd)
-    write(crc, string(checksum(file), base=16))
+    write(crc, string(checksum(file), base = 16))
     return
 end

@@ -4,7 +4,7 @@
 register `cmd` in the command registry `cmds`, which usually is
 a constant `CASTED_COMMANDS` under given module.
 """
-function set_cmd!(cmds::Dict, cmd, name=cmd_name(cmd))
+function set_cmd!(cmds::Dict, cmd, name = cmd_name(cmd))
     if haskey(cmds, name)
         @warn "replacing command $name in the registry"
     end
@@ -88,9 +88,9 @@ end
 function create_option(name::String, type, option_docs)
     if haskey(option_docs, name)
         arg, doc, short = option_docs[name]
-        return Option(name, Arg(arg; type=type); short=short)
+        return Option(name, Arg(arg; type = type); short = short)
     else
-        return Option(name, Arg("::$type"; type=type))
+        return Option(name, Arg("::$type"; type = type))
     end
 end
 
