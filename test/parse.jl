@@ -81,6 +81,14 @@ end
 @test Dummy.command_main(String["tick", "1.0"]) == 0
 
 
+@test Comonicon.precompile_script(Dummy) == """
+using Main.Dummy;
+Main.Dummy.command_main(["-h"]);
+Main.Dummy.command_main(["goo", "-h"]);
+Main.Dummy.command_main(["tick", "-h"]);
+Main.Dummy.command_main(["foo", "-h"]);
+"""
+
 empty!(ARGS)
 append!(ARGS, ["2", "--opt1", "3"])
 

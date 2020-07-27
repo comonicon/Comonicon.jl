@@ -42,3 +42,21 @@ eval(codegen(entry))
 @test command_main(["foo", "test_sin", "1.0", "--foo=2.0"]) == 0
 @test command_main(["foo", "test_sin", "1.0", "--foo", "2.0"]) == 0
 @test command_main(["foo", "test_sin", "1.0", "-f2.0"]) == 0
+
+@testset "prettify" begin
+ex1 = quote
+    if x > 0
+        begin
+            x += 1
+        end
+    end
+end
+
+ex2 = quote
+    if x > 0
+        x += 1
+    end
+end
+
+@test prettify(ex1) == prettify(ex2)
+end
