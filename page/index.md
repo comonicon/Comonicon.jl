@@ -13,8 +13,21 @@
 * **colorful** help string and builtin **help message composition** (copied and modified from [Luxor.jl](https://github.com/JuliaGraphics/Luxor.jl))
 * **fast!**
   * `command_main` can be easily precompiled by Julia compiler
+  * scripts created using Comonicon will be cached for CLI compile result (result in 5x speedup comparing to ArgParse)
   * Comonicon also ships a set of tools to help you compile/interpret your script
 
+
+```sh
+➜  Comonicon git:(master) hyperfine "julia --project example/comonicon.jl 2"
+Benchmark #1: julia --project example/comonicon.jl 2
+  Time (mean ± σ):     781.2 ms ±   4.3 ms    [User: 926.5 ms, System: 132.4 ms]
+  Range (min … max):   773.1 ms … 787.5 ms    10 runs
+
+➜  Comonicon git:(master) hyperfine "julia --project example/argparse.jl 2"
+Benchmark #1: julia --project example/argparse.jl 2
+  Time (mean ± σ):      3.885 s ±  0.038 s    [User: 3.997 s, System: 0.159 s]
+  Range (min … max):    3.839 s …  3.964 s    10 runs
+```
 
 \center{
   \figure{path="/assets/ion.png", width="100%", style="border-radius:5px;", caption="A command line package manager ion built using Comonicon"}
