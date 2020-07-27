@@ -189,15 +189,13 @@ ArgParse example implemented in Comonicon.
 
 - `-f, --flag`: a flag
 &quot;&quot;&quot;</span>
-<span class="hljs-meta">@command_main</span> <span class="hljs-keyword">function</span> main(x; opt1=<span class="hljs-number">1</span>, opt2::<span class="hljs-built_in">Int</span>=<span class="hljs-number">2</span>, flag=<span class="hljs-literal">false</span>)
+<span class="hljs-meta">@main</span> <span class="hljs-keyword">function</span> main(x; opt1=<span class="hljs-number">1</span>, opt2::<span class="hljs-built_in">Int</span>=<span class="hljs-number">2</span>, flag=<span class="hljs-literal">false</span>)
     println(<span class="hljs-string">&quot;Parsed args:&quot;</span>)
     println(<span class="hljs-string">&quot;flag=&gt;&quot;</span>, flag)
     println(<span class="hljs-string">&quot;arg=&gt;&quot;</span>, x)
     println(<span class="hljs-string">&quot;opt1=&gt;&quot;</span>, opt1)
     println(<span class="hljs-string">&quot;opt2=&gt;&quot;</span>, opt2)
-<span class="hljs-keyword">end</span>
-
-command_main()</code></pre>       </div>
+<span class="hljs-keyword">end</span></code></pre>       </div>
     </div>
   </div>
 </section>
@@ -306,7 +304,7 @@ tick tick.
     <span class="hljs-meta">@show</span> yy
 <span class="hljs-keyword">end</span>
 
-<span class="hljs-meta">@command_main</span> name=<span class="hljs-string">&quot;main&quot;</span> doc=<span class="hljs-string">&quot;&quot;&quot;
+<span class="hljs-meta">@main</span> name=<span class="hljs-string">&quot;main&quot;</span> doc=<span class="hljs-string">&quot;&quot;&quot;
 dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
 sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
 &quot;&quot;&quot;</span>
