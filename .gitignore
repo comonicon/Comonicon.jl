@@ -11,3 +11,5 @@ Manifest.toml
 *.jl.mem
 
 *.cmd
+/bin/
+/test/bin/
