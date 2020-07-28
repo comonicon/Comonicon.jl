@@ -10,30 +10,9 @@ end
 
 project(xs...) = project(Comonicon, xs...)
 
-"""
-    default_sysimg()
+sysimg() = project("deps", "lib", "libcomonicon.$(Libdl.dlext)")
+sysimg(mod, name) = project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
 
-Return `libcomonicon.(dylib, so, dll)` if the package `Comonicon`
-is compile by PackageCompiler. Or return `nothing`.
-"""
-function default_sysimg()
-    lib = project("deps", "lib", "libcomonicon.$(Libdl.dlext)")
-    if isfile(lib)
-        return lib
-    else
-        return
-    end
-end
-
-function default_sysimg(mod, name)
-    lib = project(mod, "deps", "lib", "lib$name.$(Libdl.dlext)")
-    if lib !== nothing && isfile(lib)
-        return lib
-    else
-        # fallback to try Comonicon sysimg
-        return default_sysimg()
-    end
-end
 
 """
     default_exename()
@@ -58,7 +37,7 @@ Generates a shell script that can be use as the entry of
 # Keywords
 
 - `exename`: The julia executable name, default is [`PATH.default_exename`](@ref).
-- `sysimg`: System image to use, default is [`PATH.default_sysimg`](@ref).
+- `sysimg`: System image to use, default is `nothing`.
 - `project`: the project path of the CLI.
 - `compile`: julia compile level, can be [:yes, :no, :all, :min]
 - `optimize`: julia optimization level, default is 2.
@@ -68,7 +47,7 @@ function cmd_script(
     shadow;
     exename = PATH.default_exename(),
     project = PATH.project(mod),
-    sysimg = PATH.default_sysimg(),
+    sysimg = nothing,
     compile = nothing,
     optimize = 2,
 )
@@ -148,7 +127,7 @@ function install(
     exename = PATH.default_exename(),
     project = PATH.project(mod),
     sysimg::Bool = false,
-    sysimg_path = PATH.default_sysimg(mod, name),
+    sysimg_path::String = PATH.sysimg(mod, name),
     incremental::Bool = false,
     compile = nothing,
     filter_stdlibs = false,
@@ -169,13 +148,24 @@ function install(
         )
     end
 
+    # 1. if package sysimg exists use it
+    # 2. if Comonicon sysimg exists use it
+    # 3. if nothing exists use nothing
+    if isfile(sysimg_path)
+        _sysimg_path = sysimg_path
+    elseif isfile(PATH.sysimg())
+        _sysimg_path = PATH.sysimg()
+    else
+        _sysimg_path = nothing
+    end
+
     shadow = joinpath(bin, name * ".jl")
     shell_script = cmd_script(
         mod,
         shadow;
         exename = exename,
         project = project,
-        sysimg = sysimg_path,
+        sysimg = _sysimg_path,
         compile = compile,
         optimize = optimize,
     )
@@ -223,7 +213,7 @@ Build system image for given CLI module. See also [`install`](@ref).
 """
 function build(
         mod, name=default_name(mod);
-        sysimg_path=PATH.default_sysimg(mod, name),
+        sysimg_path=PATH.sysimg(mod, name),
         project = PATH.project(mod),
         sysimg::Bool = false,
         incremental::Bool = false,
