@@ -1,10 +1,11 @@
 module PATH
 using Libdl
+using Pkg
 using ..Comonicon
 
 function project(m::Module, xs...)
     path = pathof(m)
-    path === nothing && return
+    path === nothing && return dirname(Pkg.project().path)
     return joinpath(dirname(dirname(path)), xs...)
 end
 
@@ -51,7 +52,13 @@ function cmd_script(
     compile = nothing,
     optimize = 2,
 )
-    script = String["#!/bin/sh\nJULIA_PROJECT=$project $exename"]
+
+    head = "#!/bin/sh\n"
+    if (project !== nothing) && ispath(project)
+        head *= "JULIA_PROJECT=$project "
+    end
+    head *= exename
+    script = String[head]
 
     if sysimg !== nothing
         push!(script, "-J$sysimg")
@@ -125,7 +132,7 @@ function install(
     name = default_name(mod);
     bin = joinpath(first(DEPOT_PATH), "bin"),
     exename = PATH.default_exename(),
-    project = PATH.project(mod),
+    project::String = PATH.project(mod),
     sysimg::Bool = false,
     sysimg_path::String = PATH.sysimg(mod, name),
     incremental::Bool = false,
@@ -213,8 +220,8 @@ Build system image for given CLI module. See also [`install`](@ref).
 """
 function build(
         mod, name=default_name(mod);
-        sysimg_path=PATH.sysimg(mod, name),
-        project = PATH.project(mod),
+        sysimg_path::String=PATH.sysimg(mod, name),
+        project::String = PATH.project(mod),
         sysimg::Bool = false,
         incremental::Bool = false,
         compile = nothing,
