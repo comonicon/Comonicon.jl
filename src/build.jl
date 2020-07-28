@@ -262,6 +262,7 @@ function build(
             error("unsupported OS")
 
         tarball = "$name-$VERSION-$(Sys.ARCH).tar.gz"
+        @info "creating tarball $tarball"
         cd(PATH.project(mod, "deps")) do
             run(`tar -czvf $tarball lib`)
         end
