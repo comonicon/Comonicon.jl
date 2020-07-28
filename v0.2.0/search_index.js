@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"#Comonicon","page":"Home","title":"Comonicon","text":"","category":"section"},{"location":"","page":"Home","title":"Home","text":"gith averminaluk ayh juldas mausan urdan","category":"page"},{"location":"","page":"Home","title":"Home","text":"(Image: Build Status)","category":"page"},{"location":"","page":"Home","title":"Home","text":"Roger's magic book for command line interfaces.","category":"page"},{"location":"#Reference","page":"Home","title":"Reference","text":"","category":"section"},{"location":"","page":"Home","title":"Home","text":"Modules = [Comonicon]","category":"page"}]
+}
