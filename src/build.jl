@@ -261,7 +261,7 @@ function build(
             Sys.islinux() ? "linux" :
             error("unsupported OS")
 
-        tarball = "$name-$VERSION-$(Sys.ARCH).tar.gz"
+        tarball = "$name-$VERSION-$os-$(Sys.ARCH).tar.gz"
         @info "creating tarball $tarball"
         cd(PATH.project(mod, "deps")) do
             run(`tar -czvf $tarball lib`)
