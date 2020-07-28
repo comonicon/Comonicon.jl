@@ -261,9 +261,9 @@ function build(
             Sys.islinux() ? "linux" :
             error("unsupported OS")
 
-        tarball = "$name-$version-$(Sys.ARCH).tar.gz"
+        tarball = "$name-$VERSION-$(Sys.ARCH).tar.gz"
         cd(PATH.project(mod, "deps")) do
-            run(`tar -czvf ion-0.2.0-Darwin-x86_64.tar.gz lib`)
+            run(`tar -czvf $tarball lib`)
         end
     end
 end
