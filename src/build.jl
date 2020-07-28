@@ -222,7 +222,7 @@ function build(
         mod, name=default_name(mod);
         sysimg_path::String=PATH.sysimg(mod, name),
         project::String = PATH.project(mod),
-        sysimg::Bool = false,
+        create_tarball::Bool = false,
         incremental::Bool = false,
         compile = nothing,
         filter_stdlibs = false,
@@ -254,6 +254,18 @@ function build(
         cpu_target = cpu_target,
         filter_stdlibs = filter_stdlibs,
     )
+
+    if create_tarball
+        version = get_version(mod)
+        os = Sys.isapple() ? "darwin" :
+            Sys.islinux() ? "linux" :
+            error("unsupported OS")
+
+        tarball = "$name-$version-$(Sys.ARCH).tar.gz"
+        cd(PATH.project(mod, "deps")) do
+            run(`tar -czvf ion-0.2.0-Darwin-x86_64.tar.gz lib`)
+        end
+    end
 end
 
 """
