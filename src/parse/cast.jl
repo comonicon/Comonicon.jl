@@ -209,11 +209,11 @@ function main_m(m, ex::Expr)
     if def === nothing
         ex.head === :module ||
             throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
-        cmd = xcall(command, ex.args[2]; name = "main")
+        cmd = xcall(command, ex.args[2])
         push!(ret.args, :($var_cmd = $cmd))
     else
         push!(ret.args, :(Core.@__doc__ $(def[:name])))
-        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); name = "main")
+        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def))
         push!(ret.args, :($var_cmd = $cmd))
     end
 
@@ -226,7 +226,7 @@ function main_m(m, ex::Symbol)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     quote
-        $var_cmd = $(xcall(command, ex; name = "main"))
+        $var_cmd = $(xcall(command, ex))
         $var_entry = $(xcall(Types, :EntryCommand, var_cmd))
         $(precompile_or_exec(m, var_entry))
     end
