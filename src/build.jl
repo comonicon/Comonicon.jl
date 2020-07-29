@@ -144,14 +144,16 @@ function install(
 )
 
     if sysimg
-        build(mod, name;
-            sysimg_path=sysimg_path,
-            incremental=incremental,
-            compile=compile,
-            filter_stdlibs=filter_stdlibs,
-            lib_path=lib_path,
-            cpu_target=cpu_target,
-            optimize=optimize
+        build(
+            mod,
+            name;
+            sysimg_path = sysimg_path,
+            incremental = incremental,
+            compile = compile,
+            filter_stdlibs = filter_stdlibs,
+            lib_path = lib_path,
+            cpu_target = cpu_target,
+            optimize = optimize,
         )
     end
 
@@ -219,17 +221,18 @@ end
 Build system image for given CLI module. See also [`install`](@ref).
 """
 function build(
-        mod, name=default_name(mod);
-        sysimg_path::String=PATH.sysimg(mod, name),
-        project::String = PATH.project(mod),
-        create_tarball::Bool = false,
-        incremental::Bool = false,
-        compile = nothing,
-        filter_stdlibs = false,
-        lib_path = PATH.project(mod, "deps", "lib"),
-        cpu_target = "native",
-        optimize = 2,
-    )
+    mod,
+    name = default_name(mod);
+    sysimg_path::String = PATH.sysimg(mod, name),
+    project::String = PATH.project(mod),
+    create_tarball::Bool = false,
+    incremental::Bool = false,
+    compile = nothing,
+    filter_stdlibs = false,
+    lib_path = PATH.project(mod, "deps", "lib"),
+    cpu_target = "native",
+    optimize = 2,
+)
 
     if !ispath(lib_path)
         @info "creating library path: $lib_path"
@@ -257,9 +260,7 @@ function build(
 
     if create_tarball
         version = get_version(mod)
-        os = Sys.isapple() ? "darwin" :
-            Sys.islinux() ? "linux" :
-            error("unsupported OS")
+        os = Sys.isapple() ? "darwin" : Sys.islinux() ? "linux" : error("unsupported OS")
 
         tarball = "$name-$VERSION-$os-$(Sys.ARCH).tar.gz"
         @info "creating tarball $tarball"

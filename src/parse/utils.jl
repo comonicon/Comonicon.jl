@@ -56,7 +56,7 @@ Return the files that will be cached:
 1. `cmd.jl`: a julia script that contains the generated CLI code.
 2. `checksum`: a checksum file for checking if the generated CLI code matches the original file.
 """
-function cachefile(file=Base.PROGRAM_FILE)
+function cachefile(file = Base.PROGRAM_FILE)
     dir = cachedir(file)
     return joinpath(dir, "cmd.jl"), joinpath(dir, "checksum")
 end
@@ -66,7 +66,7 @@ end
 
 Return the cache directory.
 """
-function cachedir(file=Base.PROGRAM_FILE)
+function cachedir(file = Base.PROGRAM_FILE)
     name, _ = splitext(basename(file))
     dir = joinpath(dirname(file), "." * name * ".cmd")
     isabspath(file) || return joinpath(pwd(), dir)
@@ -78,7 +78,7 @@ end
 
 Check if the given file is cached or not.
 """
-function iscached(file=Base.PROGRAM_FILE)
+function iscached(file = Base.PROGRAM_FILE)
     cache_file, crc = cachefile(file)
     isfile(crc) || return false
     isfile(cache_file) || return false
@@ -104,7 +104,7 @@ end
 
 Create cache for given command `cmd` at file location `file`.
 """
-function create_cache(cmd, file=Base.PROGRAM_FILE)
+function create_cache(cmd, file = Base.PROGRAM_FILE)
     isempty(file) && return
     dir = cachedir(file)
     if !ispath(dir)
