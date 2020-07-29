@@ -254,7 +254,7 @@ function print_version(io::IO)
     print(io, " "^doc_indent, VERSION_FLAG_DOC, "\n\n")
 end
 
-function partition(io, cmd, xs...; width = 80)
+function partition(io, cmd, xs...; width = get(io, :terminal_width, 85))
     doc_indent = get(io, :doc_indent, -1)
     doc_width = width - doc_indent
     first_line_indent = first_line_doc_indent(io, cmd)
@@ -307,7 +307,7 @@ function splittext(s)
     return result
 end
 
-function splitlines(s, width = 120)
+function splitlines(s, width = 80)
     words = splittext(s)
     lines = String[]
     current_line = String[]
