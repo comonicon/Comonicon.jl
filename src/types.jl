@@ -22,7 +22,7 @@ abstract type for commands.
 abstract type AbstractCommand end
 
 Base.@kwdef struct Arg
-    name::String = "argument"
+    name::String = "arg"
     doc::String = "positional argument"
     require::Bool = true
     type = Any
@@ -191,7 +191,7 @@ function Base.show(io::IO, arg::Arg)
     show_notation = notation && !arg.require
     show_notation && print_args(io, "[")
 
-    if arg.type in [Any, String] || arg.type <: AbstractString
+    if ignore_type(arg.type)
         print_args(io, "<", arg.name, ">")
     else
         print_args(io, "<", arg.name, "::", arg.type, ">")
@@ -199,6 +199,8 @@ function Base.show(io::IO, arg::Arg)
 
     show_notation && print_args(io, "]")
 end
+
+ignore_type(type) = type in [Any, String] || type <: AbstractString
 
 print_cmd(x) = print_cmd(stdout, x)
 
