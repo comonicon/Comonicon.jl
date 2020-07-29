@@ -6,7 +6,7 @@ Return the lowercase of `nameof(x)` in `String`.
 default_name(x) = lowercase(string(nameof(x)))
 
 function docstring(x)
-    return sprint(@doc(x); context = :color => true) do io, x
+    return sprint(Base.Docs.doc(x); context = :color => true) do io, x
         show(io, MIME"text/plain"(), x)
     end
 end
