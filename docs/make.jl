@@ -8,7 +8,7 @@ makedocs(;
         "Command Types" => "types.md",
         "Command Parsing" => "parse.md",
         "Code Generation" => "codegen.md",
-        "Build and Install CLI" => "build.md"
+        "Build and Install CLI" => "build.md",
     ],
     repo = "https://github.com/Roger-luo/Comonicon.jl",
     sitename = "Comonicon.jl",

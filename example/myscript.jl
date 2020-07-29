@@ -15,7 +15,7 @@ my command line interface.
 
 - `-f, --flag`: a flag that has short flag.
 """
-@main function mycmd(arg; option="Sam", flag::Bool=false)
+@main function mycmd(arg; option = "Sam", flag::Bool = false)
     @show arg
     @show option
     @show flag
