@@ -158,11 +158,11 @@ function Base.show(io::IO, cmd::LeafCommand)
     printstyled(io, cmd_name(cmd); color = :light_blue, bold = true)
 
     if !isempty(cmd.options)
-        printstyled(io, " [options...]"; color = :light_cyan)
+        printstyled(io, " [options]"; color = :light_cyan)
     end
 
     if !isempty(cmd.flags)
-        printstyled(io, " [flags...]"; color = :light_cyan)
+        printstyled(io, " [flags]"; color = :light_cyan)
     end
 
     if !isempty(cmd.args)
@@ -266,8 +266,13 @@ function partition(io, cmd, xs...; width = 80)
     lines = splitlines(doc, doc_width)
 
     print(io, " "^first_line_indent, first(lines))
-    for i in 2:length(lines)
+
+    for i in 2:min(3, length(lines))
         print(io, "\n", indent, " "^doc_indent, lines[i])
+    end
+
+    if length(lines) > 3
+        print(io, "...")
     end
 end
 
@@ -302,7 +307,7 @@ function splittext(s)
     return result
 end
 
-function splitlines(s, width = 80)
+function splitlines(s, width = 120)
     words = splittext(s)
     lines = String[]
     current_line = String[]
@@ -314,7 +319,7 @@ function splitlines(s, width = 80)
         if space_left < word_width
             # start a new line
             push!(lines, strip(join(current_line)))
-            current_line = String[]
+            current_line = String[word]
             space_left = width
         elseif endswith(word, "-")
             push!(current_line, word)
@@ -324,7 +329,6 @@ function splitlines(s, width = 80)
             space_left -= word_width + 1
         end
     end
-
     isempty(current_line) || push!(lines, strip(join(current_line)))
     return lines
 end
@@ -402,6 +406,10 @@ function print_body(io::IO, cmd::LeafCommand, isentry = false)
         print_list(io, "Args", cmd.args)
     end
 
+    if !isempty(cmd.options)
+        print_list(io, "Options", cmd.options)
+    end
+
     if !isempty(cmd.flags)
         print_list(io, "Flags", cmd.flags)
         print_help(io)
@@ -412,9 +420,6 @@ function print_body(io::IO, cmd::LeafCommand, isentry = false)
         isentry && print_version(io)
     end
 
-    if !isempty(cmd.options)
-        print_list(io, "Options", cmd.options)
-    end
     println(io)
 end
 
