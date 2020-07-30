@@ -54,11 +54,11 @@ macro cast(ex)
     if CACHE_FLAG[] && iscached()
         return esc(ex)
     else
-        return esc(cast_m(__module__, __source__, ex))
+        return esc(cast_m(__module__, QuoteNode(__source__), ex))
     end
 end
 
-function cast_m(m::Module, line::LineNumberNode, ex)
+function cast_m(m::Module, line::QuoteNode, ex)
     ret = Expr(:block)
     pushmaybe!(ret, create_casted_commands(m))
 
@@ -67,7 +67,7 @@ function cast_m(m::Module, line::LineNumberNode, ex)
         return ret
     end
 
-    def = splitdef(ex; throw = false)
+    def = splitdef(ex; throw=false)
     if def === nothing
         push!(ret.args, parse_module(m, line, ex))
         return ret
@@ -77,7 +77,7 @@ function cast_m(m::Module, line::LineNumberNode, ex)
     return ret
 end
 
-function parse_function(m::Module, line::LineNumberNode, ex, def)
+function parse_function(m::Module, line::QuoteNode, ex, def)
     haskey(def, :name) || error("command entry cannot be annoymous")
     def[:name] isa Symbol || error("command name should be a Symbol")
 
@@ -92,7 +92,7 @@ function parse_function(m::Module, line::LineNumberNode, ex, def)
     end
 end
 
-function parse_module(m::Module, line::LineNumberNode, ex::Expr)
+function parse_module(m::Module, line::QuoteNode, ex::Expr)
     ex.head === :module ||
         throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
 
@@ -102,7 +102,7 @@ function parse_module(m::Module, line::LineNumberNode, ex::Expr)
     end
 end
 
-function parse_module(m::Module, line::LineNumberNode, ex::Symbol)
+function parse_module(m::Module, line::QuoteNode, ex::Symbol)
     return xcall(set_cmd!, casted_commands(m), xcall(command, ex; line=line))
 end
 
@@ -188,10 +188,10 @@ via `@main [options...]`, available options are:
 - `doc`: a description of the entry command.
 """
 macro main(xs...)
-    return esc(main_m(__module__, __source__, xs...))
+    return esc(main_m(__module__, QuoteNode(__source__), xs...))
 end
 
-function main_m(m, line, ex::Expr)
+function main_m(m::Module, line::QuoteNode, ex::Expr)
     if CACHE_FLAG[] && iscached()
         return quote
             Core.@__doc__ $ex
@@ -202,7 +202,7 @@ function main_m(m, line, ex::Expr)
     ex.head === :(=) && return create_entry(m, ex)
 
     ret = Expr(:block)
-    def = splitdef(ex; throw = false)
+    def = splitdef(ex; throw=false)
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     push!(ret.args, ex)
 
@@ -222,7 +222,7 @@ function main_m(m, line, ex::Expr)
     return ret
 end
 
-function main_m(m, line, ex::Symbol)
+function main_m(m::Module, line::QuoteNode, ex::Symbol)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     quote
@@ -232,12 +232,12 @@ function main_m(m, line, ex::Symbol)
     end
 end
 
-function main_m(m, line, kwargs...)
+function main_m(m::Module, line::QuoteNode, kwargs...)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     return create_entry(m, line, kwargs...)
 end
 
-function create_entry(m, line, kwargs...)
+function create_entry(m::Module, line::QuoteNode, kwargs...)
     configs = Dict{Symbol,Any}(:name => default_name(m), :version => get_version(m), :doc => "")
     for kw in kwargs
         for key in [:name, :version, :doc]
@@ -267,7 +267,7 @@ function create_entry(m, line, kwargs...)
     return ret
 end
 
-function precompile_or_exec(m, entry)
+function precompile_or_exec(m::Module, entry)
     if m == Main && CACHE_FLAG[]
         return quote
             $create_cache($entry)

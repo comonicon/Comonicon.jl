@@ -21,7 +21,11 @@ function xcall(ref::GlobalRef, xs...; kwargs...)
         push!(params.args, Expr(:kw, key, value))
     end
 
-    return Expr(:call, ref, params, xs...)
+    if isempty(kwargs)
+        Expr(:call, ref, xs...)
+    else
+        return Expr(:call, ref, params, xs...)
+    end
 end
 
 """
