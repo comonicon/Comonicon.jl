@@ -293,6 +293,11 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
     doc = join(xs)
     isempty(doc) && return
 
+    print_doc(io, cmd, doc, doc_width, first_line_indent, indent, doc_indent)
+end
+
+# only ommit the description if they can be displayed in full later
+function print_doc(io::IO, cmd::AbstractCommand, doc::String, width::Int, first_line_indent::Int, indent::String, doc_indent::Int)
     brief = first_sentence(doc)
     if length(brief) > max_brief_length()
         lineinfo = cmd_lineinfo(cmd)
@@ -302,8 +307,7 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
         )
     end
 
-    lines = splitlines(brief, doc_width)
-
+    lines = splitlines(brief, width)
     print(io, " "^first_line_indent, first(lines))
 
     for i in 2:min(3, length(lines))
@@ -312,6 +316,14 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
 
     if length(lines) > 3
         print(io, "...")
+    end
+end
+
+function print_doc(io::IO, cmd, doc::String, width::Int, first_line_indent::Int, indent::String, doc_indent::Int)
+    lines = splitlines(doc, width)
+    print(io, " "^first_line_indent, first(lines))
+    for i in 2:length(lines)
+        print(io, "\n", indent, " "^doc_indent, lines[i])
     end
 end
 
