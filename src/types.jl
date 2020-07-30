@@ -4,7 +4,7 @@ module Types
 export Arg, Option, Flag, EntryCommand, NodeCommand, LeafCommand, AbstractCommand
 
 # interfaces
-export print_cmd, cmd_doc, cmd_name, cmd_sym
+export print_cmd, cmd_doc, cmd_name, cmd_sym, set_brief_length!, max_brief_length
 
 const MAX_DOC_WIDTH = 28
 const INDENT = 2
@@ -13,6 +13,27 @@ const VERSION_FLAG = "-V, --version"
 const HELP_FLAG_DOC = "print this help message"
 const VERSION_FLAG_DOC = "print version information"
 const PRESERVED = ["h", "help"]
+const MAX_BRIEF_LENGTH = Ref{Int}(80)
+
+"""
+    set_brief_length!(n::Int=120)
+
+Set the maximum length of a brief description. Default is 120.
+
+!!! note
+
+    This is only effective when called before [`@main`](@ref) or [`codegen`](@ref).
+"""
+function set_brief_length!(n::Int=120)
+    MAX_BRIEF_LENGTH[] = n
+end
+
+"""
+    max_brief_length()
+
+Get the maximum length allowed for a brief description.
+"""
+max_brief_length() = MAX_BRIEF_LENGTH[]
 
 """
     AbstractCommand
@@ -273,11 +294,11 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
     isempty(doc) && return
 
     brief = first_sentence(doc)
-    if length(brief) > width
+    if length(brief) > max_brief_length()
         lineinfo = cmd_lineinfo(cmd)
         error(
-            "the first sentence of doc should not be larger than $width:",
-            "please revise the doc string at $(lineinfo.file):$(lineinfo.line)"
+            "the first sentence of doc should not be larger than $(max_brief_length()). ",
+            "please revise the doc string for [$(cmd_name(cmd))] at $(lineinfo.file):$(lineinfo.line)"
         )
     end
 
@@ -295,11 +316,12 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
 end
 
 function first_sentence(content::String)
-    index = findfirst('.', content)
+    index = findfirst(". ", content)
+
     if index === nothing
         return content
     else
-        return content[1:index]
+        return content[1:first(index)]
     end
 end
 
