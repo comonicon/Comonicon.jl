@@ -26,6 +26,7 @@ Base.@kwdef struct Arg
     doc::String = "positional argument"
     require::Bool = true
     type = Any
+    line::LineNumberNode=LineNumberNode(0)
 end
 
 Base.@kwdef struct Option
@@ -33,12 +34,14 @@ Base.@kwdef struct Option
     arg::Arg = Arg()
     doc::String = ""
     short::Bool = false
+    line::LineNumberNode=LineNumberNode(0)
 end
 
 Base.@kwdef struct Flag
     name::String
     doc::String = ""
     short::Bool = true
+    line::LineNumberNode=LineNumberNode(0)
 end
 
 """
@@ -51,6 +54,7 @@ of the entire CLI and a version number. The version number is `v"0.0.0"` by defa
 Base.@kwdef struct EntryCommand <: AbstractCommand
     root::Any
     version::VersionNumber = v"0.0.0"
+    line::LineNumberNode=LineNumberNode(0)
 end
 
 """
@@ -68,9 +72,10 @@ struct NodeCommand <: AbstractCommand
     name::String
     subcmds::Vector{Any}
     doc::String
+    line::LineNumberNode
 
-    function NodeCommand(name, subcmds, doc)
-        new(name, subcmds, strip(doc))
+    function NodeCommand(name, subcmds, doc, line)
+        new(name, subcmds, strip(doc), line)
     end
 end
 
@@ -93,11 +98,12 @@ struct LeafCommand <: AbstractCommand
     options::Vector{Option}
     flags::Vector{Flag}
     doc::String
+    line::LineNumberNode
 
-    function LeafCommand(entry, name, args, options, flags, doc)
+    function LeafCommand(entry, name, args, options, flags, doc, line)
         check_duplicate_short_options(options, flags)
         nrequire = check_required_args(args)
-        new(entry, name, args, nrequire, options, flags, strip(doc))
+        new(entry, name, args, nrequire, options, flags, strip(doc), line)
     end
 end
 
@@ -105,8 +111,8 @@ Arg(name; kwargs...) = Arg(; name = name, kwargs...)
 Option(name, arg = Arg(); kwargs...) = Option(; name = name, arg = arg, kwargs...)
 Flag(name; kwargs...) = Flag(; name = name, kwargs...)
 EntryCommand(root; kwargs...) = EntryCommand(; root = root, kwargs...)
-NodeCommand(name, cmds; doc = "") = NodeCommand(name, cmds, doc)
-NodeCommand(; name, cmds, doc = "") = NodeCommand(name, cmds, doc)
+NodeCommand(name, cmds; doc = "", line=LineNumberNode(0)) = NodeCommand(name, cmds, doc, line)
+NodeCommand(; name, cmds, doc = "", line=LineNumberNode(0)) = NodeCommand(name, cmds, doc, line)
 
 function LeafCommand(
     entry;
@@ -115,9 +121,10 @@ function LeafCommand(
     options::Vector{Option} = Option[],
     flags::Vector{Flag} = Flag[],
     doc::String = "",
+    line::LineNumberNode = LineNumberNode(0),
 )
 
-    LeafCommand(entry, name, args, options, flags, doc)
+    LeafCommand(entry, name, args, options, flags, doc, line)
 end
 
 cmd_name(cmd::EntryCommand) = cmd_name(cmd.root)
@@ -127,7 +134,7 @@ cmd_doc(cmd::EntryCommand) = cmd_doc(cmd.root)
 cmd_doc(cmd) = cmd.doc
 
 cmd_sym(cmd) = Symbol(cmd_name(cmd))
-
+cmd_lineinfo(cmd) = cmd.line
 # Printings
 
 print_option_or_flag(io::IO, xs...) = printstyled(io, xs...; color = :light_cyan)
@@ -265,7 +272,16 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
     doc = join(xs)
     isempty(doc) && return
 
-    lines = splitlines(doc, doc_width)
+    brief = first_sentence(doc)
+    if length(brief) > width
+        lineinfo = cmd_lineinfo(cmd)
+        error(
+            "the first sentence of doc should not be larger than $width:",
+            "please revise the doc string at $(lineinfo.file):$(lineinfo.line)"
+        )
+    end
+
+    lines = splitlines(brief, doc_width)
 
     print(io, " "^first_line_indent, first(lines))
 
@@ -275,6 +291,15 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
 
     if length(lines) > 3
         print(io, "...")
+    end
+end
+
+function first_sentence(content::String)
+    index = findfirst('.', content)
+    if index === nothing
+        return content
+    else
+        return content[1:index]
     end
 end
 
@@ -288,7 +313,7 @@ attached to the preceding word.
 
     this is copied from Luxor/text.jl
 """
-function splittext(s)
+function splittext(s::String)
     # split text into array, keeping all separators
     # hyphens stay with first word
     result = Array{String,1}()

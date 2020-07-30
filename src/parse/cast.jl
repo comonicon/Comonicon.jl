@@ -54,30 +54,30 @@ macro cast(ex)
     if CACHE_FLAG[] && iscached()
         return esc(ex)
     else
-        return esc(cast_m(__module__, ex))
+        return esc(cast_m(__module__, __source__, ex))
     end
 end
 
-function cast_m(m, ex)
+function cast_m(m::Module, line::LineNumberNode, ex)
     ret = Expr(:block)
     pushmaybe!(ret, create_casted_commands(m))
 
     if ex isa Symbol
-        push!(ret.args, parse_module(m, ex))
+        push!(ret.args, parse_module(m, line, ex))
         return ret
     end
 
     def = splitdef(ex; throw = false)
     if def === nothing
-        push!(ret.args, parse_module(m, ex))
+        push!(ret.args, parse_module(m, line, ex))
         return ret
     end
 
-    push!(ret.args, parse_function(m, ex, def))
+    push!(ret.args, parse_function(m, line, ex, def))
     return ret
 end
 
-function parse_function(m, ex, def)
+function parse_function(m::Module, line::LineNumberNode, ex, def)
     haskey(def, :name) || error("command entry cannot be annoymous")
     def[:name] isa Symbol || error("command name should be a Symbol")
 
@@ -87,23 +87,23 @@ function parse_function(m, ex, def)
         $(xcall(
             set_cmd!,
             casted_commands(m),
-            xcall(command, def[:name], parse_args(def), parse_kwargs(def)),
+            xcall(command, def[:name], parse_args(def), parse_kwargs(def);line=line),
         ))
     end
 end
 
-function parse_module(m, ex::Expr)
+function parse_module(m::Module, line::LineNumberNode, ex::Expr)
     ex.head === :module ||
         throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
 
     return quote
         $ex
-        $(xcall(set_cmd!, casted_commands(m), xcall(command, ex.args[2])))
+        $(xcall(set_cmd!, casted_commands(m), xcall(command, ex.args[2]; line=line)))
     end
 end
 
-function parse_module(m, ex::Symbol)
-    return xcall(set_cmd!, casted_commands(m), xcall(command, ex))
+function parse_module(m::Module, line::LineNumberNode, ex::Symbol)
+    return xcall(set_cmd!, casted_commands(m), xcall(command, ex; line=line))
 end
 
 function parse_args(def)
@@ -188,10 +188,10 @@ via `@main [options...]`, available options are:
 - `doc`: a description of the entry command.
 """
 macro main(xs...)
-    return esc(main_m(__module__, xs...))
+    return esc(main_m(__module__, __source__, xs...))
 end
 
-function main_m(m, ex::Expr)
+function main_m(m, line, ex::Expr)
     if CACHE_FLAG[] && iscached()
         return quote
             Core.@__doc__ $ex
@@ -209,11 +209,11 @@ function main_m(m, ex::Expr)
     if def === nothing
         ex.head === :module ||
             throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
-        cmd = xcall(command, ex.args[2])
+        cmd = xcall(command, ex.args[2]; line=line)
         push!(ret.args, :($var_cmd = $cmd))
     else
         push!(ret.args, :(Core.@__doc__ $(def[:name])))
-        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def))
+        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); line=line)
         push!(ret.args, :($var_cmd = $cmd))
     end
 
@@ -222,22 +222,22 @@ function main_m(m, ex::Expr)
     return ret
 end
 
-function main_m(m, ex::Symbol)
+function main_m(m, line, ex::Symbol)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     quote
-        $var_cmd = $(xcall(command, ex))
-        $var_entry = $(xcall(Types, :EntryCommand, var_cmd))
+        $var_cmd = $(xcall(command, ex; line=line))
+        $var_entry = $(xcall(Types, :EntryCommand, var_cmd; line=line))
         $(precompile_or_exec(m, var_entry))
     end
 end
 
-function main_m(m, kwargs...)
+function main_m(m, line, kwargs...)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
-    return create_entry(m, kwargs...)
+    return create_entry(m, line, kwargs...)
 end
 
-function create_entry(m, kwargs...)
+function create_entry(m, line, kwargs...)
     configs = Dict{Symbol,Any}(:name => default_name(m), :version => get_version(m), :doc => "")
     for kw in kwargs
         for key in [:name, :version, :doc]
@@ -256,9 +256,9 @@ function create_entry(m, kwargs...)
         :NodeCommand,
         configs[:name],
         :(collect(values($m.CASTED_COMMANDS))),
-        configs[:doc],
+        configs[:doc], line,
     )
-    entry = xcall(Types, :EntryCommand, var_cmd, configs[:version])
+    entry = xcall(Types, :EntryCommand, var_cmd, configs[:version], line)
 
     push!(ret.args, :($var_cmd = $cmd))
     push!(ret.args, :($var_entry = $entry))
