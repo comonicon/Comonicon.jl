@@ -65,12 +65,12 @@ module Issue23
 
 using Comonicon, Test
 
-@cast function run(host="127.0.0.1"; port::Int=1234, launchbrowser::Bool=false)
-    @test host=="127.0.0.1"
-    @test port==2345
+@cast function run(host = "127.0.0.1"; port::Int = 1234, launchbrowser::Bool = false)
+    @test host == "127.0.0.1"
+    @test port == 2345
 end
 
-@main name="pluto" doc="Pluto CLI - Lightweight reactive notebooks for Julia"
+@main name = "pluto" doc = "Pluto CLI - Lightweight reactive notebooks for Julia"
 end
 
 Issue23.command_main(["run", "--port", "2345"])
