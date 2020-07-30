@@ -72,7 +72,7 @@ end
 
 function codegen_scan_glob(ctx::ASTCtx)
     quote
-        $(ctx.help) = -1
+        $(ctx.help) = isempty(ARGS) ? 1 : -1
         $(ctx.version) = -1
         for i in 1:length(ARGS)
             x = ARGS[i]
