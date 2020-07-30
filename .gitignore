@@ -13,3 +13,4 @@ Manifest.toml
 *.cmd
 /bin/
 /test/bin/
+/test/completions/
