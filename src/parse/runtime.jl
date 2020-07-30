@@ -88,7 +88,7 @@ end
 function create_option(name::String, type, option_docs)
     if haskey(option_docs, name)
         arg, doc, short = option_docs[name]
-        return Option(name, Arg(arg; type = type); short = short, doc=doc)
+        return Option(name, Arg(arg; type = type); short = short, doc = doc)
     else
         return Option(name, Arg(; type = type))
     end
