@@ -32,6 +32,9 @@ function xerror(msg::Expr)
 end
 
 hasparameters(cmd::LeafCommand) = (!isempty(cmd.flags)) || (!isempty(cmd.options))
+hassubcmds(cmd::EntryCommand) = hassubcmds(cmd.root)
+hassubcmds(cmd::LeafCommand) = false
+hassubcmds(cmd::NodeCommand) = true
 
 # regexes
 short_name(x) = string(first(cmd_name(x)))

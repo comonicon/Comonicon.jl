@@ -43,7 +43,7 @@ function command(m::Module; name = "", doc = docstring(m), line=LineNumberNode(0
     if isempty(name) # force to have a valid name
         name = default_name(m)
     end
-    NodeCommand(name, collect(values(m.CASTED_COMMANDS)), doc, line)
+    NodeCommand(name, line, doc, collect(values(m.CASTED_COMMANDS)))
 end
 
 function command(f::Function, args, kwargs; name = "", line=LineNumberNode(0))
@@ -79,7 +79,8 @@ end
 
 function create_flag(name::String, type, flag_docs, line)
     if haskey(flag_docs, name)
-        return Flag(name, flag_docs[name]..., line)
+        doc, short = flag_docs[name]
+        return Flag(name, line, doc, short)
     else
         return Flag(name; line=line)
     end
@@ -95,6 +96,6 @@ function create_option(name::String, type, option_docs, line)
 end
 
 function main(m::Module = Main; name = default_name(m), doc = "", version = get_version(m), line=LineNumberNode(0))
-    cmd = NodeCommand(name, collect(values(m.CASTED_COMMANDS)), doc, line)
+    cmd = NodeCommand(name, line, doc, collect(values(m.CASTED_COMMANDS)))
     return EntryCommand(cmd; version = version, line=line)
 end

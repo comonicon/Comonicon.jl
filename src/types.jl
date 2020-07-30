@@ -4,7 +4,7 @@ module Types
 export Arg, Option, Flag, EntryCommand, NodeCommand, LeafCommand, AbstractCommand
 
 # interfaces
-export print_cmd, cmd_doc, cmd_name, cmd_sym, set_brief_length!, max_brief_length
+export print_cmd, cmd_doc, cmd_name, cmd_sym, set_brief_length!, max_brief_length, check_first_sentence_length
 
 const MAX_DOC_WIDTH = 28
 const INDENT = 2
@@ -42,27 +42,68 @@ abstract type for commands.
 """
 abstract type AbstractCommand end
 
+struct CommandDoc
+    first::String
+    rest::String
+
+    function CommandDoc(name::String, lineinfo::LineNumberNode, doc::String)
+        doc = strip(doc)
+        brief = check_first_sentence_length(name, lineinfo, doc)
+        new(brief, doc[length(brief)+1:end])
+    end
+
+    function CommandDoc()
+        new("", "")
+    end
+end
+
+function Base.iterate(doc::CommandDoc, st=1)
+    if st == 1
+        return doc.first, 2
+    elseif st == 2
+        return doc.rest, 3
+    else
+        return nothing
+    end
+end
+
+function Base.show(io::IO, doc::CommandDoc)
+    print(io, doc.first, doc.rest)
+end
+
 Base.@kwdef struct Arg
     name::String = "arg"
-    doc::String = "positional argument"
+    line::LineNumberNode=LineNumberNode(0)
+    doc::CommandDoc = CommandDoc(name, line, "positional argument")
     require::Bool = true
     type = Any
-    line::LineNumberNode=LineNumberNode(0)
+end
+
+function Arg(name::String, line::LineNumberNode, doc::String, require::Bool, type)
+    Arg(name, line, CommandDoc(name, line, doc), require, type)
 end
 
 Base.@kwdef struct Option
     name::String
-    arg::Arg = Arg()
-    doc::String = ""
-    short::Bool = false
     line::LineNumberNode=LineNumberNode(0)
+    doc::CommandDoc = CommandDoc()
+    arg::Arg = Arg()
+    short::Bool = false
+end
+
+function Option(name::String, line::LineNumberNode, doc::String, arg::Arg, short::Bool)
+    Option(name, line, CommandDoc(name, line, doc), arg, short)
 end
 
 Base.@kwdef struct Flag
     name::String
-    doc::String = ""
-    short::Bool = true
     line::LineNumberNode=LineNumberNode(0)
+    doc::CommandDoc = CommandDoc()
+    short::Bool = true
+end
+
+function Flag(name::String, line::LineNumberNode, doc::String, short::Bool)
+    Flag(name, line, CommandDoc(name, line, doc), short)
 end
 
 """
@@ -89,15 +130,19 @@ the call to its sub-command `show`. See also [`LeafCommand`](@ref).
 git remote show origin
 ```
 """
-struct NodeCommand <: AbstractCommand
+Base.@kwdef struct NodeCommand <: AbstractCommand
     name::String
+    line::LineNumberNode = LineNumberNode(0)
+    doc::CommandDoc = CommandDoc()
     subcmds::Vector{Any}
-    doc::String
-    line::LineNumberNode
+end
 
-    function NodeCommand(name, subcmds, doc, line)
-        new(name, subcmds, strip(doc), line)
-    end
+function NodeCommand(name::String, line::LineNumberNode, doc::String, subcmds::Vector)
+    NodeCommand(name, line, CommandDoc(name, line, doc), subcmds)
+end
+
+function NodeCommand(name::String, subcmds::Vector; kwargs...)
+    NodeCommand(;name=name, subcmds=subcmds, kwargs...)
 end
 
 """
@@ -118,22 +163,24 @@ struct LeafCommand <: AbstractCommand
     nrequire::Int
     options::Vector{Option}
     flags::Vector{Flag}
-    doc::String
+    doc::CommandDoc
     line::LineNumberNode
 
     function LeafCommand(entry, name, args, options, flags, doc, line)
         check_duplicate_short_options(options, flags)
         nrequire = check_required_args(args)
-        new(entry, name, args, nrequire, options, flags, strip(doc), line)
+        new(entry, name, args, nrequire, options, flags, doc, line)
     end
+end
+
+function LeafCommand(entry, name, args, options, flags, doc::String, line)
+    LeafCommand(entry, name, args, options, flags, CommandDoc(name, line, doc), line)
 end
 
 Arg(name; kwargs...) = Arg(; name = name, kwargs...)
 Option(name, arg = Arg(); kwargs...) = Option(; name = name, arg = arg, kwargs...)
 Flag(name; kwargs...) = Flag(; name = name, kwargs...)
 EntryCommand(root; kwargs...) = EntryCommand(; root = root, kwargs...)
-NodeCommand(name, cmds; doc = "", line=LineNumberNode(0)) = NodeCommand(name, cmds, doc, line)
-NodeCommand(; name, cmds, doc = "", line=LineNumberNode(0)) = NodeCommand(name, cmds, doc, line)
 
 function LeafCommand(
     entry;
@@ -141,7 +188,7 @@ function LeafCommand(
     args::Vector{Arg} = Arg[],
     options::Vector{Option} = Option[],
     flags::Vector{Flag} = Flag[],
-    doc::String = "",
+    doc = CommandDoc(),
     line::LineNumberNode = LineNumberNode(0),
 )
 
@@ -242,7 +289,7 @@ end
 
 function print_cmd(io::IO, cmd::NodeCommand)
     if get(io, :inline, false)
-        partition(io, cmd, cmd_doc(cmd))
+        partition(io, cmd, cmd_doc(cmd).first)
     else
         print_title(io, cmd)
         print_body(io, cmd)
@@ -251,7 +298,7 @@ end
 
 function print_cmd(io::IO, cmd::LeafCommand)
     if get(io, :inline, false)
-        partition(io, cmd, cmd_doc(cmd))
+        partition(io, cmd, cmd_doc(cmd).first)
     else
         print_title(io, cmd)
         print_body(io, cmd)
@@ -259,14 +306,14 @@ function print_cmd(io::IO, cmd::LeafCommand)
 end
 
 function print_cmd(io::IO, x::Union{Option,Flag})
-    partition(io, x, cmd_doc(x))
+    partition(io, x, cmd_doc(x)...)
 end
 
 function print_cmd(io::IO, x::Arg)
     if x.require
-        partition(io, x, cmd_doc(x))
+        partition(io, x, cmd_doc(x)...)
     else
-        partition(io, x, "optional argument. ", cmd_doc(x))
+        partition(io, x, "optional argument. ", cmd_doc(x)...)
     end
 end
 
@@ -299,14 +346,6 @@ end
 # only ommit the description if they can be displayed in full later
 function print_doc(io::IO, cmd::AbstractCommand, doc::String, width::Int, first_line_indent::Int, indent::String, doc_indent::Int)
     brief = first_sentence(doc)
-    if length(brief) > max_brief_length()
-        lineinfo = cmd_lineinfo(cmd)
-        error(
-            "the first sentence of doc should not be larger than $(max_brief_length()). ",
-            "please revise the doc string for [$(cmd_name(cmd))] at $(lineinfo.file):$(lineinfo.line)"
-        )
-    end
-
     lines = splitlines(brief, width)
     print(io, " "^first_line_indent, first(lines))
 
@@ -327,7 +366,7 @@ function print_doc(io::IO, cmd, doc::String, width::Int, first_line_indent::Int,
     end
 end
 
-function first_sentence(content::String)
+function first_sentence(content)
     index = findfirst(". ", content)
 
     if index === nothing
@@ -544,6 +583,17 @@ function check_required_args(args)
         end
     end
     return count
+end
+
+function check_first_sentence_length(name, lineinfo, doc)
+    brief = first_sentence(doc)
+    if length(brief) > max_brief_length()
+        error(
+            "the first sentence of doc should not be larger than $(max_brief_length()). ",
+            "please revise the doc string for [$name] at $(lineinfo.file):$(lineinfo.line)"
+        )
+    end
+    return brief
 end
 
 end # module

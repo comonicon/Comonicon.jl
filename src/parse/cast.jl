@@ -255,8 +255,9 @@ function create_entry(m::Module, line::QuoteNode, kwargs...)
         Types,
         :NodeCommand,
         configs[:name],
+        line,
+        configs[:doc],
         :(collect(values($m.CASTED_COMMANDS))),
-        configs[:doc], line,
     )
     entry = xcall(Types, :EntryCommand, var_cmd, configs[:version], line)
 

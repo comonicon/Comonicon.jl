@@ -28,6 +28,7 @@ rm_format(x::Markdown.MD) = rm_format(x.content[1])
 Read CLI documentation from markdown format doc strings.
 """
 function read_doc(doc::Markdown.MD)
+    has_docstring(doc) || return "", read_args(nothing), read_flags(nothing), read_options(nothing)
     intro = read_intro(doc)
     args = read_args(read_section(doc, "Arguments"))
     flags = read_flags(read_section(doc, "Flags"))
@@ -144,4 +145,11 @@ function read_docstring(doc::String)
     m = match(r"^: *(.*)", strip(doc))
     m === nothing && throw(Meta.ParseError("invalid docstring format: $doc"))
     return String(m[1])
+end
+
+function has_docstring(doc::Markdown.MD)
+    paragraph = first(read_content(doc))
+    flag = paragraph isa Markdown.Paragraph &&
+        paragraph.content == Any["No documentation found."]
+    return !flag
 end

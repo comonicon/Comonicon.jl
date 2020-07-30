@@ -131,6 +131,7 @@ function install(
     mod::Module,
     name = default_name(mod);
     bin = joinpath(first(DEPOT_PATH), "bin"),
+    completion=true,
     exename = PATH.default_exename(),
     project::String = PATH.project(mod),
     sysimg::Bool = false,
@@ -195,6 +196,10 @@ function install(
     @info "generating $file"
     open(file, "w+") do f
         println(f, shell_script)
+    end
+
+    if completion
+        install_completion(mod, bin)
     end
 
     chmod(file, 0o777)
@@ -286,4 +291,29 @@ function build()
         project = project(),
         precompile_execution_file = project("test", "runtests.jl"),
     )
+end
+
+function detect_shell()
+    haskey(ENV, "SHELL") || error("cannot find available shell command")
+    name = basename(ENV["SHELL"])
+    if name == "zsh"
+        return CodeGen.ZSHCompletionCtx()
+    end
+    error("completion for $name is not supported")
+end
+
+function install_completion(m::Module, bin::String)
+    isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
+    haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
+
+    main = m.CASTED_COMMANDS["main"]
+    script = CodeGen.codegen(detect_shell(), main)
+    path = joinpath(dirname(bin), "completions")
+    
+    if !ispath(path)
+        mkpath(path)
+    end
+
+    write(joinpath(path, "_" * cmd_name(main)), script)
+    return
 end
