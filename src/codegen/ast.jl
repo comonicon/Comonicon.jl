@@ -186,18 +186,18 @@ function codegen_params(ctx::ASTCtx, params::Symbol, cmd::LeafCommand)
     it = gensym(:index)
 
     for opt in cmd.options
-        push!(regexes, regex_option(opt))
         push!(regexes, regex_flag(opt))
+        push!(regexes, regex_option(opt))
 
-        push!(actions, read_match(params, it, opt))
         push!(actions, read_forward(params, it, opt))
+        push!(actions, read_match(params, it, opt))
 
         if opt.short
-            push!(regexes, regex_short_option(opt))
             push!(regexes, regex_short_flag(opt))
+            push!(regexes, regex_short_option(opt))
 
-            push!(actions, read_match(params, it, opt))
             push!(actions, read_forward(params, it, opt))
+            push!(actions, read_match(params, it, opt))
         end
     end
 
