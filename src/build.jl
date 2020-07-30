@@ -299,7 +299,7 @@ function detect_shell()
     if name == "zsh"
         return CodeGen.ZSHCompletionCtx()
     end
-    error("completion for $name is not supported")
+    return nothing
 end
 
 function install_completion(m::Module, bin::String)
@@ -307,7 +307,9 @@ function install_completion(m::Module, bin::String)
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
 
     main = m.CASTED_COMMANDS["main"]
-    script = CodeGen.codegen(detect_shell(), main)
+    shell = detect_shell()
+    shell === nothing && return
+    script = CodeGen.codegen(shell, main)
     path = joinpath(dirname(bin), "completions")
     
     if !ispath(path)
