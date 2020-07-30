@@ -34,7 +34,7 @@ cmd2 = NodeCommand(
     [LeafCommand(test_tanh; args = [Arg("theta"; type = Real)])],
     doc = "asdasdasdasdfunuikasnsdasdasdasdas",
 )
-cmd = NodeCommand("dummy", [cmd1, cmd2]; doc = "dasdasdujkink asdas dasdas das dasd asdasd adsd as")
+cmd = NodeCommand("dummy", [cmd1, cmd2]; doc = "dasdasdujkink. asdas dasdas das dasd asdasd adsd as.")
 entry = EntryCommand(cmd)
 eval(codegen(entry))
 
