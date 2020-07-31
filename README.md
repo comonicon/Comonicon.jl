@@ -45,7 +45,7 @@ to create more complicated command line interfaces. You can check the example `I
 
 ## Features
 ### Zero Duplication
-The frontend `@command_main` and `@cast` will try to **parse everything you typed** and turn them into
+The frontend `@main` and `@cast` will try to **parse everything you typed** and turn them into
 part of your command line. This includes your function or module docstrings, your argument and keyword
 argument names, types and default values.
 
