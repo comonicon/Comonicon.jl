@@ -1,6 +1,7 @@
 using Comonicon.Types
 using Comonicon.CodeGen
 using Comonicon.PATH
+using Comonicon.CodeGen: codegen_call
 using Test
 
 function test_sin(theta; foo = 1.0)
@@ -77,3 +78,23 @@ end
 end
 
 Issue23.command_main(["run", "--port", "2345"])
+
+cmd_sin = LeafCommand(
+    test_sin;
+    args = [Arg("theta"), Arg("xs";vararg=true)],
+    doc = "sdasdbsa dasdioasdmasd dsadas",
+)
+
+@test codegen_call(ASTCtx(), :params, :n_args, cmd_sin) == :($test_sin(ARGS[1], ARGS[2:end]...))
+
+cmd_sin = LeafCommand(
+    test_sin;
+    args = [Arg("theta"), Arg("alpha"; require=false), Arg("xs";vararg=true)],
+    doc = "sdasdbsa dasdioasdmasd dsadas",
+)
+
+@test prettify(codegen_call(ASTCtx(), :params, :n_args, cmd_sin)) == Expr(:block, 
+    Expr(:if, :(n_args == 1), :($test_sin(ARGS[1]))),
+    Expr(:if, :(n_args == 2), :($test_sin(ARGS[1], ARGS[2]))),
+    Expr(:if, :(n_args == 3), :($test_sin(ARGS[1], ARGS[2], ARGS[3:end]...)))
+)

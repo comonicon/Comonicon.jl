@@ -76,11 +76,12 @@ Base.@kwdef struct Arg
     line::LineNumberNode=LineNumberNode(0)
     doc::CommandDoc = CommandDoc(name, line, "positional argument")
     require::Bool = true
+    vararg::Bool = false
     type = Any
 end
 
-function Arg(name::String, line::LineNumberNode, doc::String, require::Bool, type)
-    Arg(name, line, CommandDoc(name, line, doc), require, type)
+function Arg(name::String, line::LineNumberNode, doc::String, require::Bool, vararg::Bool, type)
+    Arg(name, line, CommandDoc(name, line, doc), require, vararg, type)
 end
 
 Base.@kwdef struct Option
@@ -168,6 +169,7 @@ struct LeafCommand <: AbstractCommand
 
     function LeafCommand(entry, name, args, options, flags, doc, line)
         check_duplicate_short_options(options, flags)
+        check_varargs_position(args)
         nrequire = check_required_args(args)
         new(entry, name, args, nrequire, options, flags, doc, line)
     end
@@ -576,13 +578,29 @@ function check_required_args(args)
     count = 0
     prev_require = 0
     for (i, arg) in enumerate(args)
-        if arg.require
-            prev_require + 1 == i || error("optional positional arguments must occur at end")
+        if arg.require && !(arg.vararg)
+            prev_require + 1 == i || error("optional positional arguments must occur at the end")
             count += 1
             prev_require = i
         end
     end
+
     return count
+end
+
+function check_varargs_position(args)
+    first_vararg_position = 0
+    first_vararg = nothing
+    for (i, arg) in enumerate(args)
+        if arg.vararg
+            first_vararg_position = i
+            break
+        end
+    end
+    if first_vararg_position > 0 && first_vararg_position != length(args)
+        throw(Meta.ParseError("syntax: invalid \"...\" on non-final argument around $(first_vararg.line)"))
+    end
+    return
 end
 
 function check_first_sentence_length(name, lineinfo, doc)

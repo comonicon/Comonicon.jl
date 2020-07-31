@@ -129,11 +129,14 @@ function parse_kwargs(def)
 end
 
 function to_argument(def, ex)
+    # (name, type, require, vararg)
     @smatch ex begin
-        ::Symbol => (string(ex), Any, true)
-        :($name::$type) => (string(name), wrap_type(def, type), true)
-        Expr(:kw, :($name::$type), _) => (string(name), wrap_type(def, type), false)
-        Expr(:kw, name::Symbol, _) => (string(name), Any, false)
+        ::Symbol => (string(ex), Any, true, false)
+        :($name::$type) => (string(name), wrap_type(def, type), true, false)
+        :($name...) => (string(name), Any, true, true)
+        :($name::$type...) => (string(name), wrap_type(def, type), true, true)
+        Expr(:kw, :($name::$type), _) => (string(name), wrap_type(def, type), false, false)
+        Expr(:kw, name::Symbol, _) => (string(name), Any, false, false)
         _ => throw(Meta.ParseError("invalid syntax for command line entry: $ex"))
     end
 end
