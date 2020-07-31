@@ -16,25 +16,28 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::NodeCommand, entry:
     push!(args, "*:: :->args")
 
     push!(lines, "_arguments -C \\")
-    args = map(x->"\"$x\"", args)
-    append!(lines, map(x->tab*x*" \\", args))
+    args = map(x -> "\"$x\"", args)
+    append!(lines, map(x -> tab * x * " \\", args))
 
     push!(lines, "")
     push!(lines, raw"case $line[1] in")
     for each in cmd.subcmds
         name = cmd_name(each)
         push!(lines, string(tab, name, ")", prefix * cmd_name(cmd) * "_" * name))
-        push!(lines, tab*";;")
+        push!(lines, tab * ";;")
     end
     push!(lines, "esac")
-    body = join(map(x->tab*x, lines), "\n")
+    body = join(map(x -> tab * x, lines), "\n")
 
     script = []
-    push!(script, """
-    function $prefix$(cmd_name(cmd))() {
-    $body
-    }
-    """)
+    push!(
+        script,
+        """
+function $prefix$(cmd_name(cmd))() {
+$body
+}
+""",
+    )
 
     for each in cmd.subcmds
         push!(script, codegen(ctx, prefix * cmd_name(cmd) * "_", each, false))
@@ -57,9 +60,9 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry:
         end
     end
 
-    args = map(x->"\"$x\"", args)
-    append!(lines, map(x->tab*x*" \\", args))
-    body = join(map(x->tab*x, lines), "\n")
+    args = map(x -> "\"$x\"", args)
+    append!(lines, map(x -> tab * x * " \\", args))
+    body = join(map(x -> tab * x, lines), "\n")
 
     return """
     function $prefix$(cmd_name(cmd))() {
@@ -69,10 +72,7 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry:
 end
 
 function basic_arguments(entry)
-    args = [
-        "-h[show help information]",
-        "--help[show help information]",
-    ]
+    args = ["-h[show help information]", "--help[show help information]"]
 
     if entry
         push!(args, "-V[show version information]")

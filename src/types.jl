@@ -4,7 +4,8 @@ module Types
 export Arg, Option, Flag, EntryCommand, NodeCommand, LeafCommand, AbstractCommand
 
 # interfaces
-export print_cmd, cmd_doc, cmd_name, cmd_sym, set_brief_length!, max_brief_length, check_first_sentence_length
+export print_cmd,
+    cmd_doc, cmd_name, cmd_sym, set_brief_length!, max_brief_length, check_first_sentence_length
 
 const MAX_DOC_WIDTH = 28
 const INDENT = 2
@@ -24,7 +25,7 @@ Set the maximum length of a brief description. Default is 120.
 
     This is only effective when called before [`@main`](@ref) or [`codegen`](@ref).
 """
-function set_brief_length!(n::Int=120)
+function set_brief_length!(n::Int = 120)
     MAX_BRIEF_LENGTH[] = n
 end
 
@@ -57,7 +58,7 @@ struct CommandDoc
     end
 end
 
-function Base.iterate(doc::CommandDoc, st=1)
+function Base.iterate(doc::CommandDoc, st = 1)
     if st == 1
         return doc.first, 2
     elseif st == 2
@@ -73,7 +74,7 @@ end
 
 Base.@kwdef struct Arg
     name::String = "arg"
-    line::LineNumberNode=LineNumberNode(0)
+    line::LineNumberNode = LineNumberNode(0)
     doc::CommandDoc = CommandDoc(name, line, "positional argument")
     require::Bool = true
     type = Any
@@ -85,7 +86,7 @@ end
 
 Base.@kwdef struct Option
     name::String
-    line::LineNumberNode=LineNumberNode(0)
+    line::LineNumberNode = LineNumberNode(0)
     doc::CommandDoc = CommandDoc()
     arg::Arg = Arg()
     short::Bool = false
@@ -97,7 +98,7 @@ end
 
 Base.@kwdef struct Flag
     name::String
-    line::LineNumberNode=LineNumberNode(0)
+    line::LineNumberNode = LineNumberNode(0)
     doc::CommandDoc = CommandDoc()
     short::Bool = true
 end
@@ -116,7 +117,7 @@ of the entire CLI and a version number. The version number is `v"0.0.0"` by defa
 Base.@kwdef struct EntryCommand <: AbstractCommand
     root::Any
     version::VersionNumber = v"0.0.0"
-    line::LineNumberNode=LineNumberNode(0)
+    line::LineNumberNode = LineNumberNode(0)
 end
 
 """
@@ -142,7 +143,7 @@ function NodeCommand(name::String, line::LineNumberNode, doc::String, subcmds::V
 end
 
 function NodeCommand(name::String, subcmds::Vector; kwargs...)
-    NodeCommand(;name=name, subcmds=subcmds, kwargs...)
+    NodeCommand(; name = name, subcmds = subcmds, kwargs...)
 end
 
 """
@@ -344,7 +345,15 @@ function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
 end
 
 # only ommit the description if they can be displayed in full later
-function print_doc(io::IO, cmd::AbstractCommand, doc::String, width::Int, first_line_indent::Int, indent::String, doc_indent::Int)
+function print_doc(
+    io::IO,
+    cmd::AbstractCommand,
+    doc::String,
+    width::Int,
+    first_line_indent::Int,
+    indent::String,
+    doc_indent::Int,
+)
     brief = first_sentence(doc)
     lines = splitlines(brief, width)
     print(io, " "^first_line_indent, first(lines))
@@ -358,7 +367,15 @@ function print_doc(io::IO, cmd::AbstractCommand, doc::String, width::Int, first_
     end
 end
 
-function print_doc(io::IO, cmd, doc::String, width::Int, first_line_indent::Int, indent::String, doc_indent::Int)
+function print_doc(
+    io::IO,
+    cmd,
+    doc::String,
+    width::Int,
+    first_line_indent::Int,
+    indent::String,
+    doc_indent::Int,
+)
     lines = splitlines(doc, width)
     print(io, " "^first_line_indent, first(lines))
     for i in 2:length(lines)
@@ -590,7 +607,7 @@ function check_first_sentence_length(name, lineinfo, doc)
     if length(brief) > max_brief_length()
         error(
             "the first sentence of doc should not be larger than $(max_brief_length()). ",
-            "please revise the doc string for [$name] at $(lineinfo.file):$(lineinfo.line)"
+            "please revise the doc string for [$name] at $(lineinfo.file):$(lineinfo.line)",
         )
     end
     return brief

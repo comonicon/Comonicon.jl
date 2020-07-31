@@ -131,7 +131,7 @@ function install(
     mod::Module,
     name = default_name(mod);
     bin = joinpath(first(DEPOT_PATH), "bin"),
-    completion=true,
+    completion = true,
     exename = PATH.default_exename(),
     project::String = PATH.project(mod),
     sysimg::Bool = false,
@@ -311,7 +311,7 @@ function install_completion(m::Module, bin::String)
     shell === nothing && return
     script = CodeGen.codegen(shell, main)
     path = joinpath(dirname(bin), "completions")
-    
+
     if !ispath(path)
         mkpath(path)
     end
