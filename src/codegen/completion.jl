@@ -8,25 +8,37 @@ function codegen(ctx::ZSHCompletionCtx, cmd::EntryCommand)
 end
 
 function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::NodeCommand, entry::Bool)
-    lines = ["local line", ""]
+    lines = [
+        "# These are set by _arguments",
+        "local context state state_descr line",
+        "typeset -A opt_args",
+        "",
+    ]
 
     args = basic_arguments(entry)
 
-    push!(args, "1: :$(actions(cmd.subcmds))")
-    push!(args, "*:: :->args")
+    push!(args, "\"1: :$(actions(cmd.subcmds))\"")
+    push!(args, "\"*:: :->args\"")
 
     push!(lines, "_arguments -C \\")
-    args = map(x->"\"$x\"", args)
     append!(lines, map(x->tab*x*" \\", args))
 
     push!(lines, "")
-    push!(lines, raw"case $line[1] in")
+    push!(lines, raw"case $state in")
+    push!(lines, tab*"(args)")
+    push!(lines, tab*tab*raw"case ${words[1]} in")
+
+    commands = []
     for each in cmd.subcmds
         name = cmd_name(each)
-        push!(lines, string(tab, name, ")", prefix * cmd_name(cmd) * "_" * name))
-        push!(lines, tab*";;")
+        push!(commands, name * ")")
+        push!(commands, tab * prefix * cmd_name(cmd) * "_" * name)
+        push!(commands, ";;")
     end
+    append!(lines, map(x->tab^3 * x, commands))
+    push!(lines, tab^2*"esac")
     push!(lines, "esac")
+
     body = join(map(x->tab*x, lines), "\n")
 
     script = []
@@ -50,14 +62,13 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry:
     for (i, each) in enumerate(cmd.options)
         name = cmd_name(each)
         doc = cmd_doc(each).first
-        push!(args, "--$name[$doc]")
-
+        token = "--$name"
         if each.short
-            push!(args, "-$(short_name(each))[$doc]")
+            token = "{-$(short_name(each)),--$name}"
         end
+        push!(args, "$token'[$doc]'")
     end
 
-    args = map(x->"\"$x\"", args)
     append!(lines, map(x->tab*x*" \\", args))
     body = join(map(x->tab*x, lines), "\n")
 
@@ -70,13 +81,11 @@ end
 
 function basic_arguments(entry)
     args = [
-        "-h[show help information]",
-        "--help[show help information]",
+        "{-h,--help}'[show help information]'",
     ]
 
     if entry
-        push!(args, "-V[show version information]")
-        push!(args, "--version[show version information]")
+        push!(args, "{-V,--version}'[show version information]'")
     end
     return args
 end
