@@ -163,13 +163,15 @@ function codegen_body(ctx::ASTCtx, cmd::LeafCommand)
     end
 
     # Error: too much arguments
-    nmost = length(cmd.args)
-    err = xerror(:("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
-    push!(validate_ex.args, quote
-        if $n_args > $nmost
-            $err
-        end
-    end)
+    if !last(cmd.args).vararg
+        nmost = length(cmd.args)
+        err = xerror(:("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
+        push!(validate_ex.args, quote
+            if $n_args > $nmost
+                $err
+            end
+        end)
+    end
 
     push!(ret.args, :($n_args = length(ARGS) - $(ctx.ptr - 1)))
     push!(ret.args, validate_ex)
@@ -231,9 +233,13 @@ function codegen_call(ctx::ASTCtx, params::Symbol, n_args::Symbol, cmd::LeafComm
         push!(ex_call.args, Expr(:parameters, :($params...)))
     end
 
+    # since we will check the position of arguments
+    # the optional and variational arguments are always in the end
     for (i, arg) in enumerate(cmd.args)
         if arg.require
-            push!(ex_call.args, xparse_args(arg.type, ctx.ptr + i - 1))
+            push!(ex_call.args, xparse_args(arg, ctx.ptr + i - 1))
+        else
+            break
         end
     end
 
@@ -245,20 +251,20 @@ function codegen_call(ctx::ASTCtx, params::Symbol, n_args::Symbol, cmd::LeafComm
         push!(ex.args, Expr(:if, :($n_args == $(cmd.nrequire)), ex_call))
     end
 
+    expanded_call_ex = copy(ex_call)
     for i in cmd.nrequire+1:length(cmd.args)
-        call_ex = copy(ex_call)
-        expanded_call = push!(call_ex.args, xparse_args(cmd.args[i].type, ctx.ptr + i - 1))
-        push!(ex.args, Expr(:if, :($n_args == $i), expanded_call))
+        expanded_call_ex = copy(expanded_call_ex)
+        push!(expanded_call_ex.args, xparse_args(cmd.args[i], ctx.ptr + i - 1))
+        push!(ex.args, Expr(:if, :($n_args == $i), expanded_call_ex))
     end
     return ex
 end
 
 function read_forward(parameters, it, option::Option)
-    type = option.arg.type
     sym = QuoteNode(cmd_sym(option))
 
     function action(m)
-        arg = xparse_args(type, :($it + 1))
+        arg = xparse_args(option.arg, :($it + 1))
         return quote
             $it < length(ARGS) || error("expect an argument")
             push!($parameters, $sym => $arg)

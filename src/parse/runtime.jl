@@ -29,6 +29,7 @@ The element of arguments vector is a tuple
 - `name::String` is the name of argument
 - `type::DataType` is the type of this argument, can be `Any` if you don't want to specify
 - `require::Bool` indicates the whether this argument is required.
+- `vararg::Bool` indicates whether this argument is a vararg.
 
 The element of kwargs vector is also a tuple
 (name, type, short):
@@ -59,8 +60,8 @@ end
 
 function create_args(args, docs, line)
     ret = Arg[]
-    for (name, type, require) in args
-        push!(ret, Arg(name; type = type, require = require, doc = get(docs, name, ""), line=line))
+    for (name, type, require, vararg) in args
+        push!(ret, Arg(name; type = type, require = require, doc = get(docs, name, ""), line=line, vararg=vararg))
     end
     return ret
 end

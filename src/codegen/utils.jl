@@ -45,13 +45,29 @@ regex_short_flag(x) = Regex("^-$(short_name(x))\$")
 regex_option(x) = Regex("^--$(cmd_name(x))=(.*)")
 regex_short_option(x) = Regex("^-$(short_name(x))(.*)")
 
-xparse_args(type, index) = xparse(type, :(ARGS[$index]))
+skip_type_convert(type) = (type in [Any, String, AbstractString])
+
+function xparse_args(arg::Arg, index)
+    if arg.vararg
+        return xparse_varargs(arg.type, index)
+    else
+        return xparse(arg.type, :(ARGS[$index]))
+    end
+end
 
 function xparse(type, str)
-    if type in [Any, String, AbstractString]
+    if skip_type_convert(type)
         return :($str)
     else
         return :(convert($type, Meta.parse($str)))
+    end
+end
+
+function xparse_varargs(type, index)
+    if skip_type_convert(type)
+        return :(ARGS[$index:end]...)
+    else
+        return :(map(x->convert($type, Meta.parse(x)), ARGS[$index:end])...)
     end
 end
 
@@ -90,7 +106,7 @@ all_required(cmd::LeafCommand) = all_required(cmd.args)
 
 function nrequired_args(args::Vector)
     return count(args) do x
-        x.require == true
+        x.require == true && x.vararg == false
     end
 end
 
