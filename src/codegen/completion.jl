@@ -81,11 +81,11 @@ end
 
 function basic_arguments(entry)
     args = [
-        "{-h,--help}'[show help information]'",
+        "'(- 1 *)'{-h,--help}'[show help information]'",
     ]
 
     if entry
-        push!(args, "{-V,--version}'[show version information]'")
+        push!(args, "'(- 1 *)'{-V,--version}'[show version information]'")
     end
     return args
 end

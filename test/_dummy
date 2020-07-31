@@ -5,8 +5,8 @@ function _dummy() {
     typeset -A opt_args
     
     _arguments -C \
-        {-h,--help}'[show help information]' \
-        {-V,--version}'[show version information]' \
+        '(- 1 *)'{-h,--help}'[show help information]' \
+        '(- 1 *)'{-V,--version}'[show version information]' \
         "1: :((foo\:'asdasd asdasd asd asdasd asdas asdasd dasdas' goosadas\:'asdasdasdasdfunuikasnsdasdasdasdas'))" \
         "*:: :->args" \
     
@@ -30,7 +30,7 @@ function _dummy_foo() {
     typeset -A opt_args
     
     _arguments -C \
-        {-h,--help}'[show help information]' \
+        '(- 1 *)'{-h,--help}'[show help information]' \
         "1: :((test_sin\:'sdasdbsa dasdioasdmasd dsadas' test_cos\:'dasdas dasidjmoasid dasdasd dasdasd dasd dasd'))" \
         "*:: :->args" \
     
@@ -50,14 +50,14 @@ function _dummy_foo() {
 
 function _dummy_foo_test_sin() {
     _arguments \
-        {-h,--help}'[show help information]' \
+        '(- 1 *)'{-h,--help}'[show help information]' \
         {-f,--foo}'[sadasd aasdas dsadas dasdasdasd asdasdas]' \
 }
 
 
 function _dummy_foo_test_cos() {
     _arguments \
-        {-h,--help}'[show help information]' \
+        '(- 1 *)'{-h,--help}'[show help information]' \
 }
 
 
@@ -67,7 +67,7 @@ function _dummy_goosadas() {
     typeset -A opt_args
     
     _arguments -C \
-        {-h,--help}'[show help information]' \
+        '(- 1 *)'{-h,--help}'[show help information]' \
         "1: :((test_tanh\:''))" \
         "*:: :->args" \
     
@@ -84,5 +84,5 @@ function _dummy_goosadas() {
 
 function _dummy_goosadas_test_tanh() {
     _arguments \
-        {-h,--help}'[show help information]' \
+        '(- 1 *)'{-h,--help}'[show help information]' \
 }
