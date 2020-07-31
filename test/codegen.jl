@@ -1,5 +1,6 @@
 using Comonicon.Types
 using Comonicon.CodeGen
+using Comonicon.PATH
 using Test
 
 function test_sin(theta; foo = 1.0)
@@ -43,7 +44,7 @@ eval(codegen(entry))
 @test command_main(["foo", "test_sin", "1.0", "--foo", "2.0"]) == 0
 @test command_main(["foo", "test_sin", "1.0", "-f2.0"]) == 0
 
-@test strip(codegen(ZSHCompletionCtx(), entry)) == strip(read("test/_dummy", String))
+@test strip(codegen(ZSHCompletionCtx(), entry)) == strip(read(PATH.project("test", "_dummy"), String))
 
 @testset "prettify" begin
     ex1 = quote
