@@ -33,6 +33,7 @@ using .CodeGen
 using .Parse: main
 
 include("build.jl")
+include("tools/tools.jl")
 include("precompile.jl")
 _precompile_()
 
