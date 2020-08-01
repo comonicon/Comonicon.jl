@@ -9,6 +9,7 @@ using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonico
     read_toml
 
 Pkg.develop(PackageSpec(path=PATH.project("test", "Foo")))
+using Foo
 
 rcfile_content = """
 some words
@@ -34,7 +35,7 @@ write_path(rcfile, true, Dict())
 
 # read_toml(PATH.project("test", "Comonicon.toml"))
 
-using Foo
+
 @test_throws ErrorException Comonicon.install(Foo)
 
 d = Dict(
@@ -65,12 +66,19 @@ Comonicon.build(Foo, false; bin=PATH.project("test", "bin"), quiet=true, export_
 @test isfile(PATH.project("test", "bin", "foo"))
 @test isfile(PATH.project("test", "bin", "foo.jl"))
 
-empty!(ARGS)
-push!(ARGS, "sysimg")
 
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.build(Foo, true; bin=PATH.project("test", "bin"), quiet=true, export_path=false)    
+    Comonicon.build(Foo, true; bin=PATH.project("test", "bin"), quiet=true, export_path=false)
+end
+
+@test ispath(PATH.project("test", "Foo", "deps"))
+
+empty!(ARGS)
+push!(ARGS, "sysimg")
+mock(create_sysimage) do plus
+    @assert plus isa Mock
+    Comonicon.install(Foo; bin=PATH.project("test", "bin"), quiet=true, export_path=false)
 end
 
 @test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name("foo")))
