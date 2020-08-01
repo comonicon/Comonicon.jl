@@ -551,9 +551,9 @@ function install_env_path(quiet::Bool=false)
 
     config_file = ""
     if shell == "zsh"
-        config_file = ".zshrc"
+        config_file = joinpath((haskey(ENV, "ZDOTDIR") ? ENV["ZDOTDIR"] : homedir()), ".zshrc")
     elseif shell == "bash"
-        config_file = ".bashrc"
+        config_file = joinpath(homedir(), ".bashrc")
     else
         @warn "auto installation for $shell is not supported, please open an issue under Comonicon.jl"
     end
