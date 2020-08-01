@@ -1,3 +1,6 @@
+"""
+path related functions.
+"""
 module PATH
 using Libdl
 using Pkg
@@ -22,6 +25,19 @@ Default Julia executable name: `joinpath(Sys.BINDIR, Base.julia_exename())`
 """
 default_exename() = joinpath(Sys.BINDIR, Base.julia_exename())
 
+"""
+    default_julia_bin()
+
+Return the default path to `.julia/bin`.
+"""
+default_julia_bin() = joinpath(first(DEPOT_PATH), "bin")
+
+"""
+    default_julia_fpath()
+
+Return the default path to `.julia/completions`
+"""
+default_julia_fpath() = joinpath(first(DEPOT_PATH), "completions")
 end
 
 """
@@ -117,6 +133,9 @@ Install the CLI defined in module `mod` to the `bin`.
 # Keywords
 
 - `bin`: path of the `bin` folder, default is the `~/.julia/bin`.
+- `completion`: create completion script or not.
+- `add_path`: set to `true` to add `.julia/bin` and `.julia/completions` to path if not exists.
+- `quiet`: prompt or not.
 - `exename`: Julia executable name, default is [`PATH.default_exename`](@ref).
 - `project`: the project path of the CLI.
 - `compile`: julia compile level, can be [:yes, :no, :all, :min]
@@ -130,8 +149,10 @@ Install the CLI defined in module `mod` to the `bin`.
 function install(
     mod::Module,
     name = default_name(mod);
-    bin = joinpath(first(DEPOT_PATH), "bin"),
+    bin = PATH.default_julia_bin(),
     completion=true,
+    add_path=true,
+    quiet=false,
     exename = PATH.default_exename(),
     project::String = PATH.project(mod),
     sysimg::Bool = false,
@@ -203,6 +224,7 @@ function install(
     end
 
     chmod(file, 0o777)
+    add_path && install_env_path(quiet)
     return
 end
 
@@ -293,29 +315,140 @@ function build()
     )
 end
 
+"""
+    detect_shell()
+
+Detect shell type via `SHELL` environment variable.
+"""
 function detect_shell()
     haskey(ENV, "SHELL") || error("cannot find available shell command")
-    name = basename(ENV["SHELL"])
-    if name == "zsh"
-        return CodeGen.ZSHCompletionCtx()
-    end
-    return nothing
+    return basename(ENV["SHELL"])
 end
 
-function install_completion(m::Module, bin::String)
+"""
+    install_completion(m::Module[, path::String=PATH.default_julia_fpath()])
+
+Install completion script at `path`. Default path is [`PATH.default_julia_fpath()`](@ref).
+"""
+function install_completion(m::Module, path::String=PATH.default_julia_fpath())
     isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
 
     main = m.CASTED_COMMANDS["main"]
     shell = detect_shell()
     shell === nothing && return
-    script = CodeGen.codegen(shell, main)
-    path = joinpath(dirname(bin), "completions")
-    
+
+    if shell == "zsh"
+        ctx = CodeGen.ZSHCompletionCtx()
+    else
+        @warn "$shell completion is not supported yet"
+        return
+    end
+
+    script = CodeGen.codegen(ctx, main)
+
     if !ispath(path)
         mkpath(path)
     end
 
     write(joinpath(path, "_" * cmd_name(main)), script)
+    return
+end
+
+function contain_comonicon_path(rcfile, env=ENV)
+    if !haskey(env, "PATH")
+        _contain_path(rcfile) && return true
+        return false
+    end
+
+    for each in split(env["PATH"], ":")
+        each == PATH.default_julia_bin() && return true
+    end
+    return false
+end
+
+function contain_comonicon_fpath(rcfile, env=ENV)
+    if !haskey(env, "FPATH")
+        _contain_fpath(rcfile) && return true
+        return false
+    end
+
+    for each in split(env["FPATH"], ":")
+        each == PATH.default_julia_fpath() && return true
+    end
+    return false
+end
+
+function _contain_path(rcfile)
+    for line in readlines(rcfile)
+        if strip(line) == "export PATH=\"\$HOME/.julia/bin:\$PATH\"" ||
+            strip(line) == "export PATH=\"$(PATH.default_julia_bin()):\$PATH\""
+            return true
+        end
+    end
+    return false
+end
+
+function _contain_fpath(rcfile)
+    for line in readlines(rcfile)
+        if strip(line) == "export FPATH=\$HOME/.julia/completions:\$FPATH" ||
+            strip(line) == "export FPATH=\"$(PATH.default_julia_fpath()):\$FPATH\""
+            return true
+        end
+    end
+    return false
+end
+
+function install_env_path(quiet::Bool=false)
+    shell = detect_shell()
+
+    config_file = ""
+    if shell == "zsh"
+        config_file = ".zshrc"
+    elseif shell == "bash"
+        config_file = ".bashrc"
+    else
+        @warn "auto installation for $shell is not supported, please open an issue under Comonicon.jl"
+    end
+
+    write_path(joinpath(homedir(), config_file), quiet)
+end
+
+"""
+    write_path(rcfile[, quiet=false])
+
+Write `PATH` and `FPATH` to current shell's rc files (.zshrc, .bashrc)
+if they do not exists.
+"""
+function write_path(rcfile, quiet::Bool=false, env=ENV)
+    isempty(rcfile) && return
+
+    script = []
+    msg = "cannot detect ~/.julia/bin in PATH, do you want to add it in PATH?"
+    if !contain_comonicon_path(rcfile, env) && Tools.prompt(msg, quiet)
+        push!(script, """
+        # generated by Comonicon
+        # Julia bin PATH
+        export PATH="$(PATH.default_julia_bin()):\$PATH"
+        """)
+        @info "adding PATH to $rcfile"
+    end
+
+    msg = "cannot detect ~/.julia/completions in FPATH, do you want to add it in FPATH?"
+    if !contain_comonicon_fpath(rcfile, env) && Tools.prompt(msg, quiet)
+        push!(script, """
+        # generated by Comonicon
+        # Julia autocompletion PATH
+        export FPATH="$(PATH.default_julia_fpath()):\$FPATH"
+        """)
+        @info "adding FPATH to $rcfile"
+    end
+
+    # exit if nothing to add
+    isempty(script) && return
+    # NOTE: we don't create the file if not exists
+    open(rcfile, "a") do io
+        write(io, "\n" * join(script, "\n"))
+    end
     return
 end

@@ -10,3 +10,7 @@ end
 @testset "parse" begin
     include("parse.jl")
 end
+
+@testset "build" begin
+    include("build.jl")
+end
