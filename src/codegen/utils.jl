@@ -67,7 +67,7 @@ function xparse_varargs(type, index)
     if skip_type_convert(type)
         return :(ARGS[$index:end]...)
     else
-        return :(map(x->convert($type, Meta.parse(x)), ARGS[$index:end])...)
+        return :(map(x -> convert($type, Meta.parse(x)), ARGS[$index:end])...)
     end
 end
 

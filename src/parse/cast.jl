@@ -67,7 +67,7 @@ function cast_m(m::Module, line::QuoteNode, ex)
         return ret
     end
 
-    def = splitdef(ex; throw=false)
+    def = splitdef(ex; throw = false)
     if def === nothing
         push!(ret.args, parse_module(m, line, ex))
         return ret
@@ -87,7 +87,7 @@ function parse_function(m::Module, line::QuoteNode, ex, def)
         $(xcall(
             set_cmd!,
             casted_commands(m),
-            xcall(command, def[:name], parse_args(def), parse_kwargs(def);line=line),
+            xcall(command, def[:name], parse_args(def), parse_kwargs(def); line = line),
         ))
     end
 end
@@ -98,12 +98,12 @@ function parse_module(m::Module, line::QuoteNode, ex::Expr)
 
     return quote
         $ex
-        $(xcall(set_cmd!, casted_commands(m), xcall(command, ex.args[2]; line=line)))
+        $(xcall(set_cmd!, casted_commands(m), xcall(command, ex.args[2]; line = line)))
     end
 end
 
 function parse_module(m::Module, line::QuoteNode, ex::Symbol)
-    return xcall(set_cmd!, casted_commands(m), xcall(command, ex; line=line))
+    return xcall(set_cmd!, casted_commands(m), xcall(command, ex; line = line))
 end
 
 function parse_args(def)
@@ -205,18 +205,18 @@ function main_m(m::Module, line::QuoteNode, ex::Expr)
     ex.head === :(=) && return create_entry(m, ex)
 
     ret = Expr(:block)
-    def = splitdef(ex; throw=false)
+    def = splitdef(ex; throw = false)
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     push!(ret.args, ex)
 
     if def === nothing
         ex.head === :module ||
             throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
-        cmd = xcall(command, ex.args[2]; line=line)
+        cmd = xcall(command, ex.args[2]; line = line)
         push!(ret.args, :($var_cmd = $cmd))
     else
         push!(ret.args, :(Core.@__doc__ $(def[:name])))
-        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); line=line)
+        cmd = xcall(command, def[:name], parse_args(def), parse_kwargs(def); line = line)
         push!(ret.args, :($var_cmd = $cmd))
     end
 
@@ -229,8 +229,8 @@ function main_m(m::Module, line::QuoteNode, ex::Symbol)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     quote
-        $var_cmd = $(xcall(command, ex; line=line))
-        $var_entry = $(xcall(Types, :EntryCommand, var_cmd; line=line))
+        $var_cmd = $(xcall(command, ex; line = line))
+        $var_entry = $(xcall(Types, :EntryCommand, var_cmd; line = line))
         $(precompile_or_exec(m, var_entry))
     end
 end
