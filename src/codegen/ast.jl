@@ -42,7 +42,7 @@ function codegen(cmd::AbstractCommand)
 
     ctx = ASTCtx()
     defs[:body] = quote
-        $(codegen_scan_glob(ctx))
+        $(codegen_scan_glob(ctx, cmd))
         $(codegen(ctx, cmd))
     end
     return combinedef(defs)
@@ -70,9 +70,34 @@ function codegen(ctx::ASTCtx, cmd::EntryCommand)
     end
 end
 
-function codegen_scan_glob(ctx::ASTCtx)
-    quote
+function codegen_scan_glob(ctx::ASTCtx, cmd::EntryCommand)
+    return codegen_scan_glob(ctx, cmd.root)
+end
+
+function codegen_scan_glob(ctx::ASTCtx, cmd::LeafCommand)
+    # do not prompt help if no required args
+    if nrequired_args(cmd.args) == 0
+        return quote
+            $(ctx.help) = -1
+            $(_codegen_scan_glob(ctx, cmd))
+        end
+    else
+        return quote
+            $(ctx.help) = isempty(ARGS) ? 1 : -1
+            $(_codegen_scan_glob(ctx, cmd))
+        end
+    end
+end
+
+function codegen_scan_glob(ctx::ASTCtx, cmd::NodeCommand)
+    return quote
         $(ctx.help) = isempty(ARGS) ? 1 : -1
+        $(_codegen_scan_glob(ctx, cmd))
+    end
+end
+
+function _codegen_scan_glob(ctx::ASTCtx, cmd)
+    quote
         $(ctx.version) = -1
         for i in 1:length(ARGS)
             x = ARGS[i]
