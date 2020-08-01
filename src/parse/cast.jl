@@ -266,7 +266,6 @@ function create_entry(m::Module, line::QuoteNode, kwargs...)
 
     push!(ret.args, :($var_cmd = $cmd))
     push!(ret.args, :($var_entry = $entry))
-    push!(ret.args, xcall(set_cmd!, casted_commands(m), var_entry, "main"))
     push!(ret.args, precompile_or_exec(m, var_entry))
     return ret
 end
@@ -284,6 +283,7 @@ function precompile_or_exec(m::Module, entry)
         end
     else
         quote
+            $(xcall(set_cmd!, casted_commands(m), entry, "main"))
             $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
             precompile(Tuple{typeof($m.command_main),Array{String,1}})
         end
