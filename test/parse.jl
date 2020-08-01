@@ -1,5 +1,6 @@
 using Comonicon
 using Comonicon.Types
+using Comonicon.BuildTools: precompile_script, install
 using Test
 
 module Dummy
@@ -81,7 +82,7 @@ end
 @test Dummy.command_main(String["tick", "1.0"]) == 0
 
 
-@test Comonicon.precompile_script(Dummy) == """
+@test precompile_script(Dummy) == """
 using Main.Dummy;
 Main.Dummy.command_main(["-h"]);
 Main.Dummy.command_main(["goo", "-h"]);
@@ -115,6 +116,7 @@ ArgParse example implemented in Comonicon.
     @test opt2 == 2
 end
 
-Comonicon.install(Dummy; bin = Comonicon.PATH.project("test", "bin"), completion=false, quiet=true)
+Comonicon.install(Dummy; bin = Comonicon.PATH.project("test", "bin"), completion=false, quiet=true, export_path=false)
+
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy"))
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy.jl"))

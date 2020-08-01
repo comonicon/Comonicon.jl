@@ -1,7 +1,7 @@
 using Comonicon
 using Test
 using Comonicon.PATH
-using Comonicon: write_path, contain_comonicon_path, contain_comonicon_fpath
+using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath
 
 rcfile_content = """
 some words
