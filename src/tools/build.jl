@@ -28,7 +28,10 @@ const COMONICON_URL = "https://github.com/Roger-luo/Comonicon.jl"
 # incremental=false
 # filter_stdlibs=true
 # cpu_target="native"
-# download="https://github.com/Roger-luo/IonCLI.jl/releases/download"
+
+# [download]
+# host="github.com"
+# user="Roger-luo"
 
 const DEFAULT_INSTALL_CONFIG = Dict(
     "bin" => PATH.default_julia_bin(),
@@ -83,9 +86,14 @@ function read_configs(mod; kwargs...)
                 install_configs[string(k)] = v
             end
 
-            if k in [:path, :incremental, :filter_stdlibs, :cpu_target, :download]
+            if k in [:path, :incremental, :filter_stdlibs, :cpu_target]
                 sysimg_configs = get!(configs, "sysimg", Dict{String, Any}())
                 sysimg_configs[string(k)] = v
+            end
+
+            if k in [:host, :repo, :user]
+                download_config = get!(configs, "download", Dict{String, Any}())
+                download_config[string(k)] = v
             end
         end
     end
@@ -138,6 +146,14 @@ function validate_toml(configs)
     for key in ["incremental", "filter_stdlibs"]
         _check(configs["sysimg"], key) do x
             x isa Bool
+        end
+    end
+
+    haskey(configs, "download") || return
+
+    for key in ["host", "user", "repo"]
+        _check(configs["download"], key) do x
+            x isa String
         end
     end
 
@@ -226,7 +242,7 @@ function install_sysimg(mod::Module, configs::Dict)
     # if sysimg will be downloaded on user side
     # when we build the sysimg, a tarball should
     # be generated.
-    if haskey(configs["sysimg"], "download")
+    if haskey(configs, "download")
         # we create a system image tarball
         # via an argument sysimg
         if "sysimg" in ARGS
@@ -247,8 +263,8 @@ function download_sysimg(mod::Module, configs::Dict)
     sysimg_configs = configs["sysimg"]
     name = configs["name"]
     tarball_name = "$name-$(VERSION)-$os-$(Sys.ARCH).tar.gz"
-    url = "$(configs["sysimg"]["download"])/v$(Comonicon.get_version(mod))/$tarball_name"
 
+    url = sysimg_url(configs["download"])
     tarball = joinpath(PATH.project(mod, "deps", tarball_name))
     PlatformEngines.probe_platform_engines!()
 
@@ -263,6 +279,18 @@ function download_sysimg(mod::Module, configs::Dict)
         rm(tarball)
     end
     return
+end
+
+function sysimg_url(configs)
+    host = configs["host"]
+    if host == "github.com"
+        url = "https://github.com/" * configs["user"] * "/" * configs["repo"] * "/releases/download/"
+    else
+        error("host $host is not supported, please open an issue at $COMONICON_URL")
+    end
+
+    url *= "v$(Comonicon.get_version(mod))/$tarball_name"
+    return url
 end
 
 function build_sysimg(mod::Module, configs::Dict)

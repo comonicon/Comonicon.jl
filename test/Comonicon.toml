@@ -1,0 +1,16 @@
+name = "ion"
+
+[install]
+bin = ".julia/bin"
+completion=true
+export_path=true
+quiet=false
+compile="min"
+
+[sysimg]
+path="deps/lib"
+incremental=false
+filter_stdlibs=true
+cpu_target="native"
+optimize=2
+download="https://github.com/Roger-luo/IonCLI.jl/releases/download"
