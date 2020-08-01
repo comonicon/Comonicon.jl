@@ -22,8 +22,6 @@ include("types.jl")
 include("codegen/codegen.jl")
 include("parse/parse.jl")
 
-
-
 export @cast, @main
 
 using .Types
@@ -32,9 +30,14 @@ using .CodeGen
 
 using .Parse: main
 
-include("build.jl")
 include("tools/tools.jl")
-include("precompile.jl")
-_precompile_()
+include("tools/path.jl")
+include("tools/build.jl")
+
+using .BuildTools
+
+# include("build.jl")
+# include("precompile.jl")
+# _precompile_()
 
 end # module
