@@ -14,3 +14,4 @@ Manifest.toml
 /bin/
 /test/bin/
 /test/completions/
+/test/Foo/deps/
