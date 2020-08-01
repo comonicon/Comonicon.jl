@@ -5,8 +5,9 @@ using Markdown
 using Pkg
 using CRC32c
 using MatchCore
-using Comonicon.Types
-using Comonicon.CodeGen
+using ..Comonicon
+using ..Comonicon.Types
+using ..Comonicon.CodeGen
 
 export @cast,
     @main,

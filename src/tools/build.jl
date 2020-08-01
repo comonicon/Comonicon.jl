@@ -52,7 +52,7 @@ const DEFAULT_SYSIMG_CONFIG = Dict(
 
 const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
 
-function build(mod, sysimg=false; kwargs...)
+function build(mod, sysimg=true; kwargs...)
     configs = read_configs(mod; kwargs...)
     validate_toml(configs)
     configs = merge_defaults(mod, configs)
@@ -62,6 +62,8 @@ function build(mod, sysimg=false; kwargs...)
     elseif !sysimg
         delete!(configs, "sysimg")
     end
+    # do not download in manual mode
+    delete!(configs, "download")
     return install(mod, configs)
 end
 
@@ -180,8 +182,8 @@ function install(mod::Module, configs::Dict)
 end
 
 function install_script(mod::Module, configs::Dict)
-    if haskey(configs, "sysimg") && isfile(sysimage_path(configs))
-        sysimg_path = sysimage_path(configs)
+    if haskey(configs, "sysimg") && isfile(sysimage_path(mod, configs))
+        sysimg_path = sysimage_path(mod, configs)
     else
         sysimg_path = nothing
     end
@@ -258,8 +260,8 @@ function install_sysimg(mod::Module, configs::Dict)
     return
 end
 
-function sysimage_path(configs)
-    return joinpath(configs["sysimg"]["path"], PATH.sysimg(configs["name"]))
+function sysimage_path(mod, configs)
+    return PATH.project(mod, configs["sysimg"]["path"], PATH.sysimg(configs["name"]))
 end
 
 function download_sysimg(mod::Module, configs::Dict)
@@ -276,7 +278,7 @@ function download_sysimg(mod::Module, configs::Dict)
         download(url, tarball)
         unpack(tarball, PATH.project(mod, "deps"))
     catch e
-        error("fail to download $url, consider build the system image locally via $mod.build()")
+        error("fail to download $url, consider build the system image locally via $mod.comonicon_build()")
     end
 
     if ispath(tarball)
@@ -319,14 +321,16 @@ function build_sysimg(mod::Module, configs::Dict)
     incremental = sysimg_configs["incremental"]
     filter_stdlibs = sysimg_configs["filter_stdlibs"]
     cpu_target = sysimg_configs["cpu_target"]
+    image_path = sysimage_path(mod, configs)
 
     @info "compile under project: $project"
     @info "incremental: $incremental"
     @info "filter stdlibs: $filter_stdlibs"
+    @info "system image path: $image_path"
 
     create_sysimage(
         nameof(mod);
-        sysimage_path = sysimage_path(configs),
+        sysimage_path = image_path,
         incremental = incremental,
         project = project,
         # TODO: add runtests.jl to execution file

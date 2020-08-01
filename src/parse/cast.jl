@@ -284,6 +284,13 @@ function precompile_or_exec(m::Module, entry)
             $(create_casted_commands(m))
             $(xcall(set_cmd!, casted_commands(m), entry, "main"))
             $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
+
+            """
+                comonicon_build([sysimg=true]; kwargs...)
+
+            build the CLI manually.
+            """
+            comonicon_build(sysimg=true; kwargs...) = $(GlobalRef(Comonicon, :build))($m, sysimg; kwargs...)
             precompile(Tuple{typeof($m.command_main),Array{String,1}})
         end
     end
