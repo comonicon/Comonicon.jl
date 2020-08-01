@@ -6,7 +6,6 @@ version = "0.4.0"
 [deps]
 CRC32c = "8bf52ea8-c179-5cab-976a-9e18b702a9bc"
 ExprTools = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
-Foo = "9cc09137-cd31-4319-9d91-dfc41e461ca2"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 MatchCore = "5dd3f0b1-72a9-48ad-ae6e-79f673da005f"
