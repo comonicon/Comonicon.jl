@@ -82,3 +82,5 @@ mock(create_sysimage) do plus
 end
 
 @test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name("foo")))
+
+Pkg.rm(PackageSpec(name="Foo"))
