@@ -202,14 +202,13 @@ function main_m(m::Module, line::QuoteNode, ex::Expr)
         end
     end
 
-    ex.head === :(=) && return create_entry(m, ex)
-
     ret = Expr(:block)
     def = splitdef(ex; throw=false)
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     push!(ret.args, ex)
 
     if def === nothing
+        ex.head === :(=) && return create_entry(m, line, ex)
         ex.head === :module ||
             throw(Meta.ParseError("invalid expression, can only cast functions or modules"))
         cmd = xcall(command, ex.args[2]; line=line)
@@ -251,7 +250,6 @@ function create_entry(m::Module, line::QuoteNode, kwargs...)
     end
 
     ret = Expr(:block)
-    pushmaybe!(ret.args, create_casted_commands(m))
 
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     cmd = xcall(
@@ -283,6 +281,7 @@ function precompile_or_exec(m::Module, entry)
         end
     else
         quote
+            $(create_casted_commands(m))
             $(xcall(set_cmd!, casted_commands(m), entry, "main"))
             $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
             precompile(Tuple{typeof($m.command_main),Array{String,1}})

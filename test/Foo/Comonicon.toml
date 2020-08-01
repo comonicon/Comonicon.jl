@@ -1,0 +1,19 @@
+name = "foo"
+
+[install]
+completion=true
+export_path=true
+quiet=false
+compile="min"
+optimize=2
+
+[sysimg]
+path="deps/lib"
+incremental=true
+filter_stdlibs=false
+cpu_target="native"
+
+[download]
+host="github.com"
+user="Roger-luo"
+repo="Foo.jl"

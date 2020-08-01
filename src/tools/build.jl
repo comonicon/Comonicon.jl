@@ -5,6 +5,7 @@ export install, build
 using PackageCompiler
 using Pkg.TOML
 using Pkg.PlatformEngines
+using ..Comonicon
 using ..Comonicon.Parse
 using ..Comonicon.CodeGen
 using ..Comonicon.PATH
@@ -44,8 +45,8 @@ const DEFAULT_INSTALL_CONFIG = Dict(
 
 const DEFAULT_SYSIMG_CONFIG = Dict(
     "path" => "deps/lib",
-    "incremental"=>false,
-    "filter_stdlibs"=>true,
+    "incremental"=>true,
+    "filter_stdlibs"=>false,
     "cpu_target"=>"native",
 )
 
@@ -56,7 +57,7 @@ function build(mod, sysimg=false; kwargs...)
     validate_toml(configs)
     configs = merge_defaults(mod, configs)
 
-    if sysimg && haskey(configs, "sysimg")
+    if sysimg && !haskey(configs, "sysimg")
         configs["sysimg"] = DEFAULT_SYSIMG_CONFIG
     elseif !sysimg
         delete!(configs, "sysimg")
@@ -72,29 +73,25 @@ function install(mod; kwargs...)
 end
 
 function read_configs(mod; kwargs...)
-    if isempty(kwargs)
-        configs = read_toml(mod)
-    else
-        configs = Dict{String, Any}()
-        for (k, v) in kwargs
-            if k == :name
-                configs["name"] = v
-            end
+    configs = read_toml(mod)
+    for (k, v) in kwargs
+        if k == :name
+            configs["name"] = v
+        end
 
-            if k in [:bin, :completion, :export_path, :quiet, :compile, :optimize]
-                install_configs = get!(configs, "install", Dict{String, Any}())
-                install_configs[string(k)] = v
-            end
+        if k in [:bin, :completion, :export_path, :quiet, :compile, :optimize]
+            install_configs = get!(configs, "install", Dict{String, Any}())
+            install_configs[string(k)] = v
+        end
 
-            if k in [:path, :incremental, :filter_stdlibs, :cpu_target]
-                sysimg_configs = get!(configs, "sysimg", Dict{String, Any}())
-                sysimg_configs[string(k)] = v
-            end
+        if k in [:path, :incremental, :filter_stdlibs, :cpu_target]
+            sysimg_configs = get!(configs, "sysimg", Dict{String, Any}())
+            sysimg_configs[string(k)] = v
+        end
 
-            if k in [:host, :repo, :user]
-                download_config = get!(configs, "download", Dict{String, Any}())
-                download_config[string(k)] = v
-            end
+        if k in [:host, :repo, :user]
+            download_config = get!(configs, "download", Dict{String, Any}())
+            download_config[string(k)] = v
         end
     end
     return configs
@@ -103,14 +100,15 @@ end
 function read_toml(mod)
     path = nothing
     for file in COMONICON_TOML
-        if ispath(file)
-            path = file
+        _path = PATH.project(mod, file)
+        if ispath(_path)
+            path = _path
             break
         end
     end
 
-    path === nothing && error("config file not found, name the config as $(join(COMONICON_TOML, " or "))")
-    configs = TOML.parsefile(PATH.project(mod, path))
+    path === nothing && return Dict()
+    configs = TOML.parsefile(path)
     return configs
 end
 
@@ -227,7 +225,7 @@ function install_script(mod::Module, configs::Dict)
     end
 
     if install_configs["completion"]
-        install_completion(mod, bin)
+        install_completion(mod, joinpath(dirname(bin), "completions"))
     end
 
     chmod(file, 0o777)
@@ -246,10 +244,15 @@ function install_sysimg(mod::Module, configs::Dict)
         # we create a system image tarball
         # via an argument sysimg
         if "sysimg" in ARGS
-            build_sysimg(mod, configs["sysimg"])
+            build_sysimg(mod, configs)
             create_tarball(mod, configs["name"])
         else
             download_sysimg(mod, configs)
+        end
+    else # manually triggered
+        build_sysimg(mod, configs)
+        if "tarball" in ARGS
+            create_tarball(mod, configs["name"])
         end
     end
     return
@@ -262,9 +265,10 @@ end
 function download_sysimg(mod::Module, configs::Dict)
     sysimg_configs = configs["sysimg"]
     name = configs["name"]
+    os = osname()
     tarball_name = "$name-$(VERSION)-$os-$(Sys.ARCH).tar.gz"
 
-    url = sysimg_url(configs["download"])
+    url = sysimg_url(mod, configs)
     tarball = joinpath(PATH.project(mod, "deps", tarball_name))
     PlatformEngines.probe_platform_engines!()
 
@@ -281,21 +285,24 @@ function download_sysimg(mod::Module, configs::Dict)
     return
 end
 
-function sysimg_url(configs)
-    host = configs["host"]
+function sysimg_url(mod, configs)
+    name = configs["name"]
+    host = configs["download"]["host"]
     if host == "github.com"
-        url = "https://github.com/" * configs["user"] * "/" * configs["repo"] * "/releases/download/"
+        url = "https://github.com/" * configs["download"]["user"] * "/" *
+            configs["download"]["repo"] * "/releases/download/"
     else
         error("host $host is not supported, please open an issue at $COMONICON_URL")
     end
 
-    url *= "v$(Comonicon.get_version(mod))/$tarball_name"
+    tarball = tarball_name(name)
+    url *= "v$(Comonicon.get_version(mod))/$tarball"
     return url
 end
 
 function build_sysimg(mod::Module, configs::Dict)
     sysimg_configs = configs["sysimg"]
-    lib_path = sysimg_configs["path"]
+    lib_path = PATH.project(mod, sysimg_configs["path"])
     if !ispath(lib_path)
         @info "creating library path: $lib_path"
         mkpath(lib_path)
@@ -333,14 +340,16 @@ end
 
 function create_tarball(mod::Module, name)
     version = get_version(mod)
-    os = osname()
-
-    tarball = "$name-$VERSION-$os-$(Sys.ARCH).tar.gz"
+    tarball = tarball_name(name)
     @info "creating tarball $tarball"
     cd(PATH.project(mod, "deps")) do
         run(`tar -czvf $tarball lib`)
     end
     return
+end
+
+function tarball_name(name)
+    return "$name-$VERSION-$(osname())-$(Sys.ARCH).tar.gz"
 end
 
 """
