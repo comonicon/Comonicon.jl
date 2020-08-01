@@ -10,8 +10,12 @@ function prompt(io::IO, msg, quiet::Bool=false)
     if quiet
         println(" Yes.")
     else
-        print(" [Y/n]")
-        read(io, Char) in ['Y', 'y', '\n'] || return false
+        print(" [Y/n] ")
+        run(`stty raw`)
+        input = read(io, Char)
+        run(`stty cooked`)
+        println()
+        input in ['Y', 'y', '\n', '\r'] || return false
     end
 
     return true
