@@ -8,7 +8,7 @@ using Comonicon.BuildTools
 using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath,
     read_toml
 
-Pkg.develop(path=PATH.project("test", "Foo"))
+Pkg.develop(PackageSpec(path=PATH.project("test", "Foo")))
 
 rcfile_content = """
 some words
