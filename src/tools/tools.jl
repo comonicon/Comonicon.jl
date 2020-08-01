@@ -14,8 +14,7 @@ function prompt(io::IO, msg, quiet::Bool=false)
         run(`stty raw`)
         input = read(io, Char)
         run(`stty cooked`)
-        println()
-        input in ['Y', 'y', '\n'] || return false
+        input in ['Y', 'y', '\n', '\r'] || return false
     end
 
     return true
