@@ -52,8 +52,10 @@ const DEFAULT_SYSIMG_CONFIG = Dict(
 
 const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
 
-function build(mod, sysimg=true; kwargs...)
-    configs = read_configs(mod; kwargs...)
+function build(mod, sysimg=true; incremental=true, filter_stdlibs=false, kwargs...)
+    configs = read_configs(mod; incremental=incremental,
+        filter_stdlibs=filter_stdlibs, kwargs...)
+
     validate_toml(configs)
     configs = merge_defaults(mod, configs)
 

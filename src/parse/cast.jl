@@ -288,7 +288,9 @@ function precompile_or_exec(m::Module, entry)
             """
                 comonicon_build([sysimg=true]; kwargs...)
 
-            build the CLI manually.
+            build the CLI manually. This will set system image build to be
+            `incremental=true` and `filter_stdlibs=false` to get better compile
+            speed locally.
             """
             comonicon_build(sysimg=true; kwargs...) = $(GlobalRef(Comonicon, :build))($m, sysimg; kwargs...)
             precompile(Tuple{typeof($m.command_main),Array{String,1}})
