@@ -180,7 +180,11 @@ function install(mod::Module, configs::Dict)
     # User will need to use mod.build([sysimg=false]) to install it
     # manually, with an option to install without system image
     # or build it locally.
-    install_script(mod, configs)
+
+    # do not install script while building tarball
+    if !("sysimg" in ARGS)
+        install_script(mod, configs)
+    end
 end
 
 function install_script(mod::Module, configs::Dict)
