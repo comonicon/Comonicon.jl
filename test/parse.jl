@@ -116,7 +116,13 @@ ArgParse example implemented in Comonicon.
     @test opt2 == 2
 end
 
-Comonicon.install(Dummy; bin = Comonicon.PATH.project("test", "bin"), completion=false, quiet=true, export_path=false)
+Comonicon.install(
+    Dummy;
+    bin = Comonicon.PATH.project("test", "bin"),
+    completion = false,
+    quiet = true,
+    export_path = false,
+)
 
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy"))
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy.jl"))

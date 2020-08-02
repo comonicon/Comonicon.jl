@@ -83,7 +83,7 @@ Issue23.command_main(["run", "--port", "2345"])
 
     cmd_sin = LeafCommand(
         test_sin;
-        args = [Arg("theta"), Arg("xs";vararg=true)],
+        args = [Arg("theta"), Arg("xs"; vararg = true)],
         doc = "sdasdbsa dasdioasdmasd dsadas",
     )
 
@@ -91,24 +91,28 @@ Issue23.command_main(["run", "--port", "2345"])
 
     cmd_sin = LeafCommand(
         test_sin;
-        args = [Arg("theta"), Arg("alpha"; require=false), Arg("xs";vararg=true)],
+        args = [Arg("theta"), Arg("alpha"; require = false), Arg("xs"; vararg = true)],
         doc = "sdasdbsa dasdioasdmasd dsadas",
     )
 
-    @test prettify(codegen_call(ASTCtx(), :params, :n_args, cmd_sin)) == Expr(:block, 
+    @test prettify(codegen_call(ASTCtx(), :params, :n_args, cmd_sin)) == Expr(
+        :block,
         Expr(:if, :(n_args == 1), :($test_sin(ARGS[1]))),
         Expr(:if, :(n_args == 2), :($test_sin(ARGS[1], ARGS[2]))),
-        Expr(:if, :(n_args == 3), :($test_sin(ARGS[1], ARGS[2], ARGS[3:end]...)))
+        Expr(:if, :(n_args == 3), :($test_sin(ARGS[1], ARGS[2], ARGS[3:end]...))),
     )
 
     cmd_sin = LeafCommand(
         test_sin;
-        args = [Arg("theta"; type=Float32), Arg("xs";type=Int, vararg=true)],
+        args = [Arg("theta"; type = Float32), Arg("xs"; type = Int, vararg = true)],
         doc = "sdasdbsa dasdioasdmasd dsadas",
     )
 
     ex = prettify(codegen_call(ASTCtx(), :params, :n_args, cmd_sin))
-    target = :($test_sin(convert($Float32, Meta.parse(ARGS[1])), map(x->convert($Int64, Meta.parse(x)), ARGS[2:end])...))
+    target = :($test_sin(
+        convert($Float32, Meta.parse(ARGS[1])),
+        map(x -> convert($Int64, Meta.parse(x)), ARGS[2:end])...,
+    ))
     target = prettify(target)
     @test ex == target
 
