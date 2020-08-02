@@ -40,21 +40,20 @@ const DEFAULT_INSTALL_CONFIG = Dict(
     "export_path" => true,
     "quiet" => false,
     "compile" => nothing,
-    "optimize"=>2,
+    "optimize" => 2,
 )
 
 const DEFAULT_SYSIMG_CONFIG = Dict(
     "path" => "deps/lib",
-    "incremental"=>true,
-    "filter_stdlibs"=>false,
-    "cpu_target"=>"native",
+    "incremental" => true,
+    "filter_stdlibs" => false,
+    "cpu_target" => "native",
 )
 
 const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
 
-function build(mod, sysimg=true; incremental=true, filter_stdlibs=false, kwargs...)
-    configs = read_configs(mod; incremental=incremental,
-        filter_stdlibs=filter_stdlibs, kwargs...)
+function build(mod, sysimg = true; incremental = true, filter_stdlibs = false, kwargs...)
+    configs = read_configs(mod; incremental = incremental, filter_stdlibs = filter_stdlibs, kwargs...)
 
     validate_toml(configs)
     configs = merge_defaults(mod, configs)
@@ -84,17 +83,17 @@ function read_configs(mod; kwargs...)
         end
 
         if k in [:bin, :completion, :export_path, :quiet, :compile, :optimize]
-            install_configs = get!(configs, "install", Dict{String, Any}())
+            install_configs = get!(configs, "install", Dict{String,Any}())
             install_configs[string(k)] = v
         end
 
         if k in [:path, :incremental, :filter_stdlibs, :cpu_target]
-            sysimg_configs = get!(configs, "sysimg", Dict{String, Any}())
+            sysimg_configs = get!(configs, "sysimg", Dict{String,Any}())
             sysimg_configs[string(k)] = v
         end
 
         if k in [:host, :repo, :user]
-            download_config = get!(configs, "download", Dict{String, Any}())
+            download_config = get!(configs, "download", Dict{String,Any}())
             download_config[string(k)] = v
         end
     end
@@ -293,8 +292,12 @@ function sysimg_url(mod, configs)
     name = configs["name"]
     host = configs["download"]["host"]
     if host == "github.com"
-        url = "https://github.com/" * configs["download"]["user"] * "/" *
-            configs["download"]["repo"] * "/releases/download/"
+        url =
+            "https://github.com/" *
+            configs["download"]["user"] *
+            "/" *
+            configs["download"]["repo"] *
+            "/releases/download/"
     else
         error("host $host is not supported, please open an issue at $COMONICON_URL")
     end
@@ -365,8 +368,8 @@ Return the name of OS, will be used in building tarball.
 """
 function osname()
     return Sys.isapple() ? "darwin" :
-        Sys.islinux() ? "linux" :
-        error("unsupported OS, please open an issue to request support at $COMONICON_URL")
+           Sys.islinux() ? "linux" :
+           error("unsupported OS, please open an issue to request support at $COMONICON_URL")
 end
 
 """
@@ -477,7 +480,7 @@ end
 
 Install completion script at `path`. Default path is [`PATH.default_julia_fpath()`](@ref).
 """
-function install_completion(m::Module, path::String=PATH.default_julia_fpath())
+function install_completion(m::Module, path::String = PATH.default_julia_fpath())
     isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
 
@@ -502,7 +505,7 @@ function install_completion(m::Module, path::String=PATH.default_julia_fpath())
     return
 end
 
-function contain_comonicon_path(rcfile, env=ENV)
+function contain_comonicon_path(rcfile, env = ENV)
     if !haskey(env, "PATH")
         _contain_path(rcfile) && return true
         return false
@@ -514,7 +517,7 @@ function contain_comonicon_path(rcfile, env=ENV)
     return false
 end
 
-function contain_comonicon_fpath(rcfile, env=ENV)
+function contain_comonicon_fpath(rcfile, env = ENV)
     if !haskey(env, "FPATH")
         _contain_fpath(rcfile) && return true
         return false
@@ -529,7 +532,7 @@ end
 function _contain_path(rcfile)
     for line in readlines(rcfile)
         if strip(line) == "export PATH=\"\$HOME/.julia/bin:\$PATH\"" ||
-            strip(line) == "export PATH=\"$(PATH.default_julia_bin()):\$PATH\""
+           strip(line) == "export PATH=\"$(PATH.default_julia_bin()):\$PATH\""
             return true
         end
     end
@@ -539,14 +542,14 @@ end
 function _contain_fpath(rcfile)
     for line in readlines(rcfile)
         if strip(line) == "export FPATH=\$HOME/.julia/completions:\$FPATH" ||
-            strip(line) == "export FPATH=\"$(PATH.default_julia_fpath()):\$FPATH\""
+           strip(line) == "export FPATH=\"$(PATH.default_julia_fpath()):\$FPATH\""
             return true
         end
     end
     return false
 end
 
-function install_env_path(quiet::Bool=false)
+function install_env_path(quiet::Bool = false)
     shell = detect_shell()
 
     config_file = ""
@@ -567,28 +570,34 @@ end
 Write `PATH` and `FPATH` to current shell's rc files (.zshrc, .bashrc)
 if they do not exists.
 """
-function write_path(rcfile, quiet::Bool=false, env=ENV)
+function write_path(rcfile, quiet::Bool = false, env = ENV)
     isempty(rcfile) && return
 
     script = []
     msg = "cannot detect ~/.julia/bin in PATH, do you want to add it in PATH?"
 
     if !contain_comonicon_path(rcfile, env) && Tools.prompt(msg, quiet)
-        push!(script, """
-        # generated by Comonicon
-        # Julia bin PATH
-        export PATH="$(PATH.default_julia_bin()):\$PATH"
-        """)
+        push!(
+            script,
+            """
+# generated by Comonicon
+# Julia bin PATH
+export PATH="$(PATH.default_julia_bin()):\$PATH"
+""",
+        )
         @info "adding PATH to $rcfile"
     end
 
     msg = "cannot detect ~/.julia/completions in FPATH, do you want to add it in FPATH?"
     if !contain_comonicon_fpath(rcfile, env) && Tools.prompt(msg, quiet)
-        push!(script, """
-        # generated by Comonicon
-        # Julia autocompletion PATH
-        export FPATH="$(PATH.default_julia_fpath()):\$FPATH"
-        """)
+        push!(
+            script,
+            """
+# generated by Comonicon
+# Julia autocompletion PATH
+export FPATH="$(PATH.default_julia_fpath()):\$FPATH"
+""",
+        )
         @info "adding FPATH to $rcfile"
     end
 
