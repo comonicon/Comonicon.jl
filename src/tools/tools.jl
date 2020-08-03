@@ -2,9 +2,9 @@ module Tools
 
 export prompt
 
-prompt(msg, quiet::Bool=false) = prompt(stdin, msg, quiet)
+prompt(msg, quiet::Bool = false) = prompt(stdin, msg, quiet)
 
-function prompt(io::IO, msg, quiet::Bool=false)
+function prompt(io::IO, msg, quiet::Bool = false)
     print(msg)
 
     if quiet

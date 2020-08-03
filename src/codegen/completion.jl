@@ -21,12 +21,12 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::NodeCommand, entry:
     push!(args, "\"*:: :->args\"")
 
     push!(lines, "_arguments -C \\")
-    append!(lines, map(x->tab*x*" \\", args))
+    append!(lines, map(x -> tab * x * " \\", args))
 
     push!(lines, "")
     push!(lines, raw"case $state in")
-    push!(lines, tab*"(args)")
-    push!(lines, tab*tab*raw"case ${words[1]} in")
+    push!(lines, tab * "(args)")
+    push!(lines, tab * tab * raw"case ${words[1]} in")
 
     commands = []
     for each in cmd.subcmds
@@ -35,18 +35,21 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::NodeCommand, entry:
         push!(commands, tab * prefix * cmd_name(cmd) * "_" * name)
         push!(commands, ";;")
     end
-    append!(lines, map(x->tab^3 * x, commands))
-    push!(lines, tab^2*"esac")
+    append!(lines, map(x -> tab^3 * x, commands))
+    push!(lines, tab^2 * "esac")
     push!(lines, "esac")
 
-    body = join(map(x->tab*x, lines), "\n")
+    body = join(map(x -> tab * x, lines), "\n")
 
     script = []
-    push!(script, """
-    function $prefix$(cmd_name(cmd))() {
-    $body
-    }
-    """)
+    push!(
+        script,
+        """
+function $prefix$(cmd_name(cmd))() {
+$body
+}
+""",
+    )
 
     for each in cmd.subcmds
         push!(script, codegen(ctx, prefix * cmd_name(cmd) * "_", each, false))
@@ -69,8 +72,8 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry:
         push!(args, "$token'[$doc]'")
     end
 
-    append!(lines, map(x->tab*x*" \\", args))
-    body = join(map(x->tab*x, lines), "\n")
+    append!(lines, map(x -> tab * x * " \\", args))
+    body = join(map(x -> tab * x, lines), "\n")
 
     return """
     function $prefix$(cmd_name(cmd))() {
@@ -80,9 +83,7 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry:
 end
 
 function basic_arguments(entry)
-    args = [
-        "'(- 1 *)'{-h,--help}'[show help information]'",
-    ]
+    args = ["'(- 1 *)'{-h,--help}'[show help information]'"]
 
     if entry
         push!(args, "'(- 1 *)'{-V,--version}'[show version information]'")
