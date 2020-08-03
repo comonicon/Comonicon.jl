@@ -42,6 +42,8 @@ function codegen(cmd::AbstractCommand)
 
     ctx = ASTCtx()
     defs[:body] = quote
+        # let Julia throw InterruptException on SIGINT
+        ccall(:jl_exit_on_sigint, Cvoid, (Cint,), 0)
         $(codegen_scan_glob(ctx, cmd))
         $(codegen(ctx, cmd))
     end
