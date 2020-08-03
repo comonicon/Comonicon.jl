@@ -259,9 +259,9 @@ end
 
 function Base.show(io::IO, opt::Flag)
     if opt.short
-        print_option_or_flag(io, "-", first(opt.name))
+        print_option_or_flag(io, "-", first(opt.name), ", ")
     end
-    print_option_or_flag(io, ",--", opt.name)
+    print_option_or_flag(io, "--", opt.name)
 end
 
 function Base.show(io::IO, arg::Arg)
