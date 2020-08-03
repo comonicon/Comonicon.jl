@@ -339,8 +339,7 @@ function build_sysimg(mod::Module, configs::Dict)
         sysimage_path = image_path,
         incremental = incremental,
         project = project,
-        # TODO: add runtests.jl to execution file
-        precompile_execution_file = precompile_jl,
+        precompile_execution_file = [precompile_jl, PATH.project(mod, "test", "runtests.jl")],
         cpu_target = cpu_target,
         filter_stdlibs = filter_stdlibs,
     )
