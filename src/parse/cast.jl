@@ -290,10 +290,20 @@ function precompile_or_exec(m::Module, entry)
 
             build the CLI manually. This will set system image build to be
             `incremental=true` and `filter_stdlibs=false` to get better compile
-            speed locally.
+            speed locally. For more detailed reference, please
+            refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
             """
             comonicon_build(sysimg = true; kwargs...) =
                 $(GlobalRef(Comonicon, :build))($m, sysimg; kwargs...)
+
+            """
+                comonicon_install(;kwargs...)
+
+            install the CLI manually. This will use the default configuration in `Comonicon.toml`,
+            if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
+            refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
+            """
+            comonicon_install(;kwargs...) = $(GlobalRef(Comonicon, :install))($m; kwargs...)
             precompile(Tuple{typeof($m.command_main),Array{String,1}})
         end
     end
