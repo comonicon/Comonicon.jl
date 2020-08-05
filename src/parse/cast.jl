@@ -288,7 +288,7 @@ function precompile_or_exec(m::Module, entry)
             """
                 comonicon_build([sysimg=true]; kwargs...)
 
-            build the CLI manually. This will set system image build to be
+            Build the CLI manually. This will set system image build to be
             `incremental=true` and `filter_stdlibs=false` to get better compile
             speed locally. For more detailed reference, please
             refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
@@ -299,11 +299,21 @@ function precompile_or_exec(m::Module, entry)
             """
                 comonicon_install(;kwargs...)
 
-            install the CLI manually. This will use the default configuration in `Comonicon.toml`,
+            Install the CLI manually. This will use the default configuration in `Comonicon.toml`,
             if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
             refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
             """
             comonicon_install(;kwargs...) = $(GlobalRef(Comonicon, :install))($m; kwargs...)
+
+            """
+                comonicon_install_path([quiet=false])
+
+            Install the `PATH` and `FPATH` to your shell configuration file. You can use `comonicon_install_path(true)`,
+            to skip interactive prompt.
+            For more detailed reference, please refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
+            """
+            comonicon_install_path() = $(GlobalRef(Comonicon.BuildTools, :install_env_path))()
+
             precompile(Tuple{typeof($m.command_main),Array{String,1}})
         end
     end

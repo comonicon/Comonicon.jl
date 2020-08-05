@@ -610,6 +610,7 @@ export FPATH="$(PATH.default_julia_fpath()):\$FPATH"
     open(rcfile, "a") do io
         write(io, "\n" * join(script, "\n"))
     end
+    @info "open a new terminal, or source $rcfile to enable the new PATH."
     return
 end
 
