@@ -29,9 +29,9 @@ function codegen(ctx::ZSHCompletionCtx, cmd::NodeCommand, prefix::String, name::
 
     commands = []
     for each in cmd.subcmds
-        name = cmd_name(each)
-        push!(commands, name * ")")
-        push!(commands, tab * prefix * cmd_name(cmd) * "_" * name)
+        paramname = cmd_name(each)
+        push!(commands, paramname * ")")
+        push!(commands, tab * prefix * name * "_" * paramname)
         push!(commands, ";;")
     end
     append!(lines, map(x -> tab^3 * x, commands))
@@ -51,7 +51,7 @@ $body
     )
 
     for each in cmd.subcmds
-        push!(script, codegen(ctx, prefix * cmd_name(cmd) * "_", each, false))
+      push!(script, codegen(ctx, each, prefix * name * "_", cmd_name(each), false))
     end
 
     return join(script, "\n\n")

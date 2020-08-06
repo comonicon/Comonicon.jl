@@ -567,7 +567,7 @@ function install_env_path(;yes::Bool = false)
         @warn "auto installation for $shell is not supported, please open an issue under Comonicon.jl"
     end
 
-    write_path(joinpath(homedir(), config_file), yes)
+    write_path(config_file, yes)
 end
 
 """

@@ -36,6 +36,7 @@ cmd2 = NodeCommand(
     [LeafCommand(test_tanh; args = [Arg("theta"; type = Real)])],
     doc = "asdasdasdasdfunuikasnsdasdasdasdas",
 )
+name = "dummy"
 cmd = NodeCommand("dummy", [cmd1, cmd2]; doc = "dasdasdujkink. asdas dasdas das dasd asdasd adsd as.")
 entry = EntryCommand(cmd)
 eval(codegen(entry))
@@ -45,7 +46,7 @@ eval(codegen(entry))
 @test command_main(["foo", "test_sin", "1.0", "--foo", "2.0"]) == 0
 @test command_main(["foo", "test_sin", "1.0", "-f2.0"]) == 0
 
-@test strip(codegen(ZSHCompletionCtx(), entry)) == strip(read(PATH.project("test", "_dummy"), String))
+@test strip(codegen(ZSHCompletionCtx(), entry, name)) == strip(read(PATH.project("test", "_dummy"), String))
 
 @testset "prettify" begin
     ex1 = quote

@@ -1,4 +1,4 @@
-#compdef _dummy dummy 
+#compdef _dummy dummy
 function _dummy() {
     # These are set by _arguments
     local context state state_descr line
