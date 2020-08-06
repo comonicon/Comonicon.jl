@@ -303,7 +303,7 @@ function precompile_or_exec(m::Module, entry)
             if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
             refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
             """
-            comonicon_install(;kwargs...) = $(GlobalRef(Comonicon, :install))($m; kwargs...)
+            comonicon_install(; kwargs...) = $(GlobalRef(Comonicon, :install))($m; kwargs...)
 
             """
                 comonicon_install_path([quiet=false])
