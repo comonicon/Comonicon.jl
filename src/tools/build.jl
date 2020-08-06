@@ -2,6 +2,7 @@ module BuildTools
 
 export install, build
 
+using Logging
 using PackageCompiler
 using Pkg.TOML
 using Pkg.PlatformEngines
@@ -19,7 +20,6 @@ const COMONICON_URL = "https://github.com/Roger-luo/Comonicon.jl"
 # [install]
 # bin = "~/.julia/bin"
 # completion=true
-# export_path=true
 # quiet=false
 # compile="min"
 # optimize=2
@@ -37,7 +37,6 @@ const COMONICON_URL = "https://github.com/Roger-luo/Comonicon.jl"
 const DEFAULT_INSTALL_CONFIG = Dict(
     "bin" => PATH.default_julia_bin(),
     "completion" => true,
-    "export_path" => true,
     "quiet" => false,
     "compile" => nothing,
     "optimize" => 2,
@@ -82,7 +81,7 @@ function read_configs(mod; kwargs...)
             configs["name"] = v
         end
 
-        if k in [:bin, :completion, :export_path, :quiet, :compile, :optimize]
+        if k in [:bin, :completion, :quiet, :compile, :optimize]
             install_configs = get!(configs, "install", Dict{String,Any}())
             install_configs[string(k)] = v
         end
@@ -132,7 +131,7 @@ function validate_toml(configs)
         x in [nothing, "min", "no", "all", "yes"]
     end
 
-    for key in ["completion", "export_path", "quiet"]
+    for key in ["completion", "quiet"]
         _check(configs["install"], key) do x
             x isa Bool
         end
@@ -169,21 +168,30 @@ function _check(f, configs, key)
 end
 
 function install(mod::Module, configs::Dict)
-    if haskey(configs, "sysimg")
-        install_sysimg(mod, configs)
+    if configs["install"]["quiet"]
+        logger = NullLogger()
+    else
+        logger = ConsoleLogger()
     end
 
-    # if the system image is required by the developer,
-    # when system image installation
-    # errors, the CLI will not be installed.
-    # User will need to use mod.build([sysimg=false]) to install it
-    # manually, with an option to install without system image
-    # or build it locally.
+    with_logger(logger) do
+        if haskey(configs, "sysimg")
+            install_sysimg(mod, configs)
+        end
 
-    # do not install script while building tarball
-    if !("sysimg" in ARGS)
-        install_script(mod, configs)
+        # if the system image is required by the developer,
+        # when system image installation
+        # errors, the CLI will not be installed.
+        # User will need to use mod.build([sysimg=false]) to install it
+        # manually, with an option to install without system image
+        # or build it locally.
+
+        # do not install script while building tarball
+        if !("sysimg" in ARGS)
+            install_script(mod, configs)
+        end
     end
+    return
 end
 
 function install_script(mod::Module, configs::Dict)
@@ -196,7 +204,6 @@ function install_script(mod::Module, configs::Dict)
     install_configs = configs["install"]
     name = configs["name"]
     bin = install_configs["bin"]
-    quiet = install_configs["quiet"]
 
     shadow = joinpath(bin, name * ".jl")
     if install_configs["compile"] === nothing
@@ -236,10 +243,6 @@ function install_script(mod::Module, configs::Dict)
     end
 
     chmod(file, 0o777)
-
-    if isinteractive() && install_configs["export_path"]
-        install_env_path(quiet)
-    end
     return
 end
 
@@ -552,7 +555,7 @@ function _contain_fpath(rcfile)
     return false
 end
 
-function install_env_path(quiet::Bool = false)
+function install_env_path(;yes::Bool = false)
     shell = detect_shell()
 
     config_file = ""
@@ -564,22 +567,22 @@ function install_env_path(quiet::Bool = false)
         @warn "auto installation for $shell is not supported, please open an issue under Comonicon.jl"
     end
 
-    write_path(joinpath(homedir(), config_file), quiet)
+    write_path(joinpath(homedir(), config_file), yes)
 end
 
 """
-    write_path(rcfile[, quiet=false])
+    write_path(rcfile[, yes=false])
 
 Write `PATH` and `FPATH` to current shell's rc files (.zshrc, .bashrc)
 if they do not exists.
 """
-function write_path(rcfile, quiet::Bool = false, env = ENV)
+function write_path(rcfile, yes::Bool = false, env = ENV)
     isempty(rcfile) && return
 
     script = []
     msg = "cannot detect ~/.julia/bin in PATH, do you want to add it in PATH?"
 
-    if !contain_comonicon_path(rcfile, env) && Tools.prompt(msg, quiet)
+    if !contain_comonicon_path(rcfile, env) && Tools.prompt(msg, yes)
         push!(
             script,
             """
@@ -592,7 +595,7 @@ export PATH="$(PATH.default_julia_bin()):\$PATH"
     end
 
     msg = "cannot detect ~/.julia/completions in FPATH, do you want to add it in FPATH?"
-    if !contain_comonicon_fpath(rcfile, env) && Tools.prompt(msg, quiet)
+    if !contain_comonicon_fpath(rcfile, env) && Tools.prompt(msg, yes)
         push!(
             script,
             """
