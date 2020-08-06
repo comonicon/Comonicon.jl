@@ -126,3 +126,8 @@ Comonicon.install(
 
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy"))
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy.jl"))
+
+@testset "default_name" begin
+    @test Comonicon.Parse.default_name("Foo.jl") == "foo"
+    @test Comonicon.Parse.default_name(sin) == "sin"
+end
