@@ -2,7 +2,6 @@ name = "foo"
 
 [install]
 completion=true
-export_path=true
 quiet=false
 compile="min"
 optimize=2

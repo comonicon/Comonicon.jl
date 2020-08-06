@@ -121,7 +121,6 @@ Comonicon.install(
     bin = Comonicon.PATH.project("test", "bin"),
     completion = false,
     quiet = false,
-    export_path = false,
 )
 
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy"))

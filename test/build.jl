@@ -43,7 +43,6 @@ d = Dict(
     "install" => Dict(
         "optimize" => 2,
         "quiet" => false,
-        "export_path" => true,
         "completion" => true,
         "compile" => "min",
     ),
@@ -57,14 +56,14 @@ d = Dict(
 
 @test d == read_toml(Foo)
 
-Comonicon.build(Foo, false; bin = PATH.project("test", "bin"), quiet = true, export_path = false)
+Comonicon.build(Foo, false; bin = PATH.project("test", "bin"), quiet = true)
 @test isfile(PATH.project("test", "bin", "foo"))
 @test isfile(PATH.project("test", "bin", "foo.jl"))
 
 
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.build(Foo, true; bin = PATH.project("test", "bin"), quiet = true, export_path = false)
+    Comonicon.build(Foo, true; bin = PATH.project("test", "bin"), quiet = true)
 end
 
 @test ispath(PATH.project("test", "Foo", "deps"))
@@ -73,7 +72,7 @@ empty!(ARGS)
 push!(ARGS, "sysimg")
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.install(Foo; bin = PATH.project("test", "bin"), quiet = true, export_path = false)
+    Comonicon.install(Foo; bin = PATH.project("test", "bin"), quiet = true)
 end
 
 @test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name("foo")))
