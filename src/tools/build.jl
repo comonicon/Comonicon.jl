@@ -1,6 +1,6 @@
 module BuildTools
 
-export install, build
+export install, build, install_env_path
 
 using Logging
 using PackageCompiler
@@ -239,7 +239,7 @@ function install_script(mod::Module, configs::Dict)
     end
 
     if install_configs["completion"]
-        install_completion(mod, joinpath(dirname(bin), "completions"))
+        install_completion(mod, name, joinpath(dirname(bin), "completions"))
     end
 
     chmod(file, 0o777)
@@ -486,7 +486,7 @@ end
 
 Install completion script at `path`. Default path is [`PATH.default_julia_fpath()`](@ref).
 """
-function install_completion(m::Module, path::String = PATH.default_julia_fpath())
+function install_completion(m::Module, name::String, path::String = PATH.default_julia_fpath())
     isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
 
@@ -501,13 +501,13 @@ function install_completion(m::Module, path::String = PATH.default_julia_fpath()
         return
     end
 
-    script = CodeGen.codegen(ctx, main)
+    script = CodeGen.codegen(ctx, main, name)
 
     if !ispath(path)
         mkpath(path)
     end
 
-    write(joinpath(path, "_" * cmd_name(main)), script)
+    write(joinpath(path, "_" * name), script)
     return
 end
 

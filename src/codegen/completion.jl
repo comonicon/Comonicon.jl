@@ -2,12 +2,11 @@ const tab = " "^4
 
 struct ZSHCompletionCtx end
 
-function codegen(ctx::ZSHCompletionCtx, cmd::EntryCommand)
-    name = cmd_name(cmd)
-    "#compdef _$name $name \n" * codegen(ctx, "_", cmd.root, true)
+function codegen(ctx::ZSHCompletionCtx, cmd::EntryCommand, name::String)
+    "#compdef _$name $name\n" * codegen(ctx, cmd.root, "_", name, true)
 end
 
-function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::NodeCommand, entry::Bool)
+function codegen(ctx::ZSHCompletionCtx, cmd::NodeCommand, prefix::String, name::String, entry::Bool)
     lines = [
         "# These are set by _arguments",
         "local context state state_descr line",
@@ -45,7 +44,7 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::NodeCommand, entry:
     push!(
         script,
         """
-function $prefix$(cmd_name(cmd))() {
+function $prefix$name() {
 $body
 }
 """,
@@ -58,16 +57,16 @@ $body
     return join(script, "\n\n")
 end
 
-function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry::Bool)
+function codegen(ctx::ZSHCompletionCtx, cmd::LeafCommand, prefix::String, name::String, entry::Bool)
     lines = ["_arguments \\"]
     args = basic_arguments(entry)
 
     for (i, each) in enumerate(cmd.options)
-        name = cmd_name(each)
+        paramname = cmd_name(each)
         doc = cmd_doc(each).first
-        token = "--$name"
+        token = "--$paramname"
         if each.short
-            token = "{-$(short_name(each)),--$name}"
+            token = "{-$(short_name(each)),--$paramname}"
         end
         push!(args, "$token'[$doc]'")
     end
@@ -76,7 +75,7 @@ function codegen(ctx::ZSHCompletionCtx, prefix::String, cmd::LeafCommand, entry:
     body = join(map(x -> tab * x, lines), "\n")
 
     return """
-    function $prefix$(cmd_name(cmd))() {
+    function $prefix$name() {
     $body
     }
     """
