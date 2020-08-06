@@ -133,9 +133,9 @@ function to_argument(def, ex)
     @smatch ex begin
         ::Symbol => (string(ex), Any, true, false)
         :($name::$type) => (string(name), wrap_type(def, type), true, false)
-        :($name...) => (string(name), Any, true, true)
         :($name::$type...) => (string(name), wrap_type(def, type), true, true)
         Expr(:kw, :($name::$type), _) => (string(name), wrap_type(def, type), false, false)
+        :($name...) => (string(name), Any, true, true)
         Expr(:kw, name::Symbol, _) => (string(name), Any, false, false)
         _ => throw(Meta.ParseError("invalid syntax for command line entry: $ex"))
     end
