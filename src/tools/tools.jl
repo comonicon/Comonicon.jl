@@ -2,12 +2,12 @@ module Tools
 
 export prompt
 
-prompt(msg, quiet::Bool = false) = prompt(stdin, msg, quiet)
+prompt(msg, yes::Bool = false) = prompt(stdin, msg, yes)
 
-function prompt(io::IO, msg, quiet::Bool = false)
+function prompt(io::IO, msg, yes::Bool = false)
     print(msg)
 
-    if quiet
+    if yes || !isinteractive()
         println(" Yes.")
     else
         print(" [Y/n] ")
