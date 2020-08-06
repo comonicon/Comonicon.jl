@@ -130,3 +130,9 @@ Comonicon.install(
     @test Comonicon.Parse.default_name("Foo.jl") == "foo"
     @test Comonicon.Parse.default_name(sin) == "sin"
 end
+
+@testset "issue/#47" begin
+    cmd = @cast f_issue_47(xs::Int...) = xs
+    @test cmd.args[1].type == Int
+    @test cmd.args[1].vararg == true
+end
