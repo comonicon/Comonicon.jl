@@ -168,7 +168,7 @@ function _check(f, configs, key)
 end
 
 function install(mod::Module, configs::Dict)
-    if install_configs["quiet"]
+    if configs["install"]["quiet"]
         logger = NullLogger()
     else
         logger = ConsoleLogger()

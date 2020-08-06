@@ -120,7 +120,7 @@ Comonicon.install(
     Dummy;
     bin = Comonicon.PATH.project("test", "bin"),
     completion = false,
-    quiet = true,
+    quiet = false,
     export_path = false,
 )
 
