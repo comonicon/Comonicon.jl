@@ -40,12 +40,8 @@ write_path(rcfile, true, Dict())
 d = Dict(
     "name" => "foo",
     "download" => Dict("repo" => "Foo.jl", "host" => "github.com", "user" => "Roger-luo"),
-    "install" => Dict(
-        "optimize" => 2,
-        "quiet" => false,
-        "completion" => true,
-        "compile" => "min",
-    ),
+    "install" =>
+        Dict("optimize" => 2, "quiet" => false, "completion" => true, "compile" => "min"),
     "sysimg" => Dict(
         "filter_stdlibs" => false,
         "cpu_target" => "native",
