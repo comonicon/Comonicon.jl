@@ -555,7 +555,7 @@ function _contain_fpath(rcfile)
     return false
 end
 
-function install_env_path(;yes::Bool = false)
+function install_env_path(; yes::Bool = false)
     shell = detect_shell()
 
     config_file = ""
