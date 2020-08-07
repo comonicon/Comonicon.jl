@@ -51,10 +51,12 @@ of `Project.toml` if the given module is a project module. If fails,
 it returns `v"0.0.0"`.
 """
 function get_version(m::Module)
+    # no version for scripts
+    m === Main && return v"0.0.0"
     # project module
     path = pathof(m)
     if path !== nothing
-        envpath = joinpath(dirname(path), "..")
+        envpath = dirname(dirname(path))
         project = Pkg.Types.read_project(Pkg.Types.projectfile_path(envpath))
         if project.name == string(nameof(m)) && project.version !== nothing
             return project.version

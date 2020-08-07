@@ -219,7 +219,7 @@ function main_m(m::Module, line::QuoteNode, ex::Expr)
         push!(ret.args, :($var_cmd = $cmd))
     end
 
-    push!(ret.args, :($var_entry = $(xcall(Types, :EntryCommand, var_cmd))))
+    push!(ret.args, :($var_entry = $(xcall(Types, :EntryCommand, var_cmd; version=get_version(m)))))
     push!(ret.args, precompile_or_exec(m, var_entry))
     return ret
 end
