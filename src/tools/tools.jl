@@ -7,7 +7,7 @@ prompt(msg, yes::Bool = false) = prompt(stdin, msg, yes)
 function prompt(io::IO, msg, yes::Bool = false)
     print(msg)
 
-    if yes || !isinteractive()
+    if yes
         println(" Yes.")
     else
         print(" [Y/n] ")
