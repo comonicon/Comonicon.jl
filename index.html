@@ -206,7 +206,8 @@ ArgParse example implemented in Comonicon.
     println(<span class="hljs-string">&quot;arg=&gt;&quot;</span>, x)
     println(<span class="hljs-string">&quot;opt1=&gt;&quot;</span>, opt1)
     println(<span class="hljs-string">&quot;opt2=&gt;&quot;</span>, opt2)
-<span class="hljs-keyword">end</span></code></pre>       </div>
+<span class="hljs-keyword">end</span></code></pre>
+      </div>
     </div>
   </div>
 </section>
@@ -320,13 +321,14 @@ dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
 sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
 &quot;&quot;&quot;</span>
 <span class="hljs-keyword">end</span> <span class="hljs-comment"># Dummy</span></code></pre>
-<p>When called inside a project module &#40;not <code>Main</code>&#41;, the <code>@command_main</code> macro will generate a precompile statement for your CLI entry, so the entry will get precompiled while precompiling the project. Then you can write a <code>deps/build.jl</code> script to install your CLI to <code>.julia/bin</code>
+<p>When called inside a project module &#40;not <code>Main</code>&#41;, the <code>@command_main</code> macro will generate a precompile statement for your CLI entry, so the entry will get precompiled while precompiling the project. Then you can write a <code>deps/build.jl</code> script to install your CLI to <code>.julia/bin</code></p>
 <pre><code class="julia hljs"><span class="hljs-keyword">using</span> Comonicon, IonCLI
 Comonicon.install(Dummy, <span class="hljs-string">&quot;dummy&quot;</span>)</code></pre>
       </div>
     </div>
   </div>
 </section>
+
 <footer class="py-5 bg-dark">
   <div class="container">
     <p class="m-0 text-center text-white">&copy; Xiu-Zhe (Roger) Luo and contributors. Website powered by <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a>, <a href="https://github.com/tlienart/PkgPage.jl">PkgPage.jl</a> and the <a href="https://julialang.org">Julia</a> programming language.</p>
