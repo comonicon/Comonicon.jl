@@ -18,12 +18,12 @@
 
 
 ```sh
-➜  Comonicon git:(master) hyperfine "julia --project example/comonicon.jl 2"
+➜  hyperfine "julia --project example/comonicon.jl 2"
 Benchmark #1: julia --project example/comonicon.jl 2
   Time (mean ± σ):     781.2 ms ±   4.3 ms    [User: 926.5 ms, System: 132.4 ms]
   Range (min … max):   773.1 ms … 787.5 ms    10 runs
 
-➜  Comonicon git:(master) hyperfine "julia --project example/argparse.jl 2"
+➜  hyperfine "julia --project example/argparse.jl 2"
 Benchmark #1: julia --project example/argparse.jl 2
   Time (mean ± σ):      3.885 s ±  0.038 s    [User: 3.997 s, System: 0.159 s]
   Range (min … max):    3.839 s …  3.964 s    10 runs
@@ -76,6 +76,10 @@ ArgParse example implemented in Comonicon.
 end
 ```
 \end{:section}
+
+save this in a julia script `main.jl` then you can check how to use it as a CLI by `julia main.jl -h`. Or you could also save it as
+`main` and put a shebang at the beginning of this file: `#!<path to your Julia binary>`, then `chmod +x main`, then you can use this
+by `./main -h`.
 
 \begin{:section, title="Conventions"}
 
