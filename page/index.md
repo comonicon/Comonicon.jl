@@ -79,7 +79,7 @@ end
 
 save this in a julia script `main.jl` then you can check how to use it as a CLI by `julia main.jl -h`. Or you could also save it as
 `main` and put a shebang at the beginning of this file: `#!<path to your Julia binary>`, then `chmod +x main`, then you can use this
-by `./main -h`.
+by `./main -h`. There are some CLI examples in the [example folder](https://github.com/Roger-luo/Comonicon.jl/tree/master/example).
 
 \begin{:section, title="Conventions"}
 
