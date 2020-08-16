@@ -149,12 +149,12 @@ pre code.hljs.plaintext {
 </ul>
 </li>
 </ul>
-<pre><code class="sh hljs">➜  Comonicon git:(master) hyperfine <span class="hljs-string">&quot;julia --project example/comonicon.jl 2&quot;</span>
+<pre><code class="sh hljs">➜  hyperfine <span class="hljs-string">&quot;julia --project example/comonicon.jl 2&quot;</span>
 Benchmark <span class="hljs-comment">#1: julia --project example/comonicon.jl 2</span>
   Time (mean ± σ):     781.2 ms ±   4.3 ms    [User: 926.5 ms, System: 132.4 ms]
   Range (min … max):   773.1 ms … 787.5 ms    10 runs
 
-➜  Comonicon git:(master) hyperfine <span class="hljs-string">&quot;julia --project example/argparse.jl 2&quot;</span>
+➜  hyperfine <span class="hljs-string">&quot;julia --project example/argparse.jl 2&quot;</span>
 Benchmark <span class="hljs-comment">#1: julia --project example/argparse.jl 2</span>
   Time (mean ± σ):      3.885 s ±  0.038 s    [User: 3.997 s, System: 0.159 s]
   Range (min … max):    3.839 s …  3.964 s    10 runs</code></pre>
@@ -212,6 +212,7 @@ ArgParse example implemented in Comonicon.
   </div>
 </section>
 
+<p>save this in a julia script <code>main.jl</code> then you can check how to use it as a CLI by <code>julia main.jl -h</code>. Or you could also save it as <code>main</code> and put a shebang at the beginning of this file: <code>#&#33;&lt;path to your Julia binary&gt;</code>, then <code>chmod &#43;x main</code>, then you can use this by <code>./main -h</code>.</p>
 <section id="conventions" class="scrollspy">
   <div class="container">
     <div class="row">
