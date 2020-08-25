@@ -4,7 +4,6 @@ export install, build
 
 using Logging
 using PackageCompiler
-using Pkg
 using Pkg.TOML
 using Pkg.PlatformEngines
 using ..Comonicon
@@ -213,13 +212,10 @@ function install_script(mod::Module, configs::Dict)
         compile = Symbol(install_configs["compile"])
     end
 
-    env = create_environment(mod, name)
-
     shell_script = cmd_script(
         mod,
         shadow;
         sysimg = sysimg_path,
-        project = env,
         compile = compile,
         optimize = install_configs["optimize"],
     )
@@ -380,17 +376,6 @@ function osname()
     return Sys.isapple() ? "darwin" :
            Sys.islinux() ? "linux" :
            error("unsupported OS, please open an issue to request support at $COMONICON_URL")
-end
-
-"""
-create a dedicated shared environment for the command
-"""
-function create_environment(mod::Module, name)
-    Pkg.activate(name; shared=true)
-    Pkg.add(PackageSpec(path=PATH.project(mod)))
-    path = Base.active_project()
-    Pkg.activate()
-    return path
 end
 
 """
