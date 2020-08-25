@@ -387,9 +387,7 @@ create a dedicated shared environment for the command
 """
 function create_environment(mod::Module, name)
     Pkg.activate(name; shared=true)
-    toml = Base.current_project(PATH.project(mod))
-    pj = Pkg.Types.read_project(toml)
-    Pkg.add(PackageSpec(;name=pj.name, version=pj.version, uuid=pj.uuid))
+    Pkg.add(PackageSpec(path=PATH.project(mod)))
     path = Base.active_project()
     Pkg.activate()
     return path
