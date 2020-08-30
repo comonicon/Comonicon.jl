@@ -79,10 +79,11 @@ Base.@kwdef struct Arg
     require::Bool = true
     vararg::Bool = false
     type = Any
+    default = nothing
 end
 
-function Arg(name::String, line::LineNumberNode, doc::String, require::Bool, vararg::Bool, type)
-    Arg(name, line, CommandDoc(name, line, doc), require, vararg, type)
+function Arg(name::String, line::LineNumberNode, doc::String, require::Bool, vararg::Bool, type, default)
+    Arg(name, line, CommandDoc(name, line, doc), require, vararg, type, default)
 end
 
 Base.@kwdef struct Option
