@@ -76,3 +76,26 @@ end
 @test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name("foo")))
 
 Pkg.rm(PackageSpec(name = "Foo"))
+
+# PR #48: check if the name of entry stays the same as config
+module PR48
+using ..Comonicon
+@cast foo(x) = x
+@cast goo(y) = y
+
+@main name = "PR48"
+
+end
+
+configs = Dict(
+    "name" => "foo",
+    "completion" => true,
+    "quiet" => false,
+    "compile" => "min",
+    "optimize" => 2
+)
+
+
+@testset "#48" begin
+    @test_throws ErrorException Comonicon.BuildTools.validate_toml(PR48, configs)    
+end
