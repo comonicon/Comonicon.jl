@@ -54,7 +54,7 @@ const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
 function build(mod, sysimg = true; incremental = true, filter_stdlibs = false, kwargs...)
     configs = read_configs(mod; incremental = incremental, filter_stdlibs = filter_stdlibs, kwargs...)
 
-    validate_toml(configs)
+    validate_toml(mod, configs)
     configs = merge_defaults(mod, configs)
 
     if sysimg && !haskey(configs, "sysimg")
@@ -70,7 +70,7 @@ end
 function install(mod; kwargs...)
     configs = read_configs(mod; kwargs...)
     configs = merge_defaults(mod, configs)
-    validate_toml(configs)
+    validate_toml(mod, configs)
     return install(mod, configs)
 end
 
@@ -126,7 +126,13 @@ function merge_defaults(mod, configs)
     return configs
 end
 
-function validate_toml(configs)
+function validate_toml(mod, configs)
+    haskey(configs, "name") || error("missing key \"name\" in Comonicon.toml or kwargs")
+    got = configs["name"]
+    exp = Types.cmd_name(mod.CASTED_COMMANDS["main"])
+    got == exp ||
+        error("field name must be the same with entry name, expect $exp got $got")
+
     _check(configs["install"], "compile") do x
         x in [nothing, "min", "no", "all", "yes"]
     end
