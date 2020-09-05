@@ -41,8 +41,6 @@ write_path(rcfile, true, Dict())
 # read_toml(PATH.project("test", "Comonicon.toml"))
 
 
-@test_throws ErrorException Comonicon.install(Foo)
-
 d = Dict(
     "name" => "foo",
     "download" => Dict("repo" => "Foo.jl", "host" => "github.com", "user" => "Roger-luo"),
@@ -63,6 +61,7 @@ mock(create_sysimage) do plus
     Comonicon.build(Foo, true; bin = PATH.project("test", "bin"), quiet = true)
 
     Comonicon.build(Foo, false; bin = PATH.project("test", "bin"), quiet = true)
+    Comonicon.install(Foo)
     @test isfile(PATH.project("test", "bin", "foo"))
     @test isfile(PATH.project("test", "bin", "foo.jl"))
 end
