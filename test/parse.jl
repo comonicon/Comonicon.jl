@@ -64,7 +64,7 @@ tick tick.
     @test yy in [1.0, 2.0]
 end
 
-@main name = "main" doc = """
+@main name = "dummy" doc = """
     dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
     sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
     """
