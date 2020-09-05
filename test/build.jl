@@ -8,6 +8,9 @@ using Comonicon.BuildTools
 using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath, read_toml
 
 Pkg.develop(PackageSpec(path = PATH.project("test", "Foo")))
+Pkg.activate(PATH.project("test", "Foo"))
+Pkg.develop(PackageSpec(path = PATH.project()))
+Pkg.activate(PATH.project("test"))
 using Foo
 
 @test Foo.CASTED_COMMANDS["main"].version == v"0.1.0"
