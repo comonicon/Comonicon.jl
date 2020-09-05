@@ -15,4 +15,4 @@ Manifest.toml
 /test/bin/
 /test/completions/
 /test/Foo/deps/
-!/test/Foo/Manifest.toml
+/test/Foo/Manifest.toml
