@@ -292,7 +292,8 @@ function download_sysimg(mod::Module, configs::Dict)
         download(url, tarball)
         unpack(tarball, PATH.project(mod, "deps"))
     catch e
-        error("fail to download $url, consider build the system image locally via $mod.comonicon_build()")
+        @warn "fail to download $url, building the system image locally"
+        build_sysimg(mod, configs)
     end
 
     if ispath(tarball)
