@@ -7,10 +7,11 @@ using Comonicon.PATH
 using Comonicon.BuildTools
 using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath, read_toml
 
-Pkg.develop(PackageSpec(path = PATH.project("test", "Foo")))
 Pkg.activate(PATH.project("test", "Foo"))
 Pkg.develop(PackageSpec(path = PATH.project()))
 Pkg.activate(PATH.project("test"))
+Pkg.develop(PackageSpec(path = PATH.project("test", "Foo")))
+
 using Foo
 
 @test Foo.CASTED_COMMANDS["main"].version == v"0.1.0"
@@ -57,14 +58,13 @@ d = Dict(
 
 @test d == read_toml(Foo)
 
-Comonicon.build(Foo, false; bin = PATH.project("test", "bin"), quiet = true)
-@test isfile(PATH.project("test", "bin", "foo"))
-@test isfile(PATH.project("test", "bin", "foo.jl"))
-
-
 mock(create_sysimage) do plus
     @assert plus isa Mock
     Comonicon.build(Foo, true; bin = PATH.project("test", "bin"), quiet = true)
+
+    Comonicon.build(Foo, false; bin = PATH.project("test", "bin"), quiet = true)
+    @test isfile(PATH.project("test", "bin", "foo"))
+    @test isfile(PATH.project("test", "bin", "foo.jl"))
 end
 
 @test ispath(PATH.project("test", "Foo", "deps"))
