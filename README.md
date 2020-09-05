@@ -35,9 +35,9 @@ pkg> add Comonicon#master
 
 ## Usage
 
-The simplest way to use it is via `@command_main` macro, please refer to the demo in [Zero Duplication](#zero-duplication).
+The simplest way to use it is via `@main` macro, please refer to the demo in [Zero Duplication](#zero-duplication).
 
-Although you can use `Comonicon` in your script, but the recommended way to build CLI with Comonicon is to use `@command_main` in a Julia project module, so the command line interface entry will get compiled by the
+Although you can use `Comonicon` in your script, but the recommended way to build CLI with Comonicon is to use `@main` in a Julia project module, so the command line interface entry will get compiled by the
 Julia compiler.
 
 Moreover, if you wish to create multiple commands. You can use `@cast` macro to annotate a function or module
@@ -82,7 +82,7 @@ This is like Python [docopt](https://github.com/docopt/docopt) but with [Fire](h
 
 ### Zero Overhead
 The backend code generator will generate Julia ASTs directly to parse your command line inputs all in one
-function `command_main` with one method `command_main(::Vector{String})`, which can be precompiled easily during module compilation.
+function `main` with one method `main(::Vector{String})`, which can be precompiled easily during module compilation.
 
 ### Zero Dependency
 You can get rid of `Comonicon` entirely after you generate the command line parsing script

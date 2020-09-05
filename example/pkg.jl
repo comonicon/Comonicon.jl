@@ -22,7 +22,7 @@ activate the environment at `path`.
     println("activating $s (shared=$shared)")
 end
 
-@command_main
+@main
 
 end
 
