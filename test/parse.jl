@@ -137,3 +137,17 @@ cmd = @cast(f_issue_47(xs::Int...) = xs)
     @test cmd.args[1].type == Int
     @test cmd.args[1].vararg == true
 end
+
+@testset "default_value" begin
+    @test Comonicon.Parse.valid_default_value(:(1))
+    @test Comonicon.Parse.valid_default_value(:("abc"))
+    @test Comonicon.Parse.valid_default_value(:('a'))
+    @test Comonicon.Parse.valid_default_value(:(1.9))
+    @test Comonicon.Parse.valid_default_value(:(sin(1)))
+    @test Comonicon.Parse.valid_default_value(:(sin((cos(3)))))
+    @test Comonicon.Parse.valid_default_value(:([sin(1), 1, "a"]))
+    @test Comonicon.Parse.valid_default_value(:((sin(1), 1, "a")))
+    @test ~Comonicon.Parse.valid_default_value(:(sin(a)))
+    @test ~Comonicon.Parse.valid_default_value(:([a, b, sin(a)]))
+    @test ~Comonicon.Parse.valid_default_value(:((a, b, sin(a)))
+end
