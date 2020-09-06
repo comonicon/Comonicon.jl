@@ -292,6 +292,9 @@ function download_sysimg(mod::Module, configs::Dict)
         unpack(tarball, PATH.project(mod, "deps"))
     catch e
         @warn "fail to download $url, building the system image locally"
+        # force incremental build
+        sysimg_configs["incremental"] = true
+        sysimg_configs["filter_stdlibs"] = false
         build_sysimg(mod, configs)
     end
 
@@ -356,6 +359,14 @@ function build_sysimg(mod::Module, configs::Dict)
         filter_stdlibs = filter_stdlibs,
     )
 
+    return
+end
+
+function find_project(path)
+    file = joinpath(path, "JuliaProject.toml")
+    isfile(file) && return file
+    file = joinpath(path, "Project.toml")
+    isfile(file) && return file
     return
 end
 
