@@ -89,15 +89,10 @@ using ..Comonicon
 
 end
 
-configs = Dict(
-    "name" => "foo",
-    "completion" => true,
-    "quiet" => false,
-    "compile" => "min",
-    "optimize" => 2
-)
+configs =
+    Dict("name" => "foo", "completion" => true, "quiet" => false, "compile" => "min", "optimize" => 2)
 
 
 @testset "#48" begin
-    @test_throws ErrorException Comonicon.BuildTools.validate_toml(PR48, configs)    
+    @test_throws ErrorException Comonicon.BuildTools.validate_toml(PR48, configs)
 end
