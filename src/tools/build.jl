@@ -130,8 +130,7 @@ function validate_toml(mod, configs)
     haskey(configs, "name") || error("missing key \"name\" in Comonicon.toml or kwargs")
     got = configs["name"]
     exp = Types.cmd_name(mod.CASTED_COMMANDS["main"])
-    got == exp ||
-        error("field name must be the same with entry name, expect $exp got $got")
+    got == exp || error("field name must be the same with entry name, expect $exp got $got")
 
     _check(configs["install"], "compile") do x
         x in [nothing, "min", "no", "all", "yes"]
