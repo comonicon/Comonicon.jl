@@ -79,7 +79,7 @@ Base.@kwdef struct Arg
     require::Bool = true
     vararg::Bool = false
     type = Any
-    default = nothing
+    default::Union{String, Nothing} = nothing
 end
 
 function Arg(name::String, line::LineNumberNode, doc::String, require::Bool, vararg::Bool, type, default)
