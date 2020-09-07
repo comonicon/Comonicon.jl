@@ -129,23 +129,23 @@ function parse_kwargs(def)
 end
 
 function to_argument(def, ex)
-    # (name, type, require, vararg)
+    # (name, type, require, vararg, default_value)
     @smatch ex begin
-        ::Symbol => (string(ex), Any, true, false)
-        :($name::$type) => (string(name), wrap_type(def, type), true, false)
-        :($name::$type...) => (string(name), wrap_type(def, type), true, true)
-        Expr(:kw, :($name::$type), _) => (string(name), wrap_type(def, type), false, false)
-        :($name...) => (string(name), Any, true, true)
-        Expr(:kw, name::Symbol, _) => (string(name), Any, false, false)
+        ::Symbol => (string(ex), Any, true, false, nothing)
+        :($name::$type) => (string(name), wrap_type(def, type), true, false, nothing)
+        :($name::$type...) => (string(name), wrap_type(def, type), true, true, nothing)
+        Expr(:kw, :($name::$type), value) => (string(name), wrap_type(def, type), false, false, string(value))
+        :($name...) => (string(name), Any, true, true, nothing)
+        Expr(:kw, name::Symbol, value) => (string(name), Any, false, false, string(value))
         _ => throw(Meta.ParseError("invalid syntax for command line entry: $ex"))
     end
 end
 
 function to_option_or_flag(ex)
     @smatch ex begin
-        Expr(:kw, name::Symbol, value) => (string(name), Any, false)
-        Expr(:kw, :($name::Bool), false) => (string(name), Bool, true)
-        Expr(:kw, :($name::$type), value) => (string(name), type, false)
+        Expr(:kw, name::Symbol, value) => (string(name), Any, false, string(value))
+        Expr(:kw, :($name::Bool), false) => (string(name), Bool, true, false)
+        Expr(:kw, :($name::$type), value) => (string(name), type, false, string(value))
         Expr(:kw, :($name::Bool), true) =>
             throw(Meta.ParseError("Boolean options must use false as default value, and will be parsed as flags. got $name"))
         ::Symbol || :($name::$type) =>
