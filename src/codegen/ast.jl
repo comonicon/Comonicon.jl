@@ -155,7 +155,7 @@ end
 function codegen_body(ctx::ASTCtx, cmd::NodeCommand)
     ex = Expr(:block)
     err_msg = "expect at least one argument for command $(cmd.name)"
-    push!(ex.args, Expr(:if, :(length(ARGS) < $(ctx.ptr)), xerror(err_msg)))
+    push!(ex.args, Expr(:if, :(length(ARGS) < $(ctx.ptr)), xerror(cmd, err_msg)))
 
     start = ctx.ptr
     for subcmd in cmd.subcmds
@@ -165,7 +165,7 @@ function codegen_body(ctx::ASTCtx, cmd::NodeCommand)
     end
 
     err_msg = :("Error: unknown command $(ARGS[$(ctx.ptr)])")
-    push!(ex.args, xerror(err_msg))
+    push!(ex.args, xerror(cmd, err_msg))
     return ex
 end
 
@@ -180,6 +180,7 @@ function codegen_body(ctx::ASTCtx, cmd::LeafCommand)
 
     if nrequires > 0
         err = xerror(
+            cmd,
             :("command $($(cmd.name)) expect at least $($nrequires) arguments, got $($n_args)"),
         )
         push!(validate_ex.args, quote
@@ -192,7 +193,7 @@ function codegen_body(ctx::ASTCtx, cmd::LeafCommand)
     # Error: too much arguments
     if isempty(cmd.args) || !last(cmd.args).vararg
         nmost = length(cmd.args)
-        err = xerror(:("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
+        err = xerror(cmd, :("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
         push!(validate_ex.args, quote
             if $n_args > $nmost
                 $err
@@ -246,7 +247,7 @@ function codegen_params(ctx::ASTCtx, params::Symbol, cmd::LeafCommand)
         while !isempty(ARGS) && $(ctx.ptr) <= $it <= length(ARGS)
             $arg = ARGS[$it]
             if startswith($arg, "-") # is a flag/option
-                $(xmatch(regexes, actions, arg))
+                $(xmatch(cmd, regexes, actions, arg))
             else
                 $it += 1
             end

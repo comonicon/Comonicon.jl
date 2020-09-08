@@ -6,17 +6,21 @@ xprint_version(cmd::EntryCommand; color = true) =
     :(println($(sprint(show, cmd; context = :color => color))))
 
 """
-    xerror(msg)
+    xerror(cmd, msg)
 
 Create an expression that contains error message, automatically merge
 interpolation expressions.
 """
-function xerror(msg::String)
+function xerror(cmd, msg::String)
     msg = "Error: $msg, use -h or --help to check more detailed help info"
-    return :(error($msg))
+    return quote
+        printstyled($msg; color=:red, bold=true)
+        $(xprint_help(cmd))
+        return 1
+    end
 end
 
-function xerror(msg::Expr)
+function xerror(cmd, msg::Expr)
     msg.head === :string || throw(Meta.ParseError("expect string expression, got $msg"))
 
     ex = Expr(:string, "Error: ")
@@ -28,7 +32,11 @@ function xerror(msg::Expr)
         end
     end
     push!(ex.args, ", use -h or --help to check more detailed help info")
-    return :(error($ex))
+    return quote
+        printstyled($ex; color=:red, bold=true)
+        $(xprint_help(cmd))
+        return 1
+    end
 end
 
 hasparameters(cmd::LeafCommand) = (!isempty(cmd.flags)) || (!isempty(cmd.options))
@@ -78,7 +86,7 @@ Generate a long ifelse expression that acts like a pattern
 matching expression that match given regex list and do the
 corresponding actions.
 """
-function xmatch(regexes, actions, str, st = 1)
+function xmatch(cmd, regexes, actions, str, st = 1)
     if st <= length(regexes)
         m = gensym(:m)
         regex, action = regexes[st], actions[st]
@@ -86,13 +94,13 @@ function xmatch(regexes, actions, str, st = 1)
         return quote
             $m = match($regex, $str)
             if $m === nothing
-                $(xmatch(regexes, actions, str, st + 1))
+                $(xmatch(cmd, regexes, actions, str, st + 1))
             else
                 $(action(m))
             end
         end
     else
-        return xerror(:("unknown option: $($str)"))
+        return xerror(cmd, :("unknown option: $($str)"))
     end
 end
 
