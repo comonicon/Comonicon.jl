@@ -68,7 +68,7 @@ end
 
 function create_args(args, docs, line)
     ret = Arg[]
-    for (name, type, require, vararg) in args
+    for (name, type, require, vararg, default) in args
         push!(
             ret,
             Arg(
@@ -78,6 +78,7 @@ function create_args(args, docs, line)
                 doc = get(docs, name, ""),
                 line = line,
                 vararg = vararg,
+                default = default
             ),
         )
     end
@@ -86,11 +87,11 @@ end
 
 function create_options_and_flags(kwargs, option_docs, flag_docs, line)
     flags, options = Flag[], Option[]
-    for (name, type, isflag) in kwargs
+    for (name, type, isflag, default) in kwargs
         if isflag
             push!(flags, create_flag(name, type, flag_docs, line))
         else
-            push!(options, create_option(name, type, option_docs, line))
+            push!(options, create_option(name, type, option_docs, line, default))
         end
     end
     return options, flags
@@ -105,12 +106,12 @@ function create_flag(name::String, type, flag_docs, line)
     end
 end
 
-function create_option(name::String, type, option_docs, line)
+function create_option(name::String, type, option_docs, line, default)
     if haskey(option_docs, name)
         arg, doc, short = option_docs[name]
-        return Option(name, Arg(arg; type = type); short = short, doc = doc, line = line)
+        return Option(name, Arg(arg; type = type, default = default); short = short, doc = doc, line = line)
     else
-        return Option(name, Arg(; type = type, line = line); line = line)
+        return Option(name, Arg(; type = type, line = line, default = default); line = line)
     end
 end
 
