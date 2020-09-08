@@ -1,0 +1,7 @@
+name = "Hello"
+uuid = "dd64c3d1-ae1f-4a3c-a09c-63a390c13099"
+authors = ["Roger-luo <rogerluo.rl18@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Comonicon = "863f3e99-da2a-4334-8734-de3dacbe5542"
