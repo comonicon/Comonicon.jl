@@ -388,6 +388,9 @@ end
 
 function first_sentence(content)
     index = findfirst(". ", content)
+    if index === nothing
+        index = findfirst(".", content)
+    end
 
     if index === nothing
         return content
