@@ -78,7 +78,7 @@ function create_args(args, docs, line)
                 doc = get(docs, name, ""),
                 line = line,
                 vararg = vararg,
-                default = default
+                default = default,
             ),
         )
     end
@@ -109,7 +109,13 @@ end
 function create_option(name::String, type, option_docs, line, default)
     if haskey(option_docs, name)
         arg, doc, short = option_docs[name]
-        return Option(name, Arg(arg; type = type, default = default); short = short, doc = doc, line = line)
+        return Option(
+            name,
+            Arg(arg; type = type, default = default);
+            short = short,
+            doc = doc,
+            line = line,
+        )
     else
         return Option(name, Arg(; type = type, line = line, default = default); line = line)
     end
