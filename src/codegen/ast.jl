@@ -193,7 +193,10 @@ function codegen_body(ctx::ASTCtx, cmd::LeafCommand)
     # Error: too much arguments
     if isempty(cmd.args) || !last(cmd.args).vararg
         nmost = length(cmd.args)
-        err = xerror(cmd, :("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"))
+        err = xerror(
+            cmd,
+            :("command $($(cmd.name)) expect at most $($nmost) arguments, got $($n_args)"),
+        )
         push!(validate_ex.args, quote
             if $n_args > $nmost
                 $err
