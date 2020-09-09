@@ -225,13 +225,7 @@ cmd_sym(cmd) = Symbol(cmd_name(cmd))
 cmd_lineinfo(cmd) = cmd.line
 
 function default_str(x::Arg)
-    content = "default is \e[36m"
-    if isempty(x.default)
-        content *= "\"\""
-    else
-        content *= x.default
-    end
-    return content  * "\e[39m. "
+    return "default is \e[36m" * x.default * "\e[39m. "
 end
 # Printings
 

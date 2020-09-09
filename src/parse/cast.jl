@@ -135,18 +135,18 @@ function to_argument(def, ex)
         :($name::$type) => (string(name), wrap_type(def, type), true, false, nothing)
         :($name::$type...) => (string(name), wrap_type(def, type), true, true, nothing)
         Expr(:kw, :($name::$type), value) =>
-            (string(name), wrap_type(def, type), false, false, string(value))
+            (string(name), wrap_type(def, type), false, false, repr(value))
         :($name...) => (string(name), Any, true, true, nothing)
-        Expr(:kw, name::Symbol, value) => (string(name), Any, false, false, string(value))
+        Expr(:kw, name::Symbol, value) => (string(name), Any, false, false, repr(value))
         _ => throw(Meta.ParseError("invalid syntax for command line entry: $ex"))
     end
 end
 
 function to_option_or_flag(ex)
     @smatch ex begin
-        Expr(:kw, name::Symbol, value) => (string(name), Any, false, string(value))
+        Expr(:kw, name::Symbol, value) => (string(name), Any, false, repr(value))
         Expr(:kw, :($name::Bool), false) => (string(name), Bool, true, false)
-        Expr(:kw, :($name::$type), value) => (string(name), type, false, string(value))
+        Expr(:kw, :($name::$type), value) => (string(name), type, false, repr(value))
         Expr(:kw, :($name::Bool), true) =>
             throw(Meta.ParseError("Boolean options must use false as default value, and will be parsed as flags. got $name"))
         ::Symbol || :($name::$type) =>
