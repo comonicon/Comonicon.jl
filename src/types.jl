@@ -69,7 +69,7 @@ function Base.iterate(doc::CommandDoc, st = 1)
 end
 
 function Base.show(io::IO, doc::CommandDoc)
-    print(io, doc.first, doc.rest)
+    print(io, "  ", doc.first, doc.rest)
 end
 
 Base.@kwdef struct Arg

@@ -22,6 +22,12 @@ rm_format(x::Markdown.Code) = x.code
 rm_format(x::String) = x
 rm_format(x::Markdown.MD) = rm_format(x.content[1])
 
+function to_string(md::Markdown.MD)
+    return sprint(md; context=:color=>true) do io, x
+        show(io, MIME("text/plain"), x)
+    end
+end
+
 """
     read_doc(markdown)
 
@@ -58,7 +64,8 @@ function read_intro(md::Markdown.MD)
             push!(intro, line)
         end
     end
-    return join(map(rm_format, intro), "\n")
+    
+    return to_string(Markdown.MD(intro, md.meta))
 end
 
 function read_section(md::Markdown.MD, title)
@@ -149,11 +156,12 @@ function read_flags(md::Markdown.List)
 end
 
 function read_item(raw::Markdown.Paragraph)
-    length(raw.content) == 2 || throw(Meta.ParseError("invalid command entry argument doc syntax"))
     raw.content[1] isa Markdown.Code ||
         throw(Meta.ParseError("command argument name should be marked by inline code"))
     name = raw.content[1].code
-    doc = read_docstring(raw.content[2])
+
+    raw_doc = to_string(Markdown.MD(Markdown.Paragraph(raw.content[2:end])))
+    doc = read_docstring(raw_doc)
     return name, doc
 end
 

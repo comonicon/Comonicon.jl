@@ -146,17 +146,17 @@ end
 
 @testset "markdown parsing" begin
     doc = md"""
-    ArgParse example implemented in Comonicon.
+    ArgParse example implemented in `Comonicon`.
 
     # Arguments
 
-    - `x`: an argument
+    - `x`: an argument, `args`
     """
 
     intro, args, flags, optionsa = Parse.read_doc(doc)
-    @test intro == "ArgParse example implemented in Comonicon."
+    @test intro == "  ArgParse example implemented in \e[36mComonicon\e[39m."
     @test haskey(args, "x")
-    @test args["x"] == "an argument"
+    @test args["x"] == "an argument, \e[36margs\e[39m"
 
     doc = md"""
     ArgParse example implemented in Comonicon.
@@ -171,7 +171,7 @@ end
     """
 
     intro, args, flags, options = Parse.read_doc(doc)
-    @test intro == "ArgParse example implemented in Comonicon."
+    @test intro == "  ArgParse example implemented in Comonicon."
     @test haskey(args, "x")
     @test args["x"] == "an argument"
     @test haskey(options, "option1")
