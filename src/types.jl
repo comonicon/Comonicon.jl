@@ -68,6 +68,14 @@ function Base.iterate(doc::CommandDoc, st = 1)
     end
 end
 
+function Base.endswith(doc::CommandDoc, b::String)
+    if isempty(doc.rest)
+        return endswith(doc.first, b)
+    else
+        return endswith(doc.rest, b)
+    end
+end
+
 function Base.show(io::IO, doc::CommandDoc)
     print(io, "  ", doc.first, doc.rest)
 end
@@ -75,7 +83,7 @@ end
 Base.@kwdef struct Arg
     name::String = "arg"
     line::LineNumberNode = LineNumberNode(0)
-    doc::CommandDoc = CommandDoc(name, line, "positional argument")
+    doc::CommandDoc = CommandDoc(name, line, "positional argument. ")
     require::Bool = true
     vararg::Bool = false
     type = Any
@@ -215,6 +223,16 @@ cmd_doc(cmd) = cmd.doc
 
 cmd_sym(cmd) = Symbol(cmd_name(cmd))
 cmd_lineinfo(cmd) = cmd.line
+
+function default_str(x::Arg)
+    content = "default is \e[36m"
+    if isempty(x.default)
+        content *= "\"\""
+    else
+        content *= x.default
+    end
+    return content  * "\e[39m. "
+end
 # Printings
 
 print_option_or_flag(io::IO, xs...) = printstyled(io, xs...; color = :light_cyan)
@@ -317,15 +335,43 @@ function print_cmd(io::IO, cmd::LeafCommand)
     end
 end
 
-function print_cmd(io::IO, x::Union{Option,Flag})
+function print_cmd(io::IO, x::Flag)
     partition(io, x, cmd_doc(x)...)
 end
 
-function print_cmd(io::IO, x::Arg)
-    if x.require
+function print_cmd(io::IO, x::Option)
+    if x.arg.default === nothing
         partition(io, x, cmd_doc(x)...)
     else
-        partition(io, x, "optional argument. ", cmd_doc(x)...)
+        doc = cmd_doc(x)
+        partition(io, x, doc...,  _hint(doc, default_str(x.arg)))
+    end
+end
+
+function print_cmd(io::IO, x::Arg)
+    contents = String[]
+
+    if !x.require
+        push!(contents, "optional. ")
+    end
+
+    doc = cmd_doc(x)
+    push!(contents, doc...)
+
+    if x.default !== nothing
+        push!(contents, _hint(doc, default_str(x)))
+    end
+
+    return partition(io, x, contents)
+end
+
+function _hint(doc::CommandDoc, hint::String)
+    if endswith(doc, ".")
+        return " " * hint
+    elseif endswith(doc, ". ")
+        return hint
+    else
+        return ". " * hint
     end
 end
 
@@ -343,13 +389,20 @@ function print_version(io::IO)
     print(io, " "^doc_indent, VERSION_FLAG_DOC, "\n\n")
 end
 
-function partition(io, cmd, xs...; width = get(io, :terminal_width, 80))
+function partition(io::IO, cmd, xs...; kwargs...)
+    return partition(io, cmd, join(xs); kwargs...)
+end
+
+function partition(io::IO, cmd, xs::Vector{String}; kwargs...)
+    return partition(io, cmd, join(xs); kwargs...)
+end
+
+function partition(io::IO, cmd, doc::String; width = get(io, :terminal_width, 80))
     doc_indent = get(io, :doc_indent, -1)
     doc_width = width - doc_indent
     first_line_indent = first_line_doc_indent(io, cmd)
     indent = " "^get(io, :indent, 0)
     print(io, indent, cmd)
-    doc = join(xs)
     isempty(doc) && return
 
     print_doc(io, cmd, doc, doc_width, first_line_indent, indent, doc_indent)
