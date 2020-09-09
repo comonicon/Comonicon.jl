@@ -30,7 +30,20 @@ Read CLI documentation from markdown format doc strings.
 function read_doc(doc::Markdown.MD)
     has_docstring(doc) || return "", read_args(nothing), read_flags(nothing), read_options(nothing)
     intro = read_intro(doc)
-    args = read_args(read_section(doc, "Arguments"))
+    
+    long_sec = read_section(doc, "Arguments")
+    short_sec = read_section(doc, "Args")
+
+    if long_sec !== nothing && short_sec !== nothing
+        error("expecting a single section about arguments, got Args and Arguments")
+    end
+
+    if long_sec === nothing
+        args = read_args(short_sec)
+    else
+        args = read_args(long_sec)
+    end
+
     flags = read_flags(read_section(doc, "Flags"))
     options = read_options(read_section(doc, "Options"))
     return intro, args, flags, options
@@ -39,7 +52,7 @@ end
 function read_intro(md::Markdown.MD)
     intro = []
     for line in read_content(md)
-        if line isa Markdown.Header{1} && line.text[1] in ["Arguments", "Options", "Flags"]
+        if line isa Markdown.Header{1} && line.text[1] in ["Arguments", "Args", "Options", "Flags"]
             break
         else
             push!(intro, line)

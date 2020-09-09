@@ -1,5 +1,7 @@
 using Comonicon
+using Markdown
 using Comonicon.Types
+using Comonicon.Parse
 using Comonicon.BuildTools: precompile_script, install
 using Test
 
@@ -136,4 +138,44 @@ cmd = @cast(f_issue_47(xs::Int...) = xs)
 @testset "issue/#47" begin
     @test cmd.args[1].type == Int
     @test cmd.args[1].vararg == true
+end
+
+@testset "markdown parsing" begin
+    doc = md"""
+    ArgParse example implemented in Comonicon.
+
+    # Arguments
+
+    - `x`: an argument
+    """
+
+    intro, args, flags, optionsa = Parse.read_doc(doc)
+    @test intro == "ArgParse example implemented in Comonicon."
+    @test haskey(args, "x")
+    @test args["x"] == "an argument"
+
+    doc = md"""
+    ArgParse example implemented in Comonicon.
+
+    # Args
+    - `x`: an argument
+    """
+
+    intro, args, flags, optionsa = Parse.read_doc(doc)
+    @test intro == "ArgParse example implemented in Comonicon."
+    @test haskey(args, "x")
+    @test args["x"] == "an argument"
+
+
+    doc = md"""
+    ArgParse example implemented in Comonicon.
+
+    # Args
+    - `x`: an argument
+
+    # Arguments
+    - `x`: an argument
+    """
+
+    @test_throws ErrorException Parse.read_doc(doc)
 end
