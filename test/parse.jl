@@ -140,6 +140,10 @@ cmd = @cast(f_issue_47(xs::Int...) = xs)
     @test cmd.args[1].vararg == true
 end
 
+@testset "disable version in @main" begin
+    @test_throws Meta.ParseError Parse.create_entry(Main, QuoteNode(LineNumberNode(1)), Expr(:kw, :version, "0.1.0"))
+end
+
 @testset "markdown parsing" begin
     doc = md"""
     ArgParse example implemented in Comonicon.

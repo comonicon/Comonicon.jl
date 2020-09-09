@@ -243,10 +243,10 @@ end
 function create_entry(m::Module, line::QuoteNode, kwargs...)
     configs = Dict{Symbol,Any}(:name => default_name(m), :version => get_version(m), :doc => "")
     for kw in kwargs
-        for key in [:name, :version, :doc]
-            if kw.args[1] === key
-                configs[key] = kw.args[2]
-            end
+        if kw.args[1] in [:name, :doc]
+            configs[kw.args[1]] = kw.args[2]
+        else
+            throw(Meta.ParseError("unsupported option: $(kw.args[1])=$(kw.args[2])"))
         end
     end
 
