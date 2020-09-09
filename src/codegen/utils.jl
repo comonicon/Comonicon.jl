@@ -14,7 +14,7 @@ interpolation expressions.
 function xerror(cmd, msg::String)
     msg = "Error: $msg, use -h or --help to check more detailed help info"
     return quote
-        printstyled($msg; color=:red, bold=true)
+        printstyled($msg; color = :red, bold = true)
         $(xprint_help(cmd))
         return 1
     end
@@ -33,7 +33,7 @@ function xerror(cmd, msg::Expr)
     end
     push!(ex.args, ", use -h or --help to check more detailed help info")
     return quote
-        printstyled($ex; color=:red, bold=true)
+        printstyled($ex; color = :red, bold = true)
         $(xprint_help(cmd))
         return 1
     end
