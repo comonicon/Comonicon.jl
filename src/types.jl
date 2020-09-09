@@ -450,9 +450,11 @@ function splitlines(s, width = 80)
         if space_left < word_width
             # start a new line
             push!(lines, strip(join(current_line)))
-            current_line = String[word]
+            current_line = String[]
             space_left = width
-        elseif endswith(word, "-")
+        end
+            
+        if endswith(word, "-")
             push!(current_line, word)
             space_left -= word_width
         else
