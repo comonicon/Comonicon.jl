@@ -1,1 +1,2 @@
-using Hello; Hello.command_main()
+using Hello;
+Hello.command_main();
