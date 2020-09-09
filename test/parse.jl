@@ -159,13 +159,21 @@ end
 
     # Args
     - `x`: an argument
+
+    # Options
+
+    - `--option1=<value>`: option with assign
+    - `--option2=<value>`: option with space
     """
 
-    intro, args, flags, optionsa = Parse.read_doc(doc)
+    intro, args, flags, options = Parse.read_doc(doc)
     @test intro == "ArgParse example implemented in Comonicon."
     @test haskey(args, "x")
     @test args["x"] == "an argument"
-
+    @test haskey(options, "option1")
+    @test haskey(options, "option2")
+    @test options["option1"] == ("value", "option with assign", false)
+    @test options["option2"] == ("value", "option with space", false)
 
     doc = md"""
     ArgParse example implemented in Comonicon.

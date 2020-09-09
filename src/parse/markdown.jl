@@ -94,6 +94,9 @@ function read_options(md::Markdown.List)
     for each in md.items
         name, doc = read_item(each[1])
         m = match(r"^(-.*) +<(.+)>$", name)
+        if m === nothing # try --option=<value>
+            m = match(r"^(-.*)=+<(.+)>$", name)
+        end
 
         if m === nothing
             err_m = match(r"^-.*$", strip(name))
