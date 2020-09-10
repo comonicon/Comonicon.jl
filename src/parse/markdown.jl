@@ -22,6 +22,12 @@ rm_format(x::Markdown.Code) = x.code
 rm_format(x::String) = x
 rm_format(x::Markdown.MD) = rm_format(x.content[1])
 
+function to_string(md::Markdown.MD)
+    return sprint(md; context = :color => true) do io, x
+        show(io, MIME("text/plain"), x)
+    end
+end
+
 """
     read_doc(markdown)
 
@@ -30,7 +36,20 @@ Read CLI documentation from markdown format doc strings.
 function read_doc(doc::Markdown.MD)
     has_docstring(doc) || return "", read_args(nothing), read_flags(nothing), read_options(nothing)
     intro = read_intro(doc)
-    args = read_args(read_section(doc, "Arguments"))
+
+    long_sec = read_section(doc, "Arguments")
+    short_sec = read_section(doc, "Args")
+
+    if long_sec !== nothing && short_sec !== nothing
+        error("expecting a single section about arguments, got Args and Arguments")
+    end
+
+    if long_sec === nothing
+        args = read_args(short_sec)
+    else
+        args = read_args(long_sec)
+    end
+
     flags = read_flags(read_section(doc, "Flags"))
     options = read_options(read_section(doc, "Options"))
     return intro, args, flags, options
@@ -39,13 +58,14 @@ end
 function read_intro(md::Markdown.MD)
     intro = []
     for line in read_content(md)
-        if line isa Markdown.Header{1} && line.text[1] in ["Arguments", "Options", "Flags"]
+        if line isa Markdown.Header{1} && line.text[1] in ["Arguments", "Args", "Options", "Flags"]
             break
         else
             push!(intro, line)
         end
     end
-    return join(map(rm_format, intro), "\n")
+
+    return to_string(Markdown.MD(intro, md.meta))
 end
 
 function read_section(md::Markdown.MD, title)
@@ -81,6 +101,9 @@ function read_options(md::Markdown.List)
     for each in md.items
         name, doc = read_item(each[1])
         m = match(r"^(-.*) +<(.+)>$", name)
+        if m === nothing # try --option=<value>
+            m = match(r"^(-.*)=+<(.+)>$", name)
+        end
 
         if m === nothing
             err_m = match(r"^-.*$", strip(name))
@@ -133,11 +156,12 @@ function read_flags(md::Markdown.List)
 end
 
 function read_item(raw::Markdown.Paragraph)
-    length(raw.content) == 2 || throw(Meta.ParseError("invalid command entry argument doc syntax"))
     raw.content[1] isa Markdown.Code ||
         throw(Meta.ParseError("command argument name should be marked by inline code"))
     name = raw.content[1].code
-    doc = read_docstring(raw.content[2])
+
+    raw_doc = to_string(Markdown.MD(Markdown.Paragraph(raw.content[2:end])))
+    doc = read_docstring(raw_doc)
     return name, doc
 end
 

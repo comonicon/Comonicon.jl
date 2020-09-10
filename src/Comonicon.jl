@@ -6,12 +6,6 @@ for more info.
 """
 module Comonicon
 
-# export print_cmd, codegen, install, cast_m, parse_doc, command, rm_lineinfo
-# export Arg, Flag, Option, NodeCommand, LeafCommand, EntryCommand
-@static if VERSION > v"1.5.0-"
-    Base.Experimental.@optlevel 0
-end
-
 using Markdown
 using Pkg
 using Libdl

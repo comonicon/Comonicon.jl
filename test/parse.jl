@@ -1,5 +1,7 @@
 using Comonicon
+using Markdown
 using Comonicon.Types
+using Comonicon.Parse
 using Comonicon.BuildTools: precompile_script, install
 using Test
 
@@ -64,7 +66,7 @@ tick tick.
     @test yy in [1.0, 2.0]
 end
 
-@main name = "main" doc = """
+@main name = "dummy" doc = """
     dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
     sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
     """
@@ -136,4 +138,60 @@ cmd = @cast(f_issue_47(xs::Int...) = xs)
 @testset "issue/#47" begin
     @test cmd.args[1].type == Int
     @test cmd.args[1].vararg == true
+end
+
+@testset "disable version in @main" begin
+    @test_throws Meta.ParseError Parse.create_entry(
+        Main,
+        QuoteNode(LineNumberNode(1)),
+        Expr(:kw, :version, "0.1.0"),
+    )
+end
+
+@testset "markdown parsing" begin
+    doc = md"""
+    ArgParse example implemented in `Comonicon`.
+
+    # Arguments
+
+    - `x`: an argument, `args`
+    """
+
+    intro, args, flags, optionsa = Parse.read_doc(doc)
+    @test intro == "  ArgParse example implemented in \e[36mComonicon\e[39m."
+    @test haskey(args, "x")
+    @test args["x"] == "an argument, \e[36margs\e[39m"
+
+    doc = md"""
+    ArgParse example implemented in Comonicon.
+
+    # Args
+    - `x`: an argument
+
+    # Options
+
+    - `--option1=<value>`: option with assign
+    - `--option2=<value>`: option with space
+    """
+
+    intro, args, flags, options = Parse.read_doc(doc)
+    @test intro == "  ArgParse example implemented in Comonicon."
+    @test haskey(args, "x")
+    @test args["x"] == "an argument"
+    @test haskey(options, "option1")
+    @test haskey(options, "option2")
+    @test options["option1"] == ("value", "option with assign", false)
+    @test options["option2"] == ("value", "option with space", false)
+
+    doc = md"""
+    ArgParse example implemented in Comonicon.
+
+    # Args
+    - `x`: an argument
+
+    # Arguments
+    - `x`: an argument
+    """
+
+    @test_throws ErrorException Parse.read_doc(doc)
 end

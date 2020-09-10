@@ -1,8 +1,7 @@
-name = "Foo"
-uuid = "9cc09137-cd31-4319-9d91-dfc41e461ca2"
+name = "Hello"
+uuid = "dd64c3d1-ae1f-4a3c-a09c-63a390c13099"
 authors = ["Roger-luo <rogerluo.rl18@gmail.com>"]
 version = "0.1.0"
 
 [deps]
 Comonicon = "863f3e99-da2a-4334-8734-de3dacbe5542"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

@@ -126,7 +126,7 @@ end
 Create cache for given command `cmd` at file location `file`.
 """
 function create_cache(cmd, file = Base.PROGRAM_FILE)
-    isempty(file) && return
+    isempty(file) && error("do not execute CLI script in -e, -E or REPL or disable_cache()")
     dir = cachedir(file)
     if !ispath(dir)
         mkpath(dir)
