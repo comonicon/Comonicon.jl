@@ -23,7 +23,7 @@ rm_format(x::String) = x
 rm_format(x::Markdown.MD) = rm_format(x.content[1])
 
 function to_string(md::Markdown.MD)
-    return sprint(md; context=:color=>true) do io, x
+    return sprint(md; context = :color => true) do io, x
         show(io, MIME("text/plain"), x)
     end
 end
@@ -36,7 +36,7 @@ Read CLI documentation from markdown format doc strings.
 function read_doc(doc::Markdown.MD)
     has_docstring(doc) || return "", read_args(nothing), read_flags(nothing), read_options(nothing)
     intro = read_intro(doc)
-    
+
     long_sec = read_section(doc, "Arguments")
     short_sec = read_section(doc, "Args")
 
@@ -64,7 +64,7 @@ function read_intro(md::Markdown.MD)
             push!(intro, line)
         end
     end
-    
+
     return to_string(Markdown.MD(intro, md.meta))
 end
 

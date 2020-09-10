@@ -141,7 +141,11 @@ cmd = @cast(f_issue_47(xs::Int...) = xs)
 end
 
 @testset "disable version in @main" begin
-    @test_throws Meta.ParseError Parse.create_entry(Main, QuoteNode(LineNumberNode(1)), Expr(:kw, :version, "0.1.0"))
+    @test_throws Meta.ParseError Parse.create_entry(
+        Main,
+        QuoteNode(LineNumberNode(1)),
+        Expr(:kw, :version, "0.1.0"),
+    )
 end
 
 @testset "markdown parsing" begin

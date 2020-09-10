@@ -338,7 +338,7 @@ function print_cmd(io::IO, x::Option)
         partition(io, x, cmd_doc(x)...)
     else
         doc = cmd_doc(x)
-        partition(io, x, doc...,  _hint(doc, default_str(x.arg)))
+        partition(io, x, doc..., _hint(doc, default_str(x.arg)))
     end
 end
 
@@ -500,7 +500,7 @@ function splitlines(s, width = 80)
             current_line = String[]
             space_left = width
         end
-            
+
         if endswith(word, "-")
             push!(current_line, word)
             space_left -= word_width
