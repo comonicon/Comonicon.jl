@@ -26,7 +26,7 @@ function docstring(x)
     end
 end
 
-xcall(m::Module, name::Function, xs...; kwargs...) = xcall(m, nameof(name), xs...; kwargs...)
+xcall(m::Module, name::Union{Type, Function}, xs...; kwargs...) = xcall(m, nameof(name), xs...; kwargs...)
 xcall(m::Module, name::Symbol, xs...; kwargs...) = xcall(GlobalRef(m, name), xs...; kwargs...)
 xcall(name, xs...; kwargs...) = xcall(Parse, name, xs...; kwargs...)
 
