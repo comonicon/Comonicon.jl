@@ -24,7 +24,7 @@ end
 
 if you write this into a script file `myscript.jl` and execute it using
 
-```julia
+```sh
 julia myscript.jl -h
 ```
 
@@ -98,6 +98,11 @@ convert your expressions to commands, these are
 - function doc string can use section names: **Arguments**, **Options** and **Flags** to annotate your CLI:
   - short options or short flags can be declared via `-f, flag` or `-o, --option <name>` (see example below)
 
+!!! note
+
+  to be compatible with shell options, variable names with underscore `_` will be automatically replaced with dash `-`.
+  As a result, the corresponding doc string should use dash `-` instead of `_` as well, e.g kwargs name `dash_dash` will
+  be converted to `--dash-dash` option/flag in terminal, and its corresponding doc string should be ``` - `--dash-dash`: <arg>```.
 
 An example of function docstring
 
