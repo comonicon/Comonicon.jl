@@ -19,13 +19,15 @@ foo foo
 # Options
 
 - `--foo <foo>`: foo foo
+- `--dash-dash <dash>`: dash dash.
 """
-@cast function foo(x::Int, y; foo::Int = 1, hulu::Float64 = 2.0, flag::Bool = false) where {T}
+@cast function foo(x::Int, y; foo::Int = 1, hulu::Float64 = 2.0, flag::Bool = false, dash_dash::String="dash") where {T}
     @test x == 1
     @test y == "2.0"
     @test foo == 2
     @test hulu == 3.0
     @test flag == true
+    @test dash_dash == "underscore"
 end
 
 """
@@ -72,8 +74,8 @@ end
     """
 end
 
-@test Dummy.command_main(String["foo", "1.0", "2.0", "--foo", "2", "--hulu=3.0", "--flag"]) == 0
-@test Dummy.command_main(String["foo", "1.0", "2.0", "--foo", "2", "--hulu=3.0", "-f"]) == 0
+@test Dummy.command_main(String["foo", "1.0", "2.0", "--foo", "2", "--hulu=3.0", "--flag", "--dash-dash=underscore"]) == 0
+@test Dummy.command_main(String["foo", "1.0", "2.0", "--foo", "2", "--hulu=3.0", "-f", "--dash-dash", "underscore"]) == 0
 @test Dummy.command_main(String["goo", "1.0", "2.0", "-gSam", "-f"]) == 0
 @test_throws ErrorException LeafCommand(
     identity;

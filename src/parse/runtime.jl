@@ -98,6 +98,7 @@ function create_options_and_flags(kwargs, option_docs, flag_docs, line)
 end
 
 function create_flag(name::String, type, flag_docs, line)
+    name = convert_undercore_to_dash(name)
     if haskey(flag_docs, name)
         doc, short = flag_docs[name]
         return Flag(name, line, doc, short)
@@ -107,6 +108,7 @@ function create_flag(name::String, type, flag_docs, line)
 end
 
 function create_option(name::String, type, option_docs, line, default)
+    name = convert_undercore_to_dash(name)
     if haskey(option_docs, name)
         arg, doc, short = option_docs[name]
         return Option(
@@ -117,7 +119,8 @@ function create_option(name::String, type, option_docs, line, default)
             line = line,
         )
     else
-        return Option(name, Arg(; type = type, line = line, default = default); line = line)
+        return Option(name,
+            Arg(; type = type, line = line, default = default); line = line)
     end
 end
 

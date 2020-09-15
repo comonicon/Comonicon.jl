@@ -137,3 +137,7 @@ function create_cache(cmd, file = Base.PROGRAM_FILE)
     write(crc, string(checksum(file), base = 16))
     return
 end
+
+function convert_undercore_to_dash(s::String)
+    return replace(s, "_"=>"-")
+end
