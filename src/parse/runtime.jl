@@ -119,8 +119,7 @@ function create_option(name::String, type, option_docs, line, default)
             line = line,
         )
     else
-        return Option(name,
-            Arg(; type = type, line = line, default = default); line = line)
+        return Option(name, Arg(; type = type, line = line, default = default); line = line)
     end
 end
 
