@@ -139,5 +139,5 @@ function create_cache(cmd, file = Base.PROGRAM_FILE)
 end
 
 function convert_undercore_to_dash(s::String)
-    return replace(s, "_"=>"-")
+    return replace(s, "_" => "-")
 end

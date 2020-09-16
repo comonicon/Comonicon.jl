@@ -221,7 +221,7 @@ cmd_name(cmd) = cmd.name
 cmd_doc(cmd::EntryCommand) = cmd_doc(cmd.root)
 cmd_doc(cmd) = cmd.doc
 
-cmd_sym(cmd) = Symbol(replace(cmd_name(cmd), "-"=>"_"))
+cmd_sym(cmd) = Symbol(replace(cmd_name(cmd), "-" => "_"))
 cmd_lineinfo(cmd) = cmd.line
 
 function default_str(x::Arg)
