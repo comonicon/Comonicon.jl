@@ -12,6 +12,9 @@ incremental=true
 filter_stdlibs=false
 cpu_target="native"
 
+[sysimg.precompile]
+execution_file = ["deps/precopmile.jl"]
+
 [download]
 host="github.com"
 user="Roger-luo"
