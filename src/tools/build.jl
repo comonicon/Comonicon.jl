@@ -135,6 +135,11 @@ end
 function merge_defaults(mod, configs)
     if haskey(configs, "sysimg")
         configs["sysimg"] = merge(DEFAULT_SYSIMG_CONFIG, configs["sysimg"])
+
+        if haskey(configs["sysimg"], "precompile")
+            pr_cfg = configs["sysimg"]["precompile"]
+            configs["sysimg"]["precompile"] = merge(DEFAULT_SYSIMG_CONFIG["precompile"], pr_cfg)
+        end
     end
 
     configs["install"] = merge(DEFAULT_INSTALL_CONFIG, configs["install"])
