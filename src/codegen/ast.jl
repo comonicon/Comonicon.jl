@@ -355,7 +355,6 @@ function read_match(parameters, it, option::Option)
     sym = QuoteNode(cmd_sym(option))
 
     function action(m)
-        println("READ_MATCH: ", typeof(m), " ", m)
         arg = xparse(type, :(String($m[1])))
         return quote
             push!($parameters, $sym => $arg)
