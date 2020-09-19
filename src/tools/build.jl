@@ -30,6 +30,10 @@ const COMONICON_URL = "https://github.com/Roger-luo/Comonicon.jl"
 # filter_stdlibs=true
 # cpu_target="native"
 
+# [sysimg.precompile]
+# execution_file = ["deps/precopmile.jl"]
+# statements_file = ["deps/statements.jl"]
+
 # [download]
 # host="github.com"
 # user="Roger-luo"
@@ -47,6 +51,10 @@ const DEFAULT_SYSIMG_CONFIG = Dict(
     "incremental" => true,
     "filter_stdlibs" => false,
     "cpu_target" => "native",
+    "precompile" => Dict{String, Vector{String}}(
+        "statements_file" => String[],
+        "execution_file" => String[],
+    )
 )
 
 const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
@@ -86,9 +94,19 @@ function read_configs(mod; kwargs...)
             install_configs[string(k)] = v
         end
 
-        if k in [:path, :incremental, :filter_stdlibs, :cpu_target]
+        if k in [
+                :path, :incremental, :filter_stdlibs, :cpu_target, :precompile,
+                # NOTE: we handle these two kwargs in a more flatten way
+                :precompile_execution_file, :precompile_statements_file
+            ]
             sysimg_configs = get!(configs, "sysimg", Dict{String,Any}())
-            sysimg_configs[string(k)] = v
+
+            if k in [:precompile_execution_file, :precompile_statements_file]
+                precompile_configs = get!(sysimg_configs, "precompile", Dict{String, Vector{String}}())
+                precompile_configs[string(k)[12:end]] = v
+            else
+                sysimg_configs[string(k)] = v
+            end
         end
 
         if k in [:host, :repo, :user]
@@ -331,13 +349,6 @@ function build_sysimg(mod::Module, configs::Dict)
         mkpath(lib_path)
     end
 
-    # install precompile script
-    precompile_jl = PATH.project(mod, "deps", "precompile.jl")
-    @info "generating precompile execution file: $precompile_jl"
-    open(precompile_jl, "w+") do f
-        print(f, precompile_script(mod))
-    end
-
     project = PATH.project(mod)
     incremental = sysimg_configs["incremental"]
     filter_stdlibs = sysimg_configs["filter_stdlibs"]
@@ -354,7 +365,8 @@ function build_sysimg(mod::Module, configs::Dict)
         sysimage_path = image_path,
         incremental = incremental,
         project = project,
-        precompile_execution_file = [precompile_jl, PATH.project(mod, "test", "runtests.jl")],
+        precompile_statements_file = sysimg_configs["precompile"]["statements_file"],
+        precompile_execution_file = sysimg_configs["precompile"]["execution_file"],
         cpu_target = cpu_target,
         filter_stdlibs = filter_stdlibs,
     )
@@ -444,36 +456,6 @@ function cmd_script(
     push!(script, "-- $shadow \$@")
 
     return join(script, " \\\n    ")
-end
-
-"""
-    precompile_script(mod)
-
-Generates a script to execute as `precompile_execution_file` for all the commands.
-"""
-function precompile_script(mod::Module)
-    script = "using $mod;\n$mod.command_main([\"-h\"]);\n"
-
-    if isdefined(mod, :CASTED_COMMANDS)
-        for (name, cmd) in mod.CASTED_COMMANDS
-            if name != "main" # skip main command
-                script *= "$mod.command_main([$(precompile_script(mod, cmd))]);\n"
-            end
-        end
-    end
-    return script
-end
-
-function precompile_script(mod::Module, cmd::EntryCommand)
-    return precompile_script(mod, cmd.root)
-end
-
-function precompile_script(mod::Module, cmd::LeafCommand)
-    return "\"$(cmd_name(cmd))\", \"-h\""
-end
-
-function precompile_script(mod::Module, cmd::NodeCommand)
-    return join(map(x -> "\"$(cmd_name(cmd))\", " * precompile_script(mod, x), cmd.subcmds))
 end
 
 Base.write(x::EntryCommand) = write(cachefile(), x)
