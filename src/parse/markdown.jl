@@ -120,7 +120,8 @@ function read_options(md::Markdown.List)
             options[lstrip(m[1], '-')] = (m[2], doc, false)
         elseif length(flags) == 2
             names = strip.(flags)
-            name = startswith(names[1], "--") ? lstrip(names[1], '-') :
+            name =
+                startswith(names[1], "--") ? lstrip(names[1], '-') :
                 startswith(names[2], "--") ? lstrip(names[2], '-') :
                 throw(Meta.ParseError("invalid option/flag: $name"))
 
@@ -143,7 +144,8 @@ function read_flags(md::Markdown.List)
             options[name[3:end]] = (doc, false)
         elseif length(flags) == 2
             names = strip.(flags)
-            name = startswith(names[1], "--") ? lstrip(names[1], '-') :
+            name =
+                startswith(names[1], "--") ? lstrip(names[1], '-') :
                 startswith(names[2], "--") ? lstrip(names[2], '-') :
                 throw(Meta.ParseError("invalid flag: $name"))
 
