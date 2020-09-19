@@ -2,7 +2,7 @@ using Comonicon
 using Markdown
 using Comonicon.Types
 using Comonicon.Parse
-using Comonicon.BuildTools: precompile_script, install
+using Comonicon.BuildTools: install
 using Test
 
 module Dummy
@@ -110,15 +110,6 @@ end
 )
 @test Dummy.command_main(String["tick", "1.0", "2.0"]) == 0
 @test Dummy.command_main(String["tick", "1.0"]) == 0
-
-
-@test precompile_script(Dummy) == """
-using Main.Dummy;
-Main.Dummy.command_main(["-h"]);
-Main.Dummy.command_main(["goo", "-h"]);
-Main.Dummy.command_main(["tick", "-h"]);
-Main.Dummy.command_main(["foo", "-h"]);
-"""
 
 empty!(ARGS)
 append!(ARGS, ["2", "--opt1", "3"])
