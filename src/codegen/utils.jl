@@ -71,6 +71,14 @@ function xparse(type, str)
     end
 end
 
+function xparse_partial(type, str, idx=1)
+    if skip_type_convert(type)
+        return :($str[$idx:end])
+    else
+        return :(convert($type, Meta.parse($str[$idx:end])))
+    end
+end
+
 function xparse_varargs(type, index)
     if skip_type_convert(type)
         return :(ARGS[$index:end]...)
@@ -97,6 +105,30 @@ function xmatch(cmd, regexes, actions, str, st = 1)
                 $(xmatch(cmd, regexes, actions, str, st + 1))
             else
                 $(action(m))
+            end
+        end
+    else
+        return xerror(cmd, :("unknown option: $($str)"))
+    end
+end
+
+"""
+    xmatch(regexes, actions, str[, st = 1])
+
+Generate a long ifelse expression that acts like a pattern
+matching expression that match given regex list and do the
+corresponding actions.
+"""
+function xmatch_no_regex(cmd, flags, actions, str, st = 1)
+    if st <= length(flags)
+        m = gensym(:m)
+        flag, action = flags[st], actions[st]
+
+        return quote
+            if !startswith($flag, $str)
+                $(xmatch_no_regex(cmd, flags, actions, str, st + 1))
+            else
+                $(action(str))
             end
         end
     else

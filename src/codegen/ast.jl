@@ -176,7 +176,7 @@ function codegen_body(ctx::ASTCtx, cmd::LeafCommand)
     ret = Expr(:block)
     validate_ex = Expr(:block)
 
-    pushmaybe!(ret, codegen_params(ctx, parameters, cmd))
+    pushmaybe!(ret, codegen_params_no_regex(ctx, parameters, cmd))
 
     if nrequires > 0
         err = xerror(
@@ -258,6 +258,51 @@ function codegen_params(ctx::ASTCtx, params::Symbol, cmd::LeafCommand)
     end
 end
 
+function codegen_params_no_regex(ctx::ASTCtx, params::Symbol, cmd::LeafCommand)
+    hasparameters(cmd) || return
+
+    flags, actions = [], []
+    arg = gensym(:arg)
+    it = gensym(:index)
+
+    for opt in cmd.options
+        long_flag = "--" * cmd_name(opt)
+        push!(flags, long_flag)
+        push!(actions, read_match_or_forward(params, it, long_flag, opt))
+
+        if opt.short
+            short_flag = "-" * first(cmd_name(opt))
+            push!(flags, short_flag)
+            push!(actions, read_match_or_forward(params, it, short_flag, opt))
+        end
+    end
+
+    for flag in cmd.flags
+        long_flag = "--" * cmd_name(opt)
+        push!(flags, long_flag)
+        push!(actions, read_flag(params, it, flag))
+
+        if flag.short
+            short_flag = "-" * first(cmd_name(opt))
+            push!(flags, short_flag)
+            push!(actions, read_flag(params, it, flag))
+        end
+    end
+
+    return quote
+        $params = []
+        $it = $(ctx.ptr)
+        while !isempty(ARGS) && $(ctx.ptr) <= $it <= length(ARGS)
+            $arg = ARGS[$it]
+            if startswith($arg, "-") # is a flag/option
+                $(xmatch_no_regex(cmd, flags, actions, arg))
+            else
+                $it += 1
+            end
+        end
+    end
+end
+
 function codegen_call(ctx::ASTCtx, params::Symbol, n_args::Symbol, cmd::LeafCommand)
     ex_call = Expr(:call, cmd.entry)
     if hasparameters(cmd)
@@ -310,11 +355,38 @@ function read_match(parameters, it, option::Option)
     sym = QuoteNode(cmd_sym(option))
 
     function action(m)
+        println("READ_MATCH: ", typeof(m), " ", m)
         arg = xparse(type, :(String($m[1])))
         return quote
             push!($parameters, $sym => $arg)
             deleteat!(ARGS, $it)
             $it = $it - 1
+        end
+    end
+end
+
+function read_match_or_forward(parameters, it, flag, option::Option)
+    type = option.arg.type
+    sym = QuoteNode(cmd_sym(option))
+
+    function action(str)
+        flag_len = length(flag)
+        arg_fwd = xparse_args(option.arg, :($it + 1))
+        arg_extract = xparse_partial(type, str, flag_len + 2)
+        return quote
+            # Entire string is the flag, look for argument
+            if length($str) == $flag_len
+                $it < length(ARGS) || error("expect an argument")
+                push!($parameters, $sym => $arg_fwd)
+                deleteat!(ARGS, ($it, $it + 1))
+                $it = $it - 1
+            elseif length($str) > $(flag_len + 1) && $str[$(flag_len + 1)] == "="
+                push!($parameters, $sym => $arg_extract)
+                deleteat!(ARGS, $it)
+                $it = $it - 1
+            else
+                error("expect an argument")
+            end
         end
     end
 end

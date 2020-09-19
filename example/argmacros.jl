@@ -1,7 +1,7 @@
 using ArgMacros
 
 function main()
-    @beginarguments begin
+    @inlinearguments begin
         @argumentdefault Int 1 opt1 "-o" "--opt1"
         @argumentdefault Int 2 opt2 "--opt2"
         @argumentflag flag "--flag"
