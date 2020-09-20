@@ -4,6 +4,14 @@ using Pkg
 
 Comonicon.disable_cache()
 
+@testset "cache flags" begin
+    @test Comonicon.Parse.CACHE_FLAG[] == false
+    Comonicon.enable_cache()
+    @test Comonicon.Parse.CACHE_FLAG[] == true
+end
+
+Comonicon.disable_cache()
+
 @testset "configurations" begin
     include("configurations.jl")
 end
