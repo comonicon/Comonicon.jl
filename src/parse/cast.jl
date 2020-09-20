@@ -176,25 +176,18 @@ casted_commands(m) = GlobalRef(m, :CASTED_COMMANDS)
 # Entry
 """
     @main <function expr>
-    @main [options...]
+    @main
 
 Create an `EntryCommand` and use it as the entry of the entire CLI.
 If you only have one function to cast to a CLI, you can use `@main`
 instead of `@cast` so it will create both the command object and
 the entry.
-
-If you have declared commands via `@cast`, you can create the entry
-via `@main [options...]`, available options are:
-
-- `name`: default is the current module name in lowercase.
-- `version`: default is the current project version or `v"0.0.0"`. If
-    it's `v"0.0.0"`, the version will not be printed.
-- `doc`: a description of the entry command.
 """
 macro main(xs...)
     return esc(main_m(__module__, QuoteNode(__source__), xs...))
 end
 
+# @main <expr>
 function main_m(m::Module, line::QuoteNode, ex::Expr)
     if CACHE_FLAG[] && iscached()
         return quote
@@ -225,6 +218,7 @@ function main_m(m::Module, line::QuoteNode, ex::Expr)
     return ret
 end
 
+# @main <symbol>
 function main_m(m::Module, line::QuoteNode, ex::Symbol)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
@@ -235,33 +229,44 @@ function main_m(m::Module, line::QuoteNode, ex::Symbol)
     end
 end
 
-function main_m(m::Module, line::QuoteNode, kwargs...)
+# @main
+function main_m(m::Module, line::QuoteNode)
     CACHE_FLAG[] && iscached() && return :(include($(cachefile()[1])))
-    return create_entry(m, line, kwargs...)
+    return create_entry(m, line)
 end
 
-function create_entry(m::Module, line::QuoteNode, kwargs...)
-    configs = Dict{Symbol,Any}(:name => default_name(m), :version => get_version(m), :doc => "")
-    for kw in kwargs
-        if kw.args[1] in [:name, :doc]
-            configs[kw.args[1]] = kw.args[2]
+function create_entry(m::Module, line::QuoteNode)
+    if m === Main
+        # in scripts
+        if endswith(Base.PROGRAM_FILE, ".jl")
+            # normal julia scripts
+            name = Base.PROGRAM_FILE[1:end-3]
+        elseif isempty(Base.PROGRAM_FILE)
+            # scripts without a program file
+            name = "main"
         else
-            throw(Meta.ParseError("unsupported option: $(kw.args[1])=$(kw.args[2])"))
+            # scripts with shebang
+            name = Base.PROGRAM_FILE
         end
+    else
+        # in projects
+        options = read_configs(m)
+        name = options.name
     end
 
     ret = Expr(:block)
+    push!(ret.args, :(Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing))
 
     var_cmd, var_entry = gensym(:cmd), gensym(:entry)
     cmd = xcall(
         Types,
         :NodeCommand,
-        configs[:name],
+        name,
         line,
-        configs[:doc],
+        :($to_string(@doc(COMMAND_ENTRY_DOC_STUB))),
         :(collect(values($m.CASTED_COMMANDS))),
     )
-    entry = xcall(Types, :EntryCommand, var_cmd, configs[:version], line)
+    entry = xcall(Types, :EntryCommand, var_cmd, get_version(m), line)
 
     push!(ret.args, :($var_cmd = $cmd))
     push!(ret.args, :($var_entry = $entry))
@@ -287,17 +292,6 @@ function precompile_or_exec(m::Module, entry)
             $(xcall(m, :eval, xcall(CodeGen, :codegen, entry)))
 
             """
-                comonicon_build([sysimg=true]; kwargs...)
-
-            Build the CLI manually. This will set system image build to be
-            `incremental=true` and `filter_stdlibs=false` to get better compile
-            speed locally. For more detailed reference, please
-            refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
-            """
-            comonicon_build(sysimg = true; kwargs...) =
-                $(GlobalRef(Comonicon, :build))($m, sysimg; kwargs...)
-
-            """
                 comonicon_install(;kwargs...)
 
             Install the CLI manually. This will use the default configuration in `Comonicon.toml`,
@@ -314,6 +308,16 @@ function precompile_or_exec(m::Module, entry)
             For more detailed reference, please refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
             """
             comonicon_install_path() = $(GlobalRef(Comonicon.BuildTools, :install_env_path))()
+
+            # entry point for apps
+            function julia_main()::Cint
+                try
+                    return command_main()
+                catch
+                    Base.invokelatest(Base.display_error, Base.catch_stack())
+                    return 1
+                end
+            end
 
             precompile(Tuple{typeof($m.command_main),Array{String,1}})
         end

@@ -1,5 +1,6 @@
 module BuildTools
 
+const COMONICON_URL = "https://github.com/Roger-luo/Comonicon.jl"
 export install, build
 
 using Logging
@@ -7,258 +8,82 @@ using PackageCompiler
 using Pkg.TOML
 using Pkg.PlatformEngines
 using ..Comonicon
+using ..Comonicon.Configurations
 using ..Comonicon.Parse
 using ..Comonicon.CodeGen
 using ..Comonicon.PATH
 using ..Comonicon.Types
 using ..Comonicon.Tools
 
-const COMONICON_URL = "https://github.com/Roger-luo/Comonicon.jl"
-# Comonicon.toml
-# name = "ion"
+function install(m::Module; kwargs...)
+    configs = read_configs(m; kwargs...)
+    return install(m, configs)
+end
 
-# [install]
-# bin = "~/.julia/bin"
-# completion=true
-# quiet=false
-# compile="min"
-# optimize=2
+function install(m::Module, configs::Configurations.Comonicon)
+    if isempty(ARGS)
+        if configs.install.quiet
+            logger = NullLogger()
+        else
+            logger = ConsoleLogger()
+        end
 
-# [sysimg]
-# path="deps/lib"
-# incremental=false
-# filter_stdlibs=true
-# cpu_target="native"
+        with_logger(logger) do
+            install_script(m, configs)
+        end
+        return
+    elseif length(ARGS) == 1
+        if "sysimg" in ARGS
+            return build_sysimg(m, configs)
+        elseif "app" in ARGS
+            return build_application(m, configs)
+        elseif "tarball" in ARGS
+            return build_tarball(m, configs)
+        end
+    end
 
-# [sysimg.precompile]
-# execution_file = ["deps/precopmile.jl"]
-# statements_file = ["deps/statements.jl"]
+    print("""
+    Comonicon - Installation CLI.
 
-# [download]
-# host="github.com"
-# user="Roger-luo"
+    USAGE
 
-const DEFAULT_INSTALL_CONFIG = Dict(
-    "bin" => PATH.default_julia_bin(),
-    "completion" => true,
-    "quiet" => false,
-    "compile" => nothing,
-    "optimize" => 2,
-)
+        julia --project deps/build.jl <target>
 
-const DEFAULT_SYSIMG_CONFIG = Dict(
-    "path" => "deps/lib",
-    "incremental" => true,
-    "filter_stdlibs" => false,
-    "cpu_target" => "native",
-    "precompile" => Dict{String, Vector{String}}(
-        "statements_file" => String[],
-        "execution_file" => String[],
+    ARGS
+
+        <target> [sysimg|app|tarball] specify this argument to build.
+    """)
+end
+
+"install a script as the CLI"
+function install_script(m::Module, configs::Configurations.Comonicon)
+    bin = expanduser(joinpath(configs.install.path, "bin"))
+    shadow = joinpath(bin, configs.name * ".jl")
+    
+    if isnothing(configs.sysimg)
+        sysimg = nothing
+    else
+        download_sysimg(m, configs)
+        sysimg = PATH.project(m, configs.sysimg.path, "lib", PATH.sysimg(configs.name))
+    end
+
+    shell_script = cmd_script(m, shadow;
+        sysimg = sysimg,
+        compile = configs.install.compile,
+        optimize = configs.install.optimize,
     )
-)
+    file = joinpath(bin, configs.name)
 
-const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
-
-function build(mod, sysimg = true; incremental = true, filter_stdlibs = false, kwargs...)
-    configs = read_configs(mod; incremental = incremental, filter_stdlibs = filter_stdlibs, kwargs...)
-
-    validate_toml(mod, configs)
-    configs = merge_defaults(mod, configs)
-
-    if sysimg && !haskey(configs, "sysimg")
-        configs["sysimg"] = DEFAULT_SYSIMG_CONFIG
-    elseif !sysimg
-        delete!(configs, "sysimg")
-    end
-    # do not download in manual mode
-    delete!(configs, "download")
-    return install(mod, configs)
-end
-
-function install(mod; kwargs...)
-    configs = read_configs(mod; kwargs...)
-    configs = merge_defaults(mod, configs)
-    validate_toml(mod, configs)
-    return install(mod, configs)
-end
-
-function read_configs(mod; kwargs...)
-    configs = read_toml(mod)
-    for (k, v) in kwargs
-        if k == :name
-            configs["name"] = v
-        end
-
-        if k in [:bin, :completion, :quiet, :compile, :optimize]
-            install_configs = get!(configs, "install", Dict{String,Any}())
-            install_configs[string(k)] = v
-        end
-
-        if k in [
-                :path, :incremental, :filter_stdlibs, :cpu_target, :precompile,
-                # NOTE: we handle these two kwargs in a more flatten way
-                :precompile_execution_file, :precompile_statements_file
-            ]
-            sysimg_configs = get!(configs, "sysimg", Dict{String,Any}())
-
-            if k in [:precompile_execution_file, :precompile_statements_file]
-                precompile_configs = get!(sysimg_configs, "precompile", Dict{String, Vector{String}}())
-                precompile_configs[string(k)[12:end]] = v
-            else
-                sysimg_configs[string(k)] = v
-            end
-        end
-
-        if k in [:host, :repo, :user]
-            download_config = get!(configs, "download", Dict{String,Any}())
-            download_config[string(k)] = v
-        end
-    end
-    return configs
-end
-
-function read_toml(mod)
-    path = nothing
-    for file in COMONICON_TOML
-        _path = PATH.project(mod, file)
-        if ispath(_path)
-            path = _path
-            break
-        end
-    end
-
-    path === nothing && return Dict()
-    configs = TOML.parsefile(path)
-    return configs
-end
-
-function merge_defaults(mod, configs)
-    if haskey(configs, "sysimg")
-        configs["sysimg"] = merge(DEFAULT_SYSIMG_CONFIG, configs["sysimg"])
-
-        if haskey(configs["sysimg"], "precompile")
-            pr_cfg = configs["sysimg"]["precompile"]
-            configs["sysimg"]["precompile"] = merge(DEFAULT_SYSIMG_CONFIG["precompile"], pr_cfg)
-        end
-    end
-
-    configs["install"] = merge(DEFAULT_INSTALL_CONFIG, configs["install"])
-    if !haskey(configs, "name")
-        configs["name"] = Parse.default_name(mod)
-    end
-    return configs
-end
-
-function validate_toml(mod, configs)
-    haskey(configs, "name") || error("missing key \"name\" in Comonicon.toml or kwargs")
-    got = configs["name"]
-    exp = Types.cmd_name(mod.CASTED_COMMANDS["main"])
-    got == exp || error("field name must be the same with entry name, expect $exp got $got")
-
-    _check(configs["install"], "compile") do x
-        x in [nothing, "min", "no", "all", "yes"]
-    end
-
-    for key in ["completion", "quiet"]
-        _check(configs["install"], key) do x
-            x isa Bool
-        end
-    end
-
-    _check(configs["install"], "optimize") do x
-        x isa Int
-    end
-
-    haskey(configs, "sysimg") || return
-
-    for key in ["incremental", "filter_stdlibs"]
-        _check(configs["sysimg"], key) do x
-            x isa Bool
-        end
-    end
-
-    haskey(configs, "download") || return
-
-    for key in ["host", "user", "repo"]
-        _check(configs["download"], key) do x
-            x isa String
-        end
-    end
-
-    return
-end
-
-function _check(f, configs, key)
-    haskey(configs, key) || error("missing key $key in Comonicon.toml or kwargs")
-    got = configs[key]
-    f(got) || error("invalid value $got for field \"$key\" in Comonicon.toml or kwargs")
-    return
-end
-
-function install(mod::Module, configs::Dict)
-    if configs["install"]["quiet"]
-        logger = NullLogger()
-    else
-        logger = ConsoleLogger()
-    end
-
-    with_logger(logger) do
-        if haskey(configs, "sysimg")
-            install_sysimg(mod, configs)
-        end
-
-        # if the system image is required by the developer,
-        # when system image installation
-        # errors, the CLI will not be installed.
-        # User will need to use mod.build([sysimg=false]) to install it
-        # manually, with an option to install without system image
-        # or build it locally.
-
-        # do not install script while building tarball
-        if !("sysimg" in ARGS)
-            install_script(mod, configs)
-        end
-    end
-    return
-end
-
-function install_script(mod::Module, configs::Dict)
-    if haskey(configs, "sysimg") && isfile(sysimage_path(mod, configs))
-        sysimg_path = sysimage_path(mod, configs)
-    else
-        sysimg_path = nothing
-    end
-
-    install_configs = configs["install"]
-    name = configs["name"]
-    bin = install_configs["bin"]
-
-    shadow = joinpath(bin, name * ".jl")
-    if install_configs["compile"] === nothing
-        compile = nothing
-    else
-        compile = Symbol(install_configs["compile"])
-    end
-
-    shell_script = cmd_script(
-        mod,
-        shadow;
-        sysimg = sysimg_path,
-        compile = compile,
-        optimize = install_configs["optimize"],
-    )
-
-    file = joinpath(bin, name)
-
+    # start writing
     if !ispath(bin)
-        @info "cannot find Julia bin folder creating .julia/bin"
+        @info "cannot find Julia bin folder creating $bin"
         mkpath(bin)
     end
 
     # generate contents
     @info "generating $shadow"
     open(shadow, "w+") do f
-        println(f, "#= generated by Comonicon for $name =# using $mod; exit($mod.command_main())")
+        println(f, "#= generated by Comonicon for $(configs.name) =# using $m; exit($mod.command_main())")
     end
 
     @info "generating $file"
@@ -266,76 +91,153 @@ function install_script(mod::Module, configs::Dict)
         println(f, shell_script)
     end
 
-    if install_configs["completion"]
-        install_completion(mod, joinpath(dirname(bin), "completions"))
+    if configs.install.completion
+        install_completion(m, configs)
     end
 
     chmod(file, 0o777)
     return
 end
 
-function install_sysimg(mod::Module, configs::Dict)
-    # if sysimg will be downloaded on user side
-    # when we build the sysimg, a tarball should
-    # be generated.
-    if haskey(configs, "download")
-        # we create a system image tarball
-        # via an argument sysimg
-        if "sysimg" in ARGS
-            build_sysimg(mod, configs)
-            create_tarball(mod, configs["name"])
-        else
-            download_sysimg(mod, configs)
+function install_completion(m::Module, configs::Configurations.Comonicon)
+    sh = detect_shell()
+    sh === nothing && return
+
+    @info "generating auto-completion script for $sh"
+    script = completion_script(sh, m)
+    script === nothing && return
+
+    completions_dir = joinpath(configs.install.path, "completions")
+    if !ispath(completions_dir)
+        mkpath(completions_dir)
+    end
+
+    completion_file = joinpath(completions_dir, "_" * configs.name)
+    @info "writing to $completion_file"
+    write(completion_file, script)
+    return
+end
+
+function build_sysimg(m::Module, configs::Configurations.Comonicon;
+        # allow override these two options
+        incremental = configs.sysimg.incremental,
+        filter_stdlibs = configs.sysimg.filter_stdlibs,
+    )
+    lib = PATH.project(m, configs.sysimg.path, "lib")
+    if !ispath(lib)
+        @info "creating library path: $lib"
+        mkpath(lib)
+    end
+
+    @info "compile under project: $(PATH.project(m))"
+    @info configs.sysimg
+
+    create_sysimage(
+        nameof(m);
+        sysimage_path = joinpath(lib, PATH.sysimg(configs.name)),
+        incremental = incremental,
+        filter_stdlibs = filter_stdlibs,
+        project = PATH.project(m),
+        precompile_statements_file = configs.sysimg.precompile.statements_file,
+        precompile_execution_file = configs.sysimg.precompile.execution_file,
+        cpu_target = configs.sysimg.cpu_target,
+    )
+
+    return
+end
+
+function build_application(m::Module, configs::Configurations.Comonicon)
+    build_dir = PATH.project(m, configs.application.path, configs.name)
+    if !ispath(build_dir)
+        @info "creating build path: $build_dir"
+        mkpath(build_dir)
+    end
+
+    @info configs.application
+
+    create_app(PATH.project(m), build_dir;
+        app_name = configs.name,
+        precompile_execution_file = configs.application.precompile.execution_file,
+        precompile_statements_file = configs.application.precompile.statements_file,
+        incremental = configs.application.incremental,
+        filter_stdlibs = configs.application.filter_stdlibs,
+        force=true,
+        cpu_target = configs.application.cpu_target,
+    )
+
+    if configs.install.completion
+        @info "generating completion scripts"
+        build_completion(m, configs)
+    end
+    return
+end
+
+function build_tarball(m::Module, configs::Configurations.Comonicon)
+    @info configs
+    if configs.sysimg !== nothing
+        build_sysimg(m, configs)
+        # pack tarball
+        tarball = tarball_name(configs.name)
+        @info "creating system image tarball $tarball"
+        cd(PATH.project(m, configs.sysimg.path)) do
+            run(`tar -czvf $tarball lib`)
         end
-    else # manually triggered
-        build_sysimg(mod, configs)
-        if "tarball" in ARGS
-            create_tarball(mod, configs["name"])
+    end
+
+    if configs.application !== nothing
+        build_application(m, configs)
+        # pack tarball
+        tarball = "application-" * tarball_name(configs.name)
+        @info "creating application tarball $tarball"
+        cd(PATH.project(m, configs.application.path)) do 
+            run(`tar -czvf $tarball $(configs.name)`)
         end
     end
     return
 end
 
-function sysimage_path(mod, configs)
-    return PATH.project(mod, configs["sysimg"]["path"], PATH.sysimg(configs["name"]))
-end
-
-function download_sysimg(mod::Module, configs::Dict)
-    sysimg_configs = configs["sysimg"]
-    name = configs["name"]
-    os = osname()
-    tarball_name = "$name-$(VERSION)-$os-$(Sys.ARCH).tar.gz"
-
-    url = sysimg_url(mod, configs)
-    tarball = joinpath(PATH.project(mod, "deps", tarball_name))
+function download_sysimg(m::Module, configs::Configurations.Comonicon)
+    url = sysimg_url(m, configs)
     PlatformEngines.probe_platform_engines!()
 
     try
-        download(url, tarball)
-        unpack(tarball, PATH.project(mod, "deps"))
+        tarball = download(url)
+        path = PATH.project(m, configs.sysimg.path)
+        unpack(tarball, path)
+        # NOTE: sysimg won't be shared, so we can just remove it
+        isfile(tarball) && rm(tarball)
     catch e
         @warn "fail to download $url, building the system image locally"
         # force incremental build
-        sysimg_configs["incremental"] = true
-        sysimg_configs["filter_stdlibs"] = false
-        build_sysimg(mod, configs)
-    end
-
-    if ispath(tarball)
-        rm(tarball)
+        build_sysimg(m, configs; incremental=true, filter_stdlibs=false)
     end
     return
 end
 
-function sysimg_url(mod, configs)
-    name = configs["name"]
-    host = configs["download"]["host"]
+function build_completion(sh::String, m::Module, configs::Configurations.Comonicon)
+    completion_dir = PATH.project(m, configs.application.path, configs.name, "completions")
+    if !ispath(completion_dir)
+        @info "creating path: $completion_dir"
+        mkpath(completion_dir)
+    end
+
+    for sh in ["zsh"]
+        script = completion_script(sh, m)
+        script === nothing && continue
+        write(joinpath(completion_dir, "$sh.completion"), script)
+    end
+    return
+end
+
+function sysimg_url(mod::Module, configs::Configurations.Comonicon)
+    name = configs.name
+    host = configs.download.host
+
     if host == "github.com"
         url =
-            "https://github.com/" *
-            configs["download"]["user"] *
+            "https://github.com/" * configs.download.user *
             "/" *
-            configs["download"]["repo"] *
+            configs.download.repo *
             "/releases/download/"
     else
         error("host $host is not supported, please open an issue at $COMONICON_URL")
@@ -346,58 +248,8 @@ function sysimg_url(mod, configs)
     return url
 end
 
-function build_sysimg(mod::Module, configs::Dict)
-    sysimg_configs = configs["sysimg"]
-    lib_path = PATH.project(mod, sysimg_configs["path"])
-    if !ispath(lib_path)
-        @info "creating library path: $lib_path"
-        mkpath(lib_path)
-    end
 
-    project = PATH.project(mod)
-    incremental = sysimg_configs["incremental"]
-    filter_stdlibs = sysimg_configs["filter_stdlibs"]
-    cpu_target = sysimg_configs["cpu_target"]
-    image_path = sysimage_path(mod, configs)
-
-    @info "compile under project: $project"
-    @info "incremental: $incremental"
-    @info "filter stdlibs: $filter_stdlibs"
-    @info "system image path: $image_path"
-
-    create_sysimage(
-        nameof(mod);
-        sysimage_path = image_path,
-        incremental = incremental,
-        project = project,
-        precompile_statements_file = sysimg_configs["precompile"]["statements_file"],
-        precompile_execution_file = sysimg_configs["precompile"]["execution_file"],
-        cpu_target = cpu_target,
-        filter_stdlibs = filter_stdlibs,
-    )
-
-    return
-end
-
-function find_project(path)
-    file = joinpath(path, "JuliaProject.toml")
-    isfile(file) && return file
-    file = joinpath(path, "Project.toml")
-    isfile(file) && return file
-    return
-end
-
-function create_tarball(mod::Module, name)
-    version = get_version(mod)
-    tarball = tarball_name(name)
-    @info "creating tarball $tarball"
-    cd(PATH.project(mod, "deps")) do
-        run(`tar -czvf $tarball lib`)
-    end
-    return
-end
-
-function tarball_name(name)
+function tarball_name(name::String)
     return "$name-$VERSION-$(osname())-$(Sys.ARCH).tar.gz"
 end
 
@@ -463,6 +315,22 @@ function cmd_script(
     return join(script, " \\\n    ")
 end
 
+function completion_script(sh::String, m::Module)
+    isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
+    haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
+    main = m.CASTED_COMMANDS["main"]
+
+    if sh == "zsh"
+        return CodeGen.codegen(ZSHCompletionCtx(), main)
+    else
+        @warn(
+            "$sh autocompletion is not supported, " *
+            "please open an issue at $COMONICON_URL for feature request."
+        )
+    end
+    return
+end
+
 Base.write(x::EntryCommand) = write(cachefile(), x)
 
 """
@@ -484,36 +352,6 @@ Detect shell type via `SHELL` environment variable.
 function detect_shell()
     haskey(ENV, "SHELL") || error("cannot find available shell command")
     return basename(ENV["SHELL"])
-end
-
-"""
-    install_completion(m::Module[, path::String=PATH.default_julia_fpath()])
-
-Install completion script at `path`. Default path is [`PATH.default_julia_fpath()`](@ref).
-"""
-function install_completion(m::Module, path::String = PATH.default_julia_fpath())
-    isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
-    haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
-
-    main = m.CASTED_COMMANDS["main"]
-    shell = detect_shell()
-    shell === nothing && return
-
-    if shell == "zsh"
-        ctx = CodeGen.ZSHCompletionCtx()
-    else
-        @warn "$shell completion is not supported yet"
-        return
-    end
-
-    script = CodeGen.codegen(ctx, main)
-
-    if !ispath(path)
-        mkpath(path)
-    end
-
-    write(joinpath(path, "_" * cmd_name(main)), script)
-    return
 end
 
 function contain_comonicon_path(rcfile, env = ENV)
@@ -591,10 +429,10 @@ function write_path(rcfile, yes::Bool = false, env = ENV)
         push!(
             script,
             """
-# generated by Comonicon
-# Julia bin PATH
-export PATH="$(PATH.default_julia_bin()):\$PATH"
-""",
+            # generated by Comonicon
+            # Julia bin PATH
+            export PATH="$(PATH.default_julia_bin()):\$PATH"
+            """,
         )
         @info "adding PATH to $rcfile"
     end
@@ -604,11 +442,11 @@ export PATH="$(PATH.default_julia_bin()):\$PATH"
         push!(
             script,
             """
-# generated by Comonicon
-# Julia autocompletion PATH
-export FPATH="$(PATH.default_julia_fpath()):\$FPATH"
-autoload -Uz compinit && compinit
-""",
+            # generated by Comonicon
+            # Julia autocompletion PATH
+            export FPATH="$(PATH.default_julia_fpath()):\$FPATH"
+            autoload -Uz compinit && compinit
+            """,
         )
         @info "adding FPATH to $rcfile"
     end
