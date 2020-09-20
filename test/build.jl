@@ -72,7 +72,7 @@ end
 @test ispath(PATH.project("test", "Foo", "deps"))
 
 empty!(ARGS)
-push!(ARGS, "sysimg")
+push!(ARGS, "tarball")
 mock(create_sysimage) do plus
     @assert plus isa Mock
     Comonicon.install(Foo; path = PATH.project("test"), quiet = true)

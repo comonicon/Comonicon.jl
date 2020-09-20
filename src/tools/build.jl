@@ -173,6 +173,7 @@ function build_application(m::Module, configs::Configurations.Comonicon)
 end
 
 function build_tarball(m::Module, configs::Configurations.Comonicon)
+    @info configs
     if configs.sysimg !== nothing
         build_sysimg(m, configs)
         # pack tarball
