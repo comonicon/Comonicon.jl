@@ -1,5 +1,6 @@
 using Comonicon
 using Test
+using Pkg
 
 Comonicon.disable_cache()
 
@@ -12,5 +13,9 @@ end
 end
 
 @testset "build" begin
-    include("build.jl")
+    try
+        include("build.jl")
+    finally
+        Pkg.rm(PackageSpec(name = "Foo"))
+    end
 end
