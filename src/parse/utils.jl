@@ -1,25 +1,3 @@
-"""
-    default_name(x)
-
-Return the lowercase of `nameof(x)` in `String`.
-"""
-default_name(x) = lowercase(string(nameof(x)))
-
-"""
-    default_name(x)
-
-Return the lowercase of a given package name. It will
-ignore the suffix if it ends with ".jl".
-"""
-function default_name(x::String)
-    if endswith(x, ".jl")
-        name = x[1:end-3]
-    else
-        name = x
-    end
-    return lowercase(name)
-end
-
 function docstring(x)
     return sprint(Base.Docs.doc(x); context = :color => true) do io, x
         show(io, MIME"text/plain"(), x)

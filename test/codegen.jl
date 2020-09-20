@@ -74,7 +74,7 @@ using Comonicon, Test
     @test port == 2345
 end
 
-@main name = "pluto" doc = "Pluto CLI - Lightweight reactive notebooks for Julia"
+@main
 end
 
 Issue23.command_main(["run", "--port", "2345"])

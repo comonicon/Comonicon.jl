@@ -5,7 +5,9 @@ using SimpleMock
 using PackageCompiler
 using Comonicon.PATH
 using Comonicon.BuildTools
-using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath, read_toml
+using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath
+using Comonicon.Configurations
+using Comonicon.Configurations: read_toml
 
 Pkg.activate(PATH.project("test", "Foo"))
 Pkg.develop(PackageSpec(path = PATH.project()))
@@ -51,7 +53,7 @@ d = Dict(
         "filter_stdlibs" => false,
         "cpu_target" => "native",
         "incremental" => true,
-        "path" => "deps/lib",
+        "path" => "deps",
         "precompile" => Dict(
             "execution_file" => ["deps/precopmile.jl"],
         )
@@ -62,10 +64,7 @@ d = Dict(
 
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.build(Foo, true; bin = PATH.project("test", "bin"), quiet = true)
-
-    Comonicon.build(Foo, false; bin = PATH.project("test", "bin"), quiet = true)
-    Comonicon.install(Foo)
+    Comonicon.install(Foo; path=PATH.project("test"))
     @test isfile(PATH.project("test", "bin", "foo"))
     @test isfile(PATH.project("test", "bin", "foo.jl"))
 end
@@ -76,27 +75,9 @@ empty!(ARGS)
 push!(ARGS, "sysimg")
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.install(Foo; bin = PATH.project("test", "bin"), quiet = true)
+    Comonicon.install(Foo; path = PATH.project("test"), quiet = true)
 end
 
 @test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name("foo")))
 
 Pkg.rm(PackageSpec(name = "Foo"))
-
-# PR #48: check if the name of entry stays the same as config
-module PR48
-using ..Comonicon
-@cast foo(x) = x
-@cast goo(y) = y
-
-@main name = "PR48"
-
-end
-
-configs =
-    Dict("name" => "foo", "completion" => true, "quiet" => false, "compile" => "min", "optimize" => 2)
-
-
-@testset "#48" begin
-    @test_throws ErrorException Comonicon.BuildTools.validate_toml(PR48, configs)
-end

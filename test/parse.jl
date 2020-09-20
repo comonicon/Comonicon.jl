@@ -5,6 +5,8 @@ using Comonicon.Parse
 using Comonicon.BuildTools: install
 using Test
 
+Comonicon.disable_cache()
+
 module Dummy
 using Comonicon
 using Test
@@ -75,10 +77,11 @@ tick tick.
     @test yy in [1.0, 2.0]
 end
 
-@main name = "dummy" doc = """
-    dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
-    sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
-    """
+"""
+dummy command. dasdas dsadasdnaskdas dsadasdnaskdas
+sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
+"""
+@main
 end
 
 @test Dummy.command_main(String[
@@ -137,9 +140,10 @@ ArgParse example implemented in Comonicon.
     @test opt2 == 2
 end
 
+empty!(ARGS)
 Comonicon.install(
     Dummy;
-    bin = Comonicon.PATH.project("test", "bin"),
+    path = Comonicon.PATH.project("test"),
     completion = false,
     quiet = false,
 )
@@ -148,8 +152,8 @@ Comonicon.install(
 @test isfile(Comonicon.PATH.project("test", "bin", "dummy.jl"))
 
 @testset "default_name" begin
-    @test Comonicon.Parse.default_name("Foo.jl") == "foo"
-    @test Comonicon.Parse.default_name(sin) == "sin"
+    @test Comonicon.PATH.default_name("Foo.jl") == "foo"
+    @test Comonicon.PATH.default_name(sin) == "sin"
 end
 
 cmd = @cast(f_issue_47(xs::Int...) = xs)
@@ -157,14 +161,6 @@ cmd = @cast(f_issue_47(xs::Int...) = xs)
 @testset "issue/#47" begin
     @test cmd.args[1].type == Int
     @test cmd.args[1].vararg == true
-end
-
-@testset "disable version in @main" begin
-    @test_throws Meta.ParseError Parse.create_entry(
-        Main,
-        QuoteNode(LineNumberNode(1)),
-        Expr(:kw, :version, "0.1.0"),
-    )
 end
 
 @testset "markdown parsing" begin
