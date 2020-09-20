@@ -4,6 +4,10 @@ using Pkg
 
 Comonicon.disable_cache()
 
+@testset "configurations" begin
+    include("configurations.jl")
+end
+
 @testset "codegen" begin
     include("codegen.jl")
 end

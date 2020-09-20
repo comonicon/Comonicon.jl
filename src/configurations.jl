@@ -114,10 +114,10 @@ Base.@kwdef struct Application <: AbstractConfiguration
     path::String="build"
     incremental::Bool=false
     filter_stdlibs::Bool=true
-    cpu_target::Bool=PackageCompiler.default_app_cpu_target()
+    cpu_target::String=PackageCompiler.default_app_cpu_target()
     precompile::Precompile=Precompile()
 
-    function Application(path::String, incremental::Bool, filter_stdlibs::Bool, cpu_target::Bool, precompile::Precompile)
+    function Application(path::String, incremental::Bool, filter_stdlibs::Bool, cpu_target::String, precompile::Precompile)
         if isabspath(path)
             throw(ArgumentError("build path must be project relative"))
         end
@@ -320,6 +320,12 @@ function read_configs(m::Union{Module, String}; kwargs...)
 end
 
 default_cmd_name(m::Module) = lowercase(string(nameof(m)))
-default_cmd_name(path::String) = lowercase(splitext(basename(path))[1])
+default_cmd_name(path::String) = error("missing field \"name\" in (Julia)Comonicon.toml")
+
+function Base.:(==)(x::T, y::T) where {T <: AbstractConfiguration}
+    return all(fieldnames(T)) do field
+        getfield(x, field) == getfield(y, field)
+    end
+end
 
 end # Configs
