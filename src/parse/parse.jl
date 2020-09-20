@@ -6,15 +6,16 @@ using Pkg
 using CRC32c
 using MatchCore
 using ..Comonicon
+using ..Comonicon.Configurations
 using ..Comonicon.Types
 using ..Comonicon.CodeGen
+using ..Comonicon.PATH: default_name
 
 export @cast,
     @main,
     read_doc,
     command,
     rm_lineinfo,
-    default_name,
     get_version,
     iscached,
     cachefile,

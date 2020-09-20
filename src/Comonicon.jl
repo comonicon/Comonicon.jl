@@ -12,25 +12,24 @@ using Libdl
 using ExprTools
 using PackageCompiler
 
+include("tools/path.jl")
+include("configurations.jl")
 include("types.jl")
 include("codegen/codegen.jl")
 include("parse/parse.jl")
 
 export @cast, @main
 
+using .Configurations
 using .Types
 using .Parse
 using .CodeGen
 
-using .Parse: main
-
 include("tools/tools.jl")
-include("tools/path.jl")
 include("tools/build.jl")
 
 using .BuildTools
 
-# include("build.jl")
 # include("precompile.jl")
 # _precompile_()
 

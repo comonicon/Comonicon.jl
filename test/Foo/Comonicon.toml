@@ -7,7 +7,7 @@ compile="min"
 optimize=2
 
 [sysimg]
-path="deps/lib"
+path="deps"
 incremental=true
 filter_stdlibs=false
 cpu_target="native"
