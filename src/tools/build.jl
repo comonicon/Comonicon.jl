@@ -21,6 +21,29 @@ function install(m::Module; kwargs...)
 end
 
 function install(m::Module, configs::Configurations.Comonicon)
+    help = """
+    Comonicon - Installation CLI.
+
+    It installs the CLI script to `.julia/bin` if not specified with subcommands.
+
+    USAGE
+
+        julia --project deps/build.jl [command]
+
+    COMMANDS
+
+        app [tarball]               build the application, optionally make a tarball.
+        sysimg [tarball]            build the system image, optionally make a tarball.
+        tarball                     build application and system image then make tarballs
+                                    for them.
+
+    EXAMPLE
+
+        julia --project deps/build.jl app tarball
+
+    build the application based on Comonicon.toml and make a tarball from it.
+    """
+    
     if isempty(ARGS)
         if configs.install.quiet
             logger = NullLogger()
@@ -32,29 +55,29 @@ function install(m::Module, configs::Configurations.Comonicon)
             install_script(m, configs)
         end
         return
-    elseif length(ARGS) == 1
-        if "sysimg" in ARGS && !isnothing(configs.sysimg)
+    elseif "-h" in ARGS || "--help" in ARGS || "help" in ARGS
+        return print(help)
+    elseif first(ARGS) == "sysimg" && !isnothing(configs.sysimg)
+        if length(ARGS) == 1
             return build_sysimg(m, configs)
-        elseif "app" in ARGS && !isnothing(configs.application)
+        elseif length(ARGS) == 2 && ARGS[2] == "tarball"
+            return build_tarball_sysimg(m, configs)
+        end
+    elseif first(ARGS) == "app" && !isnothing(configs.application)
+        if length(ARGS) == 1
             return build_application(m, configs)
-        elseif "tarball" in ARGS && (!isnothing(configs.sysimg) || !isnothing(configs.application))
+        elseif length(ARGS) == 2 && ARGS[2] == "tarball"
+            return build_tarball_app(m, configs)
+        end
+    elseif first(ARGS) == "tarball" && (!isnothing(configs.sysimg) || !isnothing(configs.application))
+        if length(ARGS) == 1
             return build_tarball(m, configs)
         end
-        printstyled("target $(ARGS[1]) not found.")
     end
 
-    print("""
-    Comonicon - Installation CLI.
-
-    USAGE
-
-        julia --project deps/build.jl <target>
-
-    ARGS
-
-        <target> [sysimg|app|tarball] specify this argument to build.
-
-    """)
+    printstyled("target $(join(ARGS, " ")) not found"; color=:red)
+    print(help)
+    return
 end
 
 "install a script as the CLI"
@@ -193,25 +216,35 @@ function build_application(m::Module, configs::Configurations.Comonicon)
 end
 
 function build_tarball(m::Module, configs::Configurations.Comonicon)
-    @info configs
-    if configs.sysimg !== nothing
-        build_sysimg(m, configs)
-        # pack tarball
-        tarball = tarball_name(configs.name)
-        @info "creating system image tarball $tarball"
-        cd(PATH.project(m, configs.sysimg.path)) do
-            run(`tar -czvf $tarball lib`)
-        end
-    end
+    build_tarball_app(m, configs)
+    build_tarball_sysimg(m, configs)
+    return
+end
 
-    if configs.application !== nothing
-        build_application(m, configs)
-        # pack tarball
-        tarball = "application-" * tarball_name(configs.name)
-        @info "creating application tarball $tarball"
-        cd(PATH.project(m, configs.application.path)) do 
-            run(`tar -czvf $tarball $(configs.name)`)
-        end
+function build_tarball_app(m::Module, configs::Configurations.Comonicon)
+    isnothing(configs.application) && return
+
+    @info configs.application
+    build_application(m, configs)
+    # pack tarball
+    tarball = "application-" * tarball_name(configs.name)
+    @info "creating application tarball $tarball"
+    cd(PATH.project(m, configs.application.path)) do 
+        run(`tar -czvf $tarball $(configs.name)`)
+    end
+    return
+end
+
+function build_tarball_sysimg(m::Module, configs::Configurations.Comonicon)
+    isnothing(configs.sysimg) && return
+
+    @info configs.sysimg
+    build_sysimg(m, configs)
+    # pack tarball
+    tarball = tarball_name(configs.name)
+    @info "creating system image tarball $tarball"
+    cd(PATH.project(m, configs.sysimg.path)) do
+        run(`tar -czvf $tarball lib`)
     end
     return
 end
