@@ -55,7 +55,7 @@ d = Dict(
         "incremental" => true,
         "path" => "deps",
         "precompile" => Dict(
-            "execution_file" => ["deps/precopmile.jl"],
+            "execution_file" => ["precopmile.jl"],
         )
     ),
 )
