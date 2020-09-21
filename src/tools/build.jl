@@ -102,6 +102,7 @@ function install_script(m::Module, configs::Configurations.Comonicon)
 end
 
 function install_completion(m::Module, configs::Configurations.Comonicon)
+    completions_dir = expanduser(joinpath(configs.install.path, "completions"))
     sh = detect_shell()
     sh === nothing && return
 
@@ -109,7 +110,6 @@ function install_completion(m::Module, configs::Configurations.Comonicon)
     script = completion_script(sh, m)
     script === nothing && return
 
-    completions_dir = joinpath(configs.install.path, "completions")
     if !ispath(completions_dir)
         mkpath(completions_dir)
     end

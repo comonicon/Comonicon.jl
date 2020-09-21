@@ -85,7 +85,7 @@ read_configs(XYZ; user="Roger-luo", repo="Foo") == Configurations.Comonicon(
       filter_stdlibs = false, 
       cpu_target = "native", 
       precompile = Precompile(
-        execution_file = ["deps/precopmile.jl"], 
+        execution_file = ["precopmile.jl"], 
         statements_file = String[], 
       ), 
     ), 
