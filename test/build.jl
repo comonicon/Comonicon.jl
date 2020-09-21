@@ -54,9 +54,7 @@ d = Dict(
         "cpu_target" => "native",
         "incremental" => true,
         "path" => "deps",
-        "precompile" => Dict(
-            "execution_file" => ["deps/precopmile.jl"],
-        )
+        "precompile" => Dict("execution_file" => ["deps/precopmile.jl"]),
     ),
 )
 
@@ -64,7 +62,7 @@ d = Dict(
 
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.install(Foo; path=PATH.project("test"))
+    Comonicon.install(Foo; path = PATH.project("test"))
     @test isfile(PATH.project("test", "bin", "foo"))
     @test isfile(PATH.project("test", "bin", "foo.jl"))
 end
