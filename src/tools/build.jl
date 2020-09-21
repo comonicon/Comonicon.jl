@@ -20,30 +20,37 @@ function install(m::Module; kwargs...)
     return install(m, configs)
 end
 
-function install(m::Module, configs::Configurations.Comonicon)
-    help = """
-    Comonicon - Installation CLI.
+function print_install_help(io::IO)
+    println(io, "Comonicon - Installation CLI.")
+    println(io)
+    println(io, "Install the CLI script to `.julia/bin` if not specified with subcommands.")
+    println(io)
+    printstyled(io, "USAGE\n\n"; bold=true)
+    printstyled(io, " "^4, "julia --project deps/build.jl [command]\n\n"; color=:cyan)
+    printstyled(io, "COMMAND\n\n"; bold=true)
 
-    It installs the CLI script to `.julia/bin` if not specified with subcommands.
+    printstyled(io, " "^4, "app"; color=:light_blue, bold=true)
+    printstyled(io, " [tarball]"; color=:blue)
+    println(io, " "^15, "build the application, optionally make a tarball.\n")
 
-    USAGE
+    printstyled(io, " "^4, "sysimg"; color=:light_blue, bold=true)
+    printstyled(io, " [tarball]"; color=:blue)
+    println(io, " "^12, "build the system image, optionally make a tarball.\n")
 
-        julia --project deps/build.jl [command]
+    printstyled(io, " "^4, "tarball"; color=:light_blue, bold=true)
+    println(io, " "^21, "build application and system image then make tarballs")
+    println(io, " "^32, "for them.\n")
 
-    COMMANDS
+    printstyled(io, "EXAMPLE\n\n"; bold=true)
+    printstyled(io, " "^4, "julia --project deps/build.jl sysimg\n\n"; color=:cyan)
+    println(io, " "^4, "build the system image in the path defined by Comonicon.toml or in deps by default.\n\n")
+    printstyled(io, " "^4, "julia --project deps/build.jl sysimg tarball\n\n"; color=:cyan)
+    println(io, " "^4, "build the system image then make a tarball on this system image.\n\n")
+    printstyled(io, " "^4, "julia --project deps/build.jl app tarball\n\n"; color=:cyan)
+    println(io, " "^4, "build the application based on Comonicon.toml and make a tarball from it.\n\n")
+end
 
-        app [tarball]               build the application, optionally make a tarball.
-        sysimg [tarball]            build the system image, optionally make a tarball.
-        tarball                     build application and system image then make tarballs
-                                    for them.
-
-    EXAMPLE
-
-        julia --project deps/build.jl app tarball
-
-    build the application based on Comonicon.toml and make a tarball from it.
-    """
-    
+function install(m::Module, configs::Configurations.Comonicon) 
     if isempty(ARGS)
         if configs.install.quiet
             logger = NullLogger()
@@ -56,7 +63,7 @@ function install(m::Module, configs::Configurations.Comonicon)
         end
         return
     elseif "-h" in ARGS || "--help" in ARGS || "help" in ARGS
-        return print(help)
+        return print_install_help(stdout)
     elseif first(ARGS) == "sysimg" && !isnothing(configs.sysimg)
         if length(ARGS) == 1
             return build_sysimg(m, configs)
@@ -76,7 +83,7 @@ function install(m::Module, configs::Configurations.Comonicon)
     end
 
     printstyled("target $(join(ARGS, " ")) not found"; color=:red)
-    print(help)
+    print_install_help(stdout)
     return
 end
 
@@ -223,8 +230,7 @@ end
 
 function build_tarball_app(m::Module, configs::Configurations.Comonicon)
     isnothing(configs.application) && return
-
-    @info configs.application
+    @info "building application"
     build_application(m, configs)
     # pack tarball
     tarball = "application-" * tarball_name(configs.name)
@@ -238,7 +244,7 @@ end
 function build_tarball_sysimg(m::Module, configs::Configurations.Comonicon)
     isnothing(configs.sysimg) && return
 
-    @info configs.sysimg
+    @info "building system image"
     build_sysimg(m, configs)
     # pack tarball
     tarball = tarball_name(configs.name)
