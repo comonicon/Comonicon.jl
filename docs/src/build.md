@@ -1,4 +1,4 @@
-# Build and Install CLI
+# Build and Install Tools
 
 You can use various way to build and install your CLI, this includes:
 
