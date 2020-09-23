@@ -49,3 +49,4 @@ jobs:
         SSH: true
         BRANCH: gh-pages
         FOLDER: page/__site
+        CLEAN: false
