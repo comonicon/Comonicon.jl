@@ -250,7 +250,7 @@ function build_tarball_app(m::Module, configs::Configurations.Comonicon)
     @info "building application"
     build_application(m, configs)
     # pack tarball
-    tarball = "application-" * tarball_name(configs.name)
+    tarball = tarball_name(m, configs.name; application=true)
     @info "creating application tarball $tarball"
     cd(PATH.project(m, configs.application.path)) do
         run(`tar -czvf $tarball $(configs.name)`)
@@ -264,7 +264,7 @@ function build_tarball_sysimg(m::Module, configs::Configurations.Comonicon)
     @info "building system image"
     build_sysimg(m, configs)
     # pack tarball
-    tarball = tarball_name(configs.name)
+    tarball = tarball_name(m, configs.name)
     @info "creating system image tarball $tarball"
     cd(PATH.project(m, configs.sysimg.path)) do
         run(`tar -czvf $tarball lib`)
@@ -320,14 +320,18 @@ function sysimg_url(mod::Module, configs::Configurations.Comonicon)
         error("host $host is not supported, please open an issue at $COMONICON_URL")
     end
 
-    tarball = tarball_name(name)
+    tarball = tarball_name(mod, name)
     url *= "v$(Comonicon.get_version(mod))/$tarball"
     return url
 end
 
 
-function tarball_name(name::String)
-    return "$name-$VERSION-$(osname())-$(Sys.ARCH).tar.gz"
+function tarball_name(m::Module, name::String; application::Bool=false)
+    if application
+        return "$name-application-$(get_version(m))-$(osname())-$(Sys.ARCH).tar.gz"
+    else
+        return "$name-sysimg-$(get_version(m))-julia-$VERSION-$(osname())-$(Sys.ARCH).tar.gz"
+    end
 end
 
 """
