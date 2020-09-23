@@ -76,4 +76,4 @@ mock(create_sysimage) do plus
     Comonicon.install(Foo; path = PATH.project("test"), quiet = true)
 end
 
-@test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name("foo")))
+@test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name(Foo, "foo")))
