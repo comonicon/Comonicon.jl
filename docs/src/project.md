@@ -33,6 +33,10 @@ ion create Demo --template=comonicon
 In a large project, one might need to define multiple
 commands. This can be done via `@cast`.
 
+```@docs
+@cast
+```
+
 `@cast` is similar to `@main` before functions, but it won't execute anything, but only create
 the command and register the command to a global variable `CASTED_COMMANDS` in the current module.
 And it will create `NodeCommand`s before modules, and the sub-commands of the `NodeCommand` can

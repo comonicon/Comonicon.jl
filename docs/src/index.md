@@ -6,12 +6,19 @@
 
 Roger's magic book for command line interfaces.
 
+```@docs
+Comonicon
+```
 
 ## Quick Start
 
 The simplest and most common way to use [`Comonicon`](@ref) is to use `@cast` and `@main`.
-Let's use a simple example to show how, the following example creates a command using
-`@cast`.
+
+```@docs
+@main
+```
+
+Let's use a simple example to show how, the following example creates a command using `@main`.
 
 ```julia
 using Comonicon

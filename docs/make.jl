@@ -1,7 +1,7 @@
 using Documenter, Comonicon
 
 makedocs(;
-    modules = [Comonicon],
+    modules = [Comonicon, Comonicon.Parse, Comonicon.CodeGen],
     format = Documenter.HTML(prettyurls = !("local" in ARGS)),
     pages = [
         "Home" => "index.md",
@@ -9,6 +9,7 @@ makedocs(;
         "Create a CLI project" => "project.md",
         "Command Types" => "types.md",
         "Command Parsing" => "parse.md",
+        "Command Configuration" => "configurations.md",
         "Code Generation" => "codegen.md",
         "Build and Install CLI" => "build.md",
     ],
