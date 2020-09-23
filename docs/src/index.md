@@ -30,81 +30,28 @@ julia myscript.jl -h
 
 You will see the following in your terminal.
 
-```
-  main
+![myscript-help](assets/images/myscript.png)
 
-No documentation found.
-mycmd is a Function.
-# 1 method for generic function "mycmd":
-[1] mycmd(arg; option, flag) in Main at /Users/roger/.julia/dev/Comonicon/example/myscript.jl:2
+If you want to add some description to your command, you can just write it as
+a Julia function doc string, e.g
 
-Usage
+```julia
+using Comonicon
 
-  main [options...] [flags...] <arg>
-
-Args
-
-  <arg>
-
-Flags
-
-  -f,--flag
-
-  -h, --help          print this help message
-
-  -V, --version       print version information
-
-Options
-
-  --option <::Any>
-
+"""
+my first Comonicon CLI.
+"""
+@main function mycmd(arg; option="Sam", flag::Bool=false)
+    @show arg
+    @show option
+    @show flag
+end
 ```
 
-Now let me explain what `@main` does here. In short it does the following things:
+![myscript-help-docstring](assets/images/myscript-doc.png)
 
-- parse your expression and create a command line object
-- use this command line object to create an entry
-- generate a Julia script to actually execute the command
-- cache the generated Julia script into a file so it won't need to recompile your code again
-
-## Convention
-
-**leaf command**: leaf commands are the commands at the last of the CLI that takes arguments,
-options and flags, e.g the `show` command below
-
-**node command**: node commands are the commands at the middle or first of the CLI that contains sub-commands,
-e.g the `remote` command below
-
-```sh
-git remote show origin
-```
-
-**arguments**: arguments are command line arguments that required at the leaf command
-
-**flags**: flags are command line options that has no arguments, e.g `--flag` or `-f` (short flag).
-
-**options**: options are command line options that has arguments, e.g `--name Sam` or `-n Sam`, also `--name=Sam` or `-nSam`.
-
-When used on function expressions, `@cast` and `@main` have the same convention on how they
-convert your expressions to commands, these are
-
-- function arguments are parsed as command arguments:
-  - value will be converted automatically if arguments has type annotation
-  - optional arguments are allowed
-- function keyword arguments are parsed as command flags or options:
-  - keyword arguments must have default value
-  - keyword arguments of type `Bool` can only have `false` as default value, which will be treated as flags that allow short flags.
-  - value will be converted automatically if keyword arguments has type annotation
-- function doc string can use section names: **Arguments**, **Options** and **Flags** to annotate your CLI:
-  - short options or short flags can be declared via `-f, flag` or `-o, --option <name>` (see example below)
-
-!!! note
-
-  to be compatible with shell options, variable names with underscore `_` will be automatically replaced with dash `-`.
-  As a result, the corresponding doc string should use dash `-` instead of `_` as well, e.g kwargs name `dash_dash` will
-  be converted to `--dash-dash` option/flag in terminal, and its corresponding doc string should be ``` - `--dash-dash`: <arg>```.
-
-An example of function docstring
+but you might also want to have more detailed help message for your CLI arguments
+and options, you can specify them via doc string:
 
 ```julia
 """
@@ -131,126 +78,67 @@ end
 
 This will give a help message looks like below after execute this in `myscript.jl` via `julia myscript.jl`
 
+![mycmd-option-doc](assets/images/mycmd-option-doc.png)
+
+Now, you can directly use this script from command line in this way. But if you want to make it accessible in shell, should do the following:
+
+- create a file without any extension called `mycmd`
+- copy the script above
+- add the following line on the top of your script `mycmd` (this is called [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))):
+
+```sh
+#!<path to your julia executable>
 ```
 
-  main
-
-my command line interface.
-
-Usage
-
-  main [options...] [flags...] <arg>
-
-Args
-
-  <arg>                  an argument
-
-Flags
-
-  -f,--flag              a flag that has short flag.
-
-  -h, --help             print this help message
-
-  -V, --version          print version information
-
-Options
-
-  -o, --option <name>
-```
-
-## Create a CLI project
-
-However, to build better and faster CLI, you will want to build your CLI in a Julia package
-and deliver it to your users. This can be done via `@cast`.
-
-`@cast` is similar to `@main` before functions, but it won't execute anything, but only create
-the command and register the command to a global variable `CASTED_COMMANDS` in the current module.
-And it will create `NodeCommand`s before modules, and the sub-commands of the `NodeCommand` can
-be created via `@cast` inside the module.
-
-After you create the commands via `@cast`, you can declare an entry at the bottom of your module
-via `@main`. A simple example looks like the following
+now your `mycmd` script should look like the following
 
 ```julia
-module Dummy
-
+#!<path to your julia executable>
 using Comonicon
 
-@cast mycmd1(arg; option="Sam") = println("cmd1: arg=", arg, "option=", option)
-@cast mycmd2(arg; option="Sam") = println("cmd2: arg=", arg, "option=", option)
-
-module Cmd3
-
-using Comonicon
-
-@cast mycmd4(arg) = println("cmd4: arg=", arg)
-
-end # module
-
-@main name="dummy" version=v"0.1.0"
-
-end # module
+"""
+my first Comonicon CLI.
+"""
+@main function mycmd(arg; option="Sam", flag::Bool=false)
+    @show arg
+    @show option
+    @show flag
+end
 ```
 
-You can find all created commands via following
+- now we need to give this file permission via `chmod`:
 
-```julia
-julia> Dummy.CASTED_COMMANDS
-Dict{String,Any} with 3 entries:
-  "mycmd2" => mycmd2 [options...] <arg>
-  "main"   => dummy v0.1.0
-  "mycmd1" => mycmd1 [options...] <arg>
+```sh
+chmod +x mycmd
 ```
 
-and you can execute the command via `Dummy.command_main` created by `@main`:
+- you can now execute this file directly via `./mycmd`, if you want to be able to execute
+   this cmd directly from anywhere in your terminal, you can move this file to `.julia/bin`
+   folder, then add `.julia/bin` to your `PATH`
 
-```julia
-julia> Dummy.command_main(["-h"])
-
-  dummy v0.1.0
-
-
-
-Usage
-
-  dummy <command>
-
-Commands
-
-  mycmd2 [options...] <arg>    No documentation found. Main.Dummy.mycmd2 is a
-                               # 1 method for generic function "mycmd2": [1]
-                               option) in Main.Dummy at REPL[2]:6
-
-  mycmd1 [options...] <arg>    No documentation found. Main.Dummy.mycmd1 is a
-                               # 1 method for generic function "mycmd1": [1]
-                               option) in Main.Dummy at REPL[2]:5
-
-Flags
-
-  -h, --help                   print this help message
-
-  -V, --version                print version information
-
-
-0
+```sh
+export PATH="$HOME/.julia/bin:$PATH"
 ```
 
-Then you can create a `build.jl` file in your package `deps` folder to install this command to `~/.julia/bin`
-when your user install your package. This will only need two line:
+## What's under the hood?
 
-```julia
-# build.jl
-using Comonicon, Dummy
-Comonicon.install(Dummy, "dummy")
-```
+Now let me explain what `@main` does here. In short it does the following things:
 
-You can turn on the keyword `sysimg` to `true` to compile a system image for the CLI.
+- parse your expression and create a command line object
+- use this command line object to create an entry (See [Conventions](@ref) section to read about its convention)
+- generate a Julia script to actually execute the command
+- cache the generated Julia script into a file so it won't need to recompile your code again
 
-```julia
-# build.jl
-using Comonicon, Dummy
-Comonicon.install(Dummy, "dummy"; sysimg=true)
-```
+## Developer Recommendations
 
-There is an example project [IonCLI.jl](https://github.com/Roger-luo/IonCLI.jl) you can take as
-a reference.
+For simple and small cases, a CLI script is sufficient.
+
+However, for larger projects and more serious usage, one should [create a Comonicon CLI project](@ref project) to use the full power of Comonicon. You will be able
+to gain the following features for free in a Comonicon project:
+
+- much faster startup time
+- automatic CLI installation
+- much easier to deliver it to more users:
+  - can be registered and installed as a Julia package
+  - distributable system image build in CI (powered by [PackageCompiler](https://github.com/JuliaLang/PackageCompiler.jl))
+  - distributable standalone application build in CI (powered by [PackageCompiler](https://github.com/JuliaLang/PackageCompiler.jl))

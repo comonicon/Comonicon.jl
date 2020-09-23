@@ -192,8 +192,8 @@ function build_sysimg(
         @info "cpu_target override to $cpu_target"
     end
 
-    exec_file = map(x -> PATH.project(m, "deps", x), configs.sysimg.precompile.execution_file)
-    stmt_file = map(x -> PATH.project(m, "deps", x), configs.sysimg.precompile.statements_file)
+    exec_file = map(x -> PATH.project(m, x), configs.sysimg.precompile.execution_file)
+    stmt_file = map(x -> PATH.project(m, x), configs.sysimg.precompile.statements_file)
 
     create_sysimage(
         nameof(m);
@@ -218,8 +218,8 @@ function build_application(m::Module, configs::Configurations.Comonicon)
 
     @info configs.application
 
-    exec_file = map(x -> PATH.project(m, "deps", x), configs.application.precompile.execution_file)
-    stmt_file = map(x -> PATH.project(m, "deps", x), configs.application.precompile.statements_file)
+    exec_file = map(x -> PATH.project(m, x), configs.application.precompile.execution_file)
+    stmt_file = map(x -> PATH.project(m, x), configs.application.precompile.statements_file)
     create_app(
         PATH.project(m),
         build_dir;

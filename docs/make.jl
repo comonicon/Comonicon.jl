@@ -5,6 +5,8 @@ makedocs(;
     format = Documenter.HTML(prettyurls = !("local" in ARGS)),
     pages = [
         "Home" => "index.md",
+        "Conventions" => "conventions.md",
+        "Create a CLI project" => "project.md",
         "Command Types" => "types.md",
         "Command Parsing" => "parse.md",
         "Code Generation" => "codegen.md",

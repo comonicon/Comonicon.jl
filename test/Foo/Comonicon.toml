@@ -13,7 +13,7 @@ filter_stdlibs=false
 cpu_target="native"
 
 [sysimg.precompile]
-execution_file = ["precopmile.jl"]
+execution_file = ["deps/precopmile.jl"]
 
 [download]
 host="github.com"

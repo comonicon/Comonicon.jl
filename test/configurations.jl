@@ -81,7 +81,7 @@ read_configs(XYZ; user = "Roger-luo", repo = "Foo") == Configurations.Comonicon(
         incremental = true,
         filter_stdlibs = false,
         cpu_target = "native",
-        precompile = Precompile(execution_file = ["precopmile.jl"], statements_file = String[]),
+        precompile = Precompile(execution_file = ["deps/precopmile.jl"], statements_file = String[]),
     ),
     download = Download(host = "github.com", user = "Roger-luo", repo = "Foo.jl"),
     application = nothing,

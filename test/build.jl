@@ -54,7 +54,7 @@ d = Dict(
         "cpu_target" => "native",
         "incremental" => true,
         "path" => "deps",
-        "precompile" => Dict("execution_file" => ["precopmile.jl"]),
+        "precompile" => Dict("execution_file" => ["deps/precopmile.jl"]),
     ),
 )
 
