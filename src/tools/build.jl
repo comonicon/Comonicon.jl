@@ -250,7 +250,7 @@ function build_tarball_app(m::Module, configs::Configurations.Comonicon)
     @info "building application"
     build_application(m, configs)
     # pack tarball
-    tarball = tarball_name(m, configs.name; application=true)
+    tarball = tarball_name(m, configs.name; application = true)
     @info "creating application tarball $tarball"
     cd(PATH.project(m, configs.application.path)) do
         run(`tar -czvf $tarball $(configs.name)`)
@@ -326,7 +326,7 @@ function sysimg_url(mod::Module, configs::Configurations.Comonicon)
 end
 
 
-function tarball_name(m::Module, name::String; application::Bool=false)
+function tarball_name(m::Module, name::String; application::Bool = false)
     if application
         return "$name-application-$(get_version(m))-$(osname())-$(Sys.ARCH).tar.gz"
     else
