@@ -13,9 +13,11 @@ function project(m::Module, xs...)
 end
 
 project(xs...) = project(Comonicon, xs...)
+deps(m::Module, xs...) = project(m, "deps", xs...)
 
 sysimg() = "libcomonicon.$(Libdl.dlext)"
 sysimg(name) = "lib$name.$(Libdl.dlext)"
+
 
 """
     default_exename()

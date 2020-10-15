@@ -147,17 +147,33 @@ end
 function install_completion(m::Module, configs::Configurations.Comonicon)
     completions_dir = expanduser(joinpath(configs.install.path, "completions"))
     sh = detect_shell()
-    sh === nothing && return
+    @info "SHELL detected: $sh"
+    if !ispath(completions_dir)
+        mkpath(completions_dir)
+    end
+    completion_file = joinpath(completions_dir, "_" * configs.name)
 
+    # 1. check if there are custom completion scripts
+    custom_completions = PATH.deps(m, "completions")
+    if ispath(custom_completions)
+        for each in readdir(custom_completions)
+            if each == "$sh.completion"
+                @info "custom completion script found: $each"
+                cp(
+                    joinpath(custom_completions, each), completion_file;
+                    force=true,
+                    follow_symlinks=true,
+                )
+                return
+            end
+        end
+    end
+
+    # 2. auto generate if nothing found
     @info "generating auto-completion script for $sh"
     script = completion_script(sh, m)
     script === nothing && return
 
-    if !ispath(completions_dir)
-        mkpath(completions_dir)
-    end
-
-    completion_file = joinpath(completions_dir, "_" * configs.name)
     @info "writing to $completion_file"
     write(completion_file, script)
     return
@@ -297,7 +313,24 @@ function build_completion(m::Module, configs::Configurations.Comonicon)
         mkpath(completion_dir)
     end
 
-    for sh in ["zsh"]
+    custom_completions = PATH.deps(m, "completions")
+    shell_with_custom_completion = String[]
+    if ispath(custom_completions)
+        for each in readdir(custom_completions)
+            if endswith(each, ".completion")
+                @info "custom completion found: $each"
+                cp(
+                    joinpath(custom_completions, each), joinpath(completion_dir, each);
+                    force=true,
+                    follow_symlinks=true,
+                )
+                push!(shell_with_custom_completion, each[1:end-11])
+            end
+        end
+    end
+
+    # auto generate supported completions
+    for sh in setdiff(["zsh"], shell_with_custom_completion)
         script = completion_script(sh, m)
         script === nothing && continue
         write(joinpath(completion_dir, "$sh.completion"), script)
