@@ -60,4 +60,35 @@ function default_name(x::String)
     return lowercase(name)
 end
 
+struct Asset
+    package::Union{Nothing, String}
+    path::String
+end
+
+function Asset(s::String)
+    parts = strip.(split(s, ":"))
+
+    if length(parts) == 1
+        return Asset(nothing, parts[1])
+    elseif length(parts) == 2
+        return Asset(parts[1], parts[2])
+    else
+        error("invalid asset path syntax: $s")
+    end
+end
+
+function Base.show(io::IO, x::Asset)
+    print(io, "asset\"", )
+    if x.package === nothing
+        print(io, x.path)
+    else
+        print(io, x.package, ": ", x.path)
+    end
+    print(io, "\"")
+end
+
+macro asset_str(s::String)
+    return Asset(s)
+end
+
 end

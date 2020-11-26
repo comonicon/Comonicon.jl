@@ -111,6 +111,7 @@ Application build configurations.
 ## Keywords
 
 - `path`: application build path, default is "build".
+- `assets`: assets of the application.
 - `incremental`: set to `true` to build incrementally, default is `true`.
 - `filter_stdlibs`: set to `true` to filter out unused stdlibs, default is `false`.
 - `cpu_target`: cpu target to build, default is `PackageCompiler.default_app_cpu_target()`.
@@ -118,6 +119,7 @@ Application build configurations.
 """
 Base.@kwdef struct Application <: AbstractConfiguration
     path::String = "build"
+    assets::Vector{PATH.Asset} = PATH.Asset[]
     incremental::Bool = false
     filter_stdlibs::Bool = true
     cpu_target::String = PackageCompiler.default_app_cpu_target()
@@ -125,6 +127,7 @@ Base.@kwdef struct Application <: AbstractConfiguration
 
     function Application(
         path::String,
+        assets::Vector{String},
         incremental::Bool,
         filter_stdlibs::Bool,
         cpu_target::String,
@@ -133,7 +136,7 @@ Base.@kwdef struct Application <: AbstractConfiguration
         if isabspath(path)
             throw(ArgumentError("build path must be project relative"))
         end
-        new(path, incremental, filter_stdlibs, cpu_target, precompile)
+        new(path, Asset.(assets), incremental, filter_stdlibs, cpu_target, precompile)
     end
 end
 

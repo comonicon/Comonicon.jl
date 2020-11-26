@@ -218,6 +218,8 @@ function build_application(m::Module, configs::Configurations.Comonicon)
 
     @info configs.application
 
+    copy_assets(m, configs)
+
     exec_file = map(x -> PATH.project(m, x), configs.application.precompile.execution_file)
     stmt_file = map(x -> PATH.project(m, x), configs.application.precompile.statements_file)
     create_app(
@@ -237,6 +239,26 @@ function build_application(m::Module, configs::Configurations.Comonicon)
         build_completion(m, configs)
     end
     return
+end
+
+function copy_assets(m::Module, configs::Configurations.Comonicon)
+    assets = configs.application.assets
+    build_dir = PATH.project(m, configs.application.path, configs.name)
+    isempty(assets) && return
+
+    for each in assets
+        pname, path = asset_path(each)
+
+        if pname === nothing # project assets
+            src = PATH.project(m, path)
+            dst = joinpath(build_dir, "assets", path)
+        else # package assets
+            src = PATH.package(m, pname, path)
+            dst = joinpath(build_dir, "assets", pname, path)
+        end
+        cp(src, dst; force=true, follow_symlinks=true)
+    end
+    return    
 end
 
 function build_tarball(m::Module, configs::Configurations.Comonicon)
