@@ -12,8 +12,8 @@ end
 
 Comonicon.disable_cache()
 
-@testset "configurations" begin
-    include("configurations.jl")
+@testset "options" begin
+    include("options.jl")
 end
 
 @testset "codegen" begin
@@ -24,10 +24,15 @@ end
     include("parse.jl")
 end
 
-@testset "build" begin
-    try
-        include("build.jl")
-    finally
-        Pkg.rm(PackageSpec(name = "Foo"))
-    end
-end
+# @testset "build" begin
+#     try
+#         include("build.jl")
+#     finally
+#         Pkg.rm(PackageSpec(name = "Foo"))
+#     end
+# end
+
+# using Comonicon.Options
+# using Comonicon
+
+# read_configs("test/Foo")

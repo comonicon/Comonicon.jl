@@ -2,7 +2,6 @@ using Comonicon
 using Markdown
 using Comonicon.Types
 using Comonicon.Parse
-using Comonicon.BuildTools: install
 using Test
 
 Comonicon.disable_cache()
@@ -141,10 +140,9 @@ ArgParse example implemented in Comonicon.
 end
 
 empty!(ARGS)
-Comonicon.install(Dummy; path = Comonicon.PATH.project("test"), completion = false, quiet = false)
 
-@test isfile(Comonicon.PATH.project("test", "bin", "dummy"))
-@test isfile(Comonicon.PATH.project("test", "bin", "dummy.jl"))
+# @test isfile(Comonicon.PATH.project("test", "bin", "dummy"))
+# @test isfile(Comonicon.PATH.project("test", "bin", "dummy.jl"))
 
 @testset "default_name" begin
     @test Comonicon.PATH.default_name("Foo.jl") == "foo"

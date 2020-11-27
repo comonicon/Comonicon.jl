@@ -1,5 +1,6 @@
 module Types
 
+using ..Options
 # types
 export Arg, Option, Flag, EntryCommand, NodeCommand, LeafCommand, AbstractCommand
 
@@ -134,6 +135,7 @@ of the entire CLI and a version number. The version number is `v"0.0.0"` by defa
 """
 Base.@kwdef struct EntryCommand <: AbstractCommand
     root::Any
+    options::Union{Nothing, Options.Comonicon} = nothing
     version::VersionNumber = v"0.0.0"
     line::LineNumberNode = LineNumberNode(0)
 end

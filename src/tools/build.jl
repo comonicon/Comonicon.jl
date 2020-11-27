@@ -8,7 +8,7 @@ using PackageCompiler
 using Pkg.TOML
 using Pkg.PlatformEngines
 using ..Comonicon
-using ..Comonicon.Configurations
+using ..Comonicon.Options
 using ..Comonicon.Parse
 using ..Comonicon.CodeGen
 using ..Comonicon.PATH
@@ -58,7 +58,7 @@ function print_install_help(io::IO)
     )
 end
 
-function install(m::Module, configs::Configurations.Comonicon)
+function install(m::Module, configs::Options.Comonicon)
     if isempty(ARGS)
         if configs.install.quiet
             logger = NullLogger()
@@ -96,7 +96,7 @@ function install(m::Module, configs::Configurations.Comonicon)
 end
 
 "install a script as the CLI"
-function install_script(m::Module, configs::Configurations.Comonicon)
+function install_script(m::Module, configs::Options.Comonicon)
     bin = expanduser(joinpath(configs.install.path, "bin"))
     shadow = joinpath(bin, configs.name * ".jl")
 
@@ -144,7 +144,7 @@ function install_script(m::Module, configs::Configurations.Comonicon)
     return
 end
 
-function install_completion(m::Module, configs::Configurations.Comonicon)
+function install_completion(m::Module, configs::Options.Comonicon)
     completions_dir = expanduser(joinpath(configs.install.path, "completions"))
     sh = detect_shell()
     sh === nothing && return
@@ -165,7 +165,7 @@ end
 
 function build_sysimg(
     m::Module,
-    configs::Configurations.Comonicon;
+    configs::Options.Comonicon;
     # allow override these two options
     incremental = configs.sysimg.incremental,
     filter_stdlibs = configs.sysimg.filter_stdlibs,
@@ -209,7 +209,7 @@ function build_sysimg(
     return
 end
 
-function build_application(m::Module, configs::Configurations.Comonicon)
+function build_application(m::Module, configs::Options.Comonicon)
     build_dir = PATH.project(m, configs.application.path, configs.name)
     if !ispath(build_dir)
         @info "creating build path: $build_dir"
@@ -239,13 +239,13 @@ function build_application(m::Module, configs::Configurations.Comonicon)
     return
 end
 
-function build_tarball(m::Module, configs::Configurations.Comonicon)
+function build_tarball(m::Module, configs::Options.Comonicon)
     build_tarball_app(m, configs)
     build_tarball_sysimg(m, configs)
     return
 end
 
-function build_tarball_app(m::Module, configs::Configurations.Comonicon)
+function build_tarball_app(m::Module, configs::Options.Comonicon)
     isnothing(configs.application) && return
     @info "building application"
     build_application(m, configs)
@@ -258,7 +258,7 @@ function build_tarball_app(m::Module, configs::Configurations.Comonicon)
     return
 end
 
-function build_tarball_sysimg(m::Module, configs::Configurations.Comonicon)
+function build_tarball_sysimg(m::Module, configs::Options.Comonicon)
     isnothing(configs.sysimg) && return
 
     @info "building system image"
@@ -272,7 +272,7 @@ function build_tarball_sysimg(m::Module, configs::Configurations.Comonicon)
     return
 end
 
-function download_sysimg(m::Module, configs::Configurations.Comonicon)
+function download_sysimg(m::Module, configs::Options.Comonicon)
     url = sysimg_url(m, configs)
     PlatformEngines.probe_platform_engines!()
 
@@ -290,7 +290,7 @@ function download_sysimg(m::Module, configs::Configurations.Comonicon)
     return
 end
 
-function build_completion(m::Module, configs::Configurations.Comonicon)
+function build_completion(m::Module, configs::Options.Comonicon)
     completion_dir = PATH.project(m, configs.application.path, configs.name, "completions")
     if !ispath(completion_dir)
         @info "creating path: $completion_dir"
@@ -305,7 +305,7 @@ function build_completion(m::Module, configs::Configurations.Comonicon)
     return
 end
 
-function sysimg_url(mod::Module, configs::Configurations.Comonicon)
+function sysimg_url(mod::Module, configs::Options.Comonicon)
     name = configs.name
     host = configs.download.host
 
