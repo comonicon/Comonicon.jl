@@ -12,8 +12,8 @@ end
 
 Comonicon.disable_cache()
 
-@testset "configurations" begin
-    include("configurations.jl")
+@testset "options" begin
+    include("options.jl")
 end
 
 @testset "codegen" begin

@@ -248,6 +248,7 @@ function create_entry(m::Module, line::QuoteNode)
             # scripts with shebang
             name = Base.PROGRAM_FILE
         end
+        options = nothing
     else
         # in projects
         options = read_configs(m)
@@ -266,7 +267,7 @@ function create_entry(m::Module, line::QuoteNode)
         :($to_string(@doc(COMMAND_ENTRY_DOC_STUB))),
         :(collect(values($m.CASTED_COMMANDS))),
     )
-    entry = xcall(Types, :EntryCommand, var_cmd, get_version(m), line)
+    entry = xcall(Types, :EntryCommand, var_cmd, options, get_version(m), line)
 
     push!(ret.args, :($var_cmd = $cmd))
     push!(ret.args, :($var_entry = $entry))

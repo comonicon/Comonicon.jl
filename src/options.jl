@@ -1,20 +1,15 @@
-module Configurations
+module Options
 
 export read_configs
+using TOML
+using Configurations
+using ..Comonicon.PATH
+using ..Comonicon: @asset_str, Asset
 
 const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
 
-using PackageCompiler
-using Pkg.TOML
-using ..Comonicon.PATH
-
 """
-abstract type for Comonicon configurations.
-"""
-abstract type AbstractConfiguration end
-
-"""
-    Install <: AbstractConfiguration
+    Install
 
 Installation configurations.
 
@@ -26,7 +21,7 @@ Installation configurations.
 - `compile`: julia compiler option for CLIs if not built as standalone application, default is "min".
 - `optimize`: julia compiler option for CLIs if not built as standalone application, default is `2`.
 """
-Base.@kwdef struct Install <: AbstractConfiguration
+@option struct Install
     path::String = "~/.julia"
     completion::Bool = true
     quiet::Bool = false
@@ -35,7 +30,7 @@ Base.@kwdef struct Install <: AbstractConfiguration
 end
 
 """
-    Precompile <: AbstractConfiguration
+    Precompile
 
 Precompilation files for `PackageCompiler`.
 
@@ -44,13 +39,30 @@ Precompilation files for `PackageCompiler`.
 - `execution_file`: precompile execution file.
 - `statements_file`: precompile statements file.
 """
-Base.@kwdef struct Precompile <: AbstractConfiguration
+@option struct Precompile
     execution_file::Vector{String} = String[]
     statements_file::Vector{String} = String[]
 end
 
+# See https://github.com/JuliaCI/julia-buildbot/blob/489ad6dee5f1e8f2ad341397dc15bb4fce436b26/master/inventory.py
+function default_app_cpu_target()
+    if Sys.ARCH === :i686
+        return "pentium4;sandybridge,-xsaveopt,clone_all"
+    elseif Sys.ARCH === :x86_64
+        return "generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
+    elseif Sys.ARCH === :arm
+        return "armv7-a;armv7-a,neon;armv7-a,neon,vfp4"
+    elseif Sys.ARCH === :aarch64
+        return "generic" # is this really the best here?
+    elseif Sys.ARCH === :powerpc64le
+        return "pwr8"
+    else
+        return "generic"
+    end
+end
+
 """
-    SysImg <: AbstractConfiguration
+    SysImg
 
 System image build configurations.
 
@@ -62,29 +74,16 @@ System image build configurations.
 - `cpu_target`: cpu target to build, default is `PackageCompiler.default_app_cpu_target()`.
 - `precompile`: precompile configurations, see [`Precompile`](@ref), default is `Precompile()`.
 """
-Base.@kwdef struct SysImg <: AbstractConfiguration
+@option struct SysImg
     path::String = "deps"
     incremental::Bool = true
     filter_stdlibs::Bool = false
-    cpu_target::String = PackageCompiler.default_app_cpu_target()
+    cpu_target::String = default_app_cpu_target()
     precompile::Precompile = Precompile()
-
-    function SysImg(
-        path::String,
-        incremental::Bool,
-        filter_stdlibs::Bool,
-        cpu_target::String,
-        precompile::Precompile,
-    )
-        if isabspath(path)
-            throw(ArgumentError("sysimg path must be project relative"))
-        end
-        new(path, incremental, filter_stdlibs, cpu_target, precompile)
-    end
 end
 
 """
-    Download <: AbstractConfiguration
+    Download
 
 Download information.
 
@@ -97,14 +96,14 @@ Download information.
 !!! note
     Currently this only supports github, and this is considered experimental.
 """
-Base.@kwdef struct Download <: AbstractConfiguration
+@option struct Download
     host::String = "github.com"
     user::String
     repo::String
 end
 
 """
-    Application <: AbstractConfiguration
+    Application
 
 Application build configurations.
 
@@ -116,28 +115,14 @@ Application build configurations.
 - `cpu_target`: cpu target to build, default is `PackageCompiler.default_app_cpu_target()`.
 - `precompile`: precompile configurations, see [`Precompile`](@ref), default is `Precompile()`.
 """
-Base.@kwdef struct Application <: AbstractConfiguration
+@option struct Application
     path::String = "build"
+    assets::Vector{Asset} = Asset[]
     incremental::Bool = false
     filter_stdlibs::Bool = true
-    cpu_target::String = PackageCompiler.default_app_cpu_target()
+    cpu_target::String = default_app_cpu_target()
     precompile::Precompile = Precompile()
-
-    function Application(
-        path::String,
-        incremental::Bool,
-        filter_stdlibs::Bool,
-        cpu_target::String,
-        precompile::Precompile,
-    )
-        if isabspath(path)
-            throw(ArgumentError("build path must be project relative"))
-        end
-        new(path, incremental, filter_stdlibs, cpu_target, precompile)
-    end
 end
-
-Base.@kwdef struct Daemon <: AbstractConfiguration end
 
 """
     Comonicon <: AbstractConfiguration
@@ -154,7 +139,7 @@ project directory and read in using [`read_configs`](@ref).
 - `download`: download options, see also [`Download`](@ref).
 - `application`: application build options, see also [`Application`](@ref).
 """
-Base.@kwdef struct Comonicon <: AbstractConfiguration
+@option struct Comonicon
     name::String
 
     install::Install = Install()
@@ -163,68 +148,15 @@ Base.@kwdef struct Comonicon <: AbstractConfiguration
     application::Union{Application,Nothing} = nothing
 end
 
-function Base.show(io::IO, x::AbstractConfiguration)
-    indent = get(io, :indent, 0)
-
-    summary(io, x)
-    println(io, "(")
-    fnames = fieldnames(typeof(x))
-    for each in fieldnames(typeof(x))
-        inner_io = IOContext(io, :indent => indent + 2)
-        print(inner_io, " "^indent, " "^2, each, " = ")
-        show(inner_io, getfield(x, each))
-        println(inner_io, ", ")
+function validate(options::Comonicon)
+    if options.sysimg !== nothing
+        isabspath(options.sysimg.path) && error("system image path must be project relative")
     end
-    print(io, " "^indent, ")")
+
+    if options.application !== nothing
+        isabspath(options.application.path) && error("application build path must project relative")
+    end
     return
-end
-
-function _list_configurations(::Type{T}) where {T<:AbstractConfiguration}
-    map(x -> " "^2 * string(x), fieldnames(T))
-end
-
-function Comonicon(d::Dict{String})
-    haskey(d, "name") || error("key \"name\" is missing in (Julia)Comonicon.toml")
-
-    return Comonicon(;
-        name = d["name"],
-        install = haskey(d, "install") ? Install(d["install"]) : Install(),
-        sysimg = haskey(d, "sysimg") ? SysImg(d["sysimg"]) : nothing,
-        download = haskey(d, "download") ? Download(d["download"]) : nothing,
-        application = haskey(d, "application") ? Application(d["application"]) : nothing,
-    )
-end
-
-function _handle_precompile(d::Dict{String})
-    return _to_kwargs(d) do k, v
-        if k == "precompile"
-            return Precompile(v)
-        else
-            return v
-        end
-    end
-end
-
-function _to_kwargs(f, d::Dict{String})
-    kwargs = Dict{Symbol,Any}()
-    for (k, v) in d
-        kwargs[Symbol(k)] = f(k, v)
-    end
-    return kwargs
-end
-
-_to_kwargs(d::Dict{String}) = _to_kwargs((k, v) -> v, d)
-
-function SysImg(d::Dict{String})
-    return SysImg(; _handle_precompile(d)...)
-end
-
-function Application(d::Dict{String})
-    return Application(; _handle_precompile(d)...)
-end
-
-function (::Type{T})(d::Dict{String}) where {T<:AbstractConfiguration}
-    return T(; _to_kwargs(d)...)
 end
 
 """
@@ -290,53 +222,17 @@ See also [`Comonicon`](@ref), [`Install`](@ref), [`SysImg`](@ref), [`Application
 [`Download`](@ref), [`Precompile`](@ref).
 """
 function read_configs(m::Union{Module,String}; kwargs...)
-    configurations = read_toml(m)
-
-    for (k, v) in kwargs
-        if k in fieldnames(Comonicon)
-            configurations[string(k)] = v
-        elseif k in fieldnames(Install)
-            option_install = get!(configurations, "install", Dict{String,Any}())
-            option_install[string(k)] = v
-        elseif k in fieldnames(Download)
-            option_download = get!(configurations, "download", Dict{String,Any}())
-            option_download[string(k)] = v
-        elseif k in fieldnames(SysImg) || k in fieldnames(Application)
-            throw(ArgumentError(
-                "ambiguous option, please use SysImg/Application struct " *
-                "with keyword \"sysimg\"/\"application\" to specifiy option \"$k\"",
-            ))
-        else
-            throw(ArgumentError("""
-            unsupported kwargs $k, options are:
-            $(join([
-                "comonicon options:",
-                _list_configurations(Comonicon)...,
-                "",
-                "install options:",
-                _list_configurations(Install)...,
-                "",
-                "download options:",
-                _list_configurations(Download)...,
-            ], "\n"))
-            """))
-        end
+    d = read_toml(m)
+    if !haskey(d, "name")
+        d["name"] = default_cmd_name(m)
     end
 
-    if !haskey(configurations, "name")
-        configurations["name"] = default_cmd_name(m)
-    end
-
-    return Comonicon(configurations)
+    options = from_dict(Comonicon, d; kwargs...)
+    validate(options)
+    return options
 end
 
 default_cmd_name(m::Module) = lowercase(string(nameof(m)))
-default_cmd_name(path::String) = error("missing field \"name\" in (Julia)Comonicon.toml")
+default_cmd_name(m) = error("command name is not specified")
 
-function Base.:(==)(x::T, y::T) where {T<:AbstractConfiguration}
-    return all(fieldnames(T)) do field
-        getfield(x, field) == getfield(y, field)
-    end
-end
-
-end # Configs
+end # Options

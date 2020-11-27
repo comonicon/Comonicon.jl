@@ -6,7 +6,7 @@ using Pkg
 using CRC32c
 using MatchCore
 using ..Comonicon
-using ..Comonicon.Configurations
+using ..Comonicon.Options
 using ..Comonicon.Types
 using ..Comonicon.CodeGen
 using ..Comonicon.PATH: default_name

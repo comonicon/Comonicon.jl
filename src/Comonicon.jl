@@ -10,17 +10,20 @@ using Markdown
 using Pkg
 using Libdl
 using ExprTools
-using PackageCompiler
+using Crayons.Box
 
-include("tools/path.jl")
-include("configurations.jl")
+export @asset_str
+
+include("path.jl")
+include("assets.jl")
+include("options.jl")
 include("types.jl")
 include("codegen/codegen.jl")
 include("parse/parse.jl")
 
 export @cast, @main
 
-using .Configurations
+using .Options
 using .Types
 using .Parse
 using .CodeGen
