@@ -6,8 +6,8 @@ using PackageCompiler
 using Comonicon.PATH
 using Comonicon.BuildTools
 using Comonicon.BuildTools: write_path, contain_comonicon_path, contain_comonicon_fpath
-using Comonicon.Configurations
-using Comonicon.Configurations: read_toml
+using Comonicon.Options
+using Comonicon.Options: read_toml
 
 Pkg.activate(PATH.project("test", "Foo"))
 Pkg.develop(PackageSpec(path = PATH.project()))
@@ -44,21 +44,21 @@ write_path(rcfile, true, Dict())
 # read_toml(PATH.project("test", "Comonicon.toml"))
 
 
-d = Dict(
-    "name" => "foo",
-    "download" => Dict("repo" => "Foo.jl", "host" => "github.com", "user" => "Roger-luo"),
-    "install" =>
-        Dict("optimize" => 2, "quiet" => false, "completion" => true, "compile" => "min"),
-    "sysimg" => Dict(
-        "filter_stdlibs" => false,
-        "cpu_target" => "native",
-        "incremental" => true,
-        "path" => "deps",
-        "precompile" => Dict("execution_file" => ["deps/precopmile.jl"]),
-    ),
-)
+# d = Dict(
+#     "name" => "foo",
+#     "download" => Dict("repo" => "Foo.jl", "host" => "github.com", "user" => "Roger-luo"),
+#     "install" =>
+#         Dict("optimize" => 2, "quiet" => false, "completion" => true, "compile" => "min"),
+#     "sysimg" => Dict(
+#         "filter_stdlibs" => false,
+#         "cpu_target" => "native",
+#         "incremental" => true,
+#         "path" => "deps",
+#         "precompile" => Dict("execution_file" => ["deps/precopmile.jl"]),
+#     ),
+# )
 
-@test d == read_toml(Foo)
+# @test d == read_toml(Foo)
 
 mock(create_sysimage) do plus
     @assert plus isa Mock

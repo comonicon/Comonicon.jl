@@ -301,14 +301,14 @@ function precompile_or_exec(m::Module, entry)
             """
             comonicon_install(; kwargs...) = $(GlobalRef(Comonicon, :install))($m; kwargs...)
 
-            # """
-            #     comonicon_install_path([quiet=false])
+            """
+                comonicon_install_path([quiet=false])
 
-            # Install the `PATH` and `FPATH` to your shell configuration file. You can use `comonicon_install_path(true)`,
-            # to skip interactive prompt.
-            # For more detailed reference, please refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
-            # """
-            # comonicon_install_path() = $(GlobalRef(Comonicon.BuildTools, :install_env_path))()
+            Install the `PATH` and `FPATH` to your shell configuration file. You can use `comonicon_install_path(true)`,
+            to skip interactive prompt.
+            For more detailed reference, please refer to [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
+            """
+            comonicon_install_path() = $(GlobalRef(Comonicon.BuildTools, :install_env_path))()
 
             # entry point for apps
             function julia_main()::Cint

@@ -28,10 +28,10 @@ using .Types
 using .Parse
 using .CodeGen
 
-# include("tools/tools.jl")
-# include("tools/build.jl")
+include("tools/tools.jl")
+include("tools/build.jl")
 
-# using .BuildTools
+using .BuildTools
 
 # include("precompile.jl")
 # _precompile_()

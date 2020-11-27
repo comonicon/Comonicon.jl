@@ -24,15 +24,10 @@ end
     include("parse.jl")
 end
 
-# @testset "build" begin
-#     try
-#         include("build.jl")
-#     finally
-#         Pkg.rm(PackageSpec(name = "Foo"))
-#     end
-# end
-
-# using Comonicon.Options
-# using Comonicon
-
-# read_configs("test/Foo")
+@testset "build" begin
+    try
+        include("build.jl")
+    finally
+        Pkg.rm(PackageSpec(name = "Foo"))
+    end
+end
