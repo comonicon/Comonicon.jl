@@ -1,5 +1,5 @@
 struct Asset
-    package::Union{Nothing, String}
+    package::Union{Nothing,String}
     path::String
 end
 
