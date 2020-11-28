@@ -17,7 +17,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
-Configurations = "0.2"
+Configurations = "0.2, 0.4"
 ExprTools = "0.1"
 MatchCore = "0.1"
 julia = "1"
