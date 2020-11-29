@@ -216,10 +216,19 @@ function build_application(m::Module, configs::Options.Comonicon)
         mkpath(build_dir)
     end
 
-    @info configs.application
+    @info "application options: " configs.application
 
     exec_file = map(x -> PATH.project(m, x), configs.application.precompile.execution_file)
     stmt_file = map(x -> PATH.project(m, x), configs.application.precompile.statements_file)
+
+
+    default_c_driver_program = PATH.project(PackageCompiler, "src", "embedding_wrapper.c")
+    c_driver_program = if isnothing(configs.application.c_driver_program)
+        default_c_driver_program
+    else
+        configs.application.c_driver_program
+    end
+
     create_app(
         PATH.project(m),
         build_dir;
@@ -230,6 +239,7 @@ function build_application(m::Module, configs::Options.Comonicon)
         filter_stdlibs = configs.application.filter_stdlibs,
         force = true,
         cpu_target = configs.application.cpu_target,
+        c_driver_program = get_c_driver_program(configs.application),
     )
 
     if configs.install.completion
@@ -238,6 +248,16 @@ function build_application(m::Module, configs::Options.Comonicon)
     end
     return
 end
+
+function get_c_driver_program(configs::Options.Application)
+    default_c_driver_program = PATH.project(PackageCompiler, "src", "embedding_wrapper.c")
+    return if isnothing(configs.c_driver_program)
+        default_c_driver_program
+    else
+        configs.c_driver_program
+    end
+end
+
 
 function build_tarball(m::Module, configs::Options.Comonicon)
     build_tarball_app(m, configs)

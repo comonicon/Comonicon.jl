@@ -114,6 +114,7 @@ Application build configurations.
 - `filter_stdlibs`: set to `true` to filter out unused stdlibs, default is `false`.
 - `cpu_target`: cpu target to build, default is `PackageCompiler.default_app_cpu_target()`.
 - `precompile`: precompile configurations, see [`Precompile`](@ref), default is `Precompile()`.
+- `c_driver_program`: driver program.
 """
 @option struct Application
     path::String = "build"
@@ -122,6 +123,7 @@ Application build configurations.
     filter_stdlibs::Bool = true
     cpu_target::String = default_app_cpu_target()
     precompile::Precompile = Precompile()
+    c_driver_program::Union{String, Nothing} = nothing
 end
 
 """
