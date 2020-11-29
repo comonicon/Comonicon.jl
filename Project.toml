@@ -18,6 +18,7 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
 Configurations = "0.4"
+Crayons = "4.0"
 ExprTools = "0.1"
 MatchCore = "0.1"
 julia = "1"
