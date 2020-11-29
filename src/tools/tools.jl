@@ -23,10 +23,10 @@ end
 
 function cmd_error(msg::String)
     if get(ENV, "COMONICON_DEBUG", "OFF") == "ON"
-        printstyled(msg; color=:red, bold=true)
-        exit(1)
-    else
         error(msg)
+    else
+        printstyled(msg, "\n"; color=:red, bold=true)
+        exit(1)
     end
 end
 
