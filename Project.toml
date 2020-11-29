@@ -1,7 +1,7 @@
 name = "Comonicon"
 uuid = "863f3e99-da2a-4334-8734-de3dacbe5542"
 authors = ["Roger-luo and contributors"]
-version = "0.9.1"
+version = "0.10.0"
 
 [deps]
 CRC32c = "8bf52ea8-c179-5cab-976a-9e18b702a9bc"
@@ -17,7 +17,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
-Configurations = "0.2"
+Configurations = "0.4"
 ExprTools = "0.1"
 MatchCore = "0.1"
 julia = "1"
