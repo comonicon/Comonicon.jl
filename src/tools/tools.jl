@@ -21,4 +21,13 @@ function prompt(io::IO, msg, yes::Bool = false)
     return true
 end
 
+function cmd_error(msg::String)
+    if get(ENV, "COMONICON_DEBUG", "OFF") == "ON"
+        printstyled(msg; color=:red, bold=true)
+        exit(1)
+    else
+        error(msg)
+    end
+end
+
 end
