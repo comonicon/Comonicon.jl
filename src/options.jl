@@ -123,7 +123,7 @@ Application build configurations.
     filter_stdlibs::Bool = true
     cpu_target::String = default_app_cpu_target()
     precompile::Precompile = Precompile()
-    c_driver_program::Union{String, Nothing} = nothing
+    c_driver_program::Union{String,Nothing} = nothing
 end
 
 """
