@@ -110,7 +110,11 @@ function read_options(md::Markdown.List)
             if err_m === nothing
                 throw(Meta.ParseError("invalid option: $name"))
             else
-                throw(Meta.ParseError("invalid option: $name, expect option argument doc, got only flag"))
+                throw(
+                    Meta.ParseError(
+                        "invalid option: $name, expect option argument doc, got only flag",
+                    ),
+                )
             end
         end
 
