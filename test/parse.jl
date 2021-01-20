@@ -84,27 +84,12 @@ sdasdasdasdasdasd adsdasdas dsadasdas dasdasd dasda
 @main
 end
 
-@test Dummy.command_main(String[
-    "foo",
-    "1.0",
-    "2.0",
-    "--foo",
-    "2",
-    "--hulu=3.0",
-    "--flag",
-    "--dash-dash=underscore",
-]) == 0
-@test Dummy.command_main(String[
-    "foo",
-    "1.0",
-    "2.0",
-    "--foo",
-    "2",
-    "--hulu=3.0",
-    "-f",
-    "--dash-dash",
-    "underscore",
-]) == 0
+@test Dummy.command_main(
+    String["foo", "1.0", "2.0", "--foo", "2", "--hulu=3.0", "--flag", "--dash-dash=underscore"],
+) == 0
+@test Dummy.command_main(
+    String["foo", "1.0", "2.0", "--foo", "2", "--hulu=3.0", "-f", "--dash-dash", "underscore"],
+) == 0
 @test Dummy.command_main(String["goo", "1.0", "2.0", "-gSam", "-f"]) == 0
 @test_throws ErrorException LeafCommand(
     identity;
