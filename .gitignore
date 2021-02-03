@@ -19,4 +19,5 @@ package-lock.json
 /test/completions/
 /test/Foo/deps/
 /test/Foo/Manifest.toml
+/test/Foo/build
 !/test/Foo/deps/precompile.jl
