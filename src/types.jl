@@ -678,7 +678,11 @@ function check_varargs_position(args)
         end
     end
     if first_vararg_position > 0 && first_vararg_position != length(args)
-        throw(Meta.ParseError("syntax: invalid \"...\" on non-final argument around $(first_vararg.line)"))
+        throw(
+            Meta.ParseError(
+                "syntax: invalid \"...\" on non-final argument around $(first_vararg.line)",
+            ),
+        )
     end
     return
 end

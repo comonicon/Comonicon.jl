@@ -147,10 +147,14 @@ function to_option_or_flag(ex)
         Expr(:kw, name::Symbol, value) => (string(name), Any, false, repr(value))
         Expr(:kw, :($name::Bool), false) => (string(name), Bool, true, false)
         Expr(:kw, :($name::$type), value) => (string(name), type, false, repr(value))
-        Expr(:kw, :($name::Bool), true) =>
-            throw(Meta.ParseError("Boolean options must use false as default value, and will be parsed as flags. got $name"))
-        ::Symbol || :($name::$type) =>
-            throw(Meta.ParseError("options should have default values or make it a positional argument"))
+        Expr(:kw, :($name::Bool), true) => throw(
+            Meta.ParseError(
+                "Boolean options must use false as default value, and will be parsed as flags. got $name",
+            ),
+        )
+        ::Symbol || :($name::$type) => throw(
+            Meta.ParseError("options should have default values or make it a positional argument"),
+        )
         _ => throw(Meta.ParseError("invalid syntax: $ex"))
     end
 end
