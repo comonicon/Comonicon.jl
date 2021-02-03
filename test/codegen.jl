@@ -117,3 +117,18 @@ Issue23.command_main(["run", "--port", "2345"])
     @test ex == target
 
 end
+
+module Issue110
+
+using Comonicon
+using Test
+
+@main function main(;niterations::Int=3000, seed::Int=1234, radius::Float64=1.5)
+    @test niterations == 2345
+    @test seed == 42
+    @test radius == 1.1
+end
+
+end
+
+Issue110.command_main(["--niterations=2345", "--seed=42", "--radius=1.1"])
