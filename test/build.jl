@@ -62,7 +62,7 @@ write_path(rcfile, true, Dict())
 
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.install(Foo; path = PATH.project("test"))
+    Comonicon.install(Foo; install_path = PATH.project("test"))
     @test isfile(PATH.project("test", "bin", "foo"))
     @test isfile(PATH.project("test", "bin", "foo.jl"))
 end
@@ -73,7 +73,7 @@ empty!(ARGS)
 push!(ARGS, "tarball")
 mock(create_sysimage) do plus
     @assert plus isa Mock
-    Comonicon.install(Foo; path = PATH.project("test"), quiet = true)
+    Comonicon.install(Foo; install_path = PATH.project("test"), install_quiet = true)
 end
 
 @test isfile(PATH.project("test", "Foo", "deps", BuildTools.tarball_name(Foo, "foo")))
