@@ -314,7 +314,6 @@ function read_match(parameters, it, option::Option)
         return quote
             push!($parameters, $sym => $arg)
             deleteat!(ARGS, $it)
-            $it = $it - 1
         end
     end
 end
@@ -325,7 +324,6 @@ function read_flag(parameters, it, flag)
         return quote
             push!($parameters, $sym => true)
             deleteat!(ARGS, $it)
-            $it = $it - 1
         end
     end
 end
