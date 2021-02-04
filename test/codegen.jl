@@ -123,7 +123,7 @@ module Issue110
 using Comonicon
 using Test
 
-@main function main(;niterations::Int=3000, seed::Int=1234, radius::Float64=1.5)
+@main function main(; niterations::Int = 3000, seed::Int = 1234, radius::Float64 = 1.5)
     @test niterations == 2345
     @test seed == 42
     @test radius == 1.1
