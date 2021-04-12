@@ -1,12 +1,49 @@
 module Options
 
-export read_configs
+export read_configs, has_comonicon_toml
+
+using Pkg
 using TOML
 using Configurations
-using ..Comonicon.PATH
-using ..Comonicon: @asset_str, Asset
 
 const COMONICON_TOML = ["Comonicon.toml", "JuliaComonicon.toml"]
+
+function project(m::Module, xs...)
+    path = pathof(m)
+    path === nothing && return dirname(Pkg.project().path)
+    return joinpath(dirname(dirname(path)), xs...)
+end
+
+struct Asset
+    package::Union{Nothing,String}
+    path::String
+end
+
+function Asset(s::String)
+    parts = strip.(split(s, ":"))
+    if length(parts) == 1
+        Asset(nothing, parts[1])
+    elseif length(parts) == 2
+        Asset(parts[1], parts[2])
+    else
+        error("invalid syntax for asset string: $s")
+    end
+end
+
+macro asset_str(s::String)
+    return Asset(s)
+end
+
+function Base.show(io::IO, x::Asset)
+    print(io, "asset\"")
+    if x.package !== nothing
+        print(io, GREEN_FG(x.package), ": ")
+    end
+    print(io, CYAN_FG(x.path), "\"")
+end
+
+Base.convert(::Type{Asset}, s::String) = Asset(s)
+
 
 """
     Install
@@ -197,7 +234,11 @@ end
 Read `Comonicon.toml` or `JuliaComonicon.toml` in given module's project path.
 """
 function read_toml(mod::Module)
-    return read_toml(PATH.project(mod))
+    return read_toml(project(mod))
+end
+
+function has_comonicon_toml(m::Module)
+    !isnothing(find_comonicon_toml(project(m)))
 end
 
 """

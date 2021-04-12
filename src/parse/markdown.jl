@@ -178,7 +178,5 @@ function read_docstring(doc::String)
 end
 
 function has_docstring(doc::Markdown.MD)
-    paragraph = first(read_content(doc))
-    flag = paragraph isa Markdown.Paragraph && paragraph.content == Any["No documentation found."]
-    return !flag
+    !occursin("No documentation found", md_to_string(doc))
 end
