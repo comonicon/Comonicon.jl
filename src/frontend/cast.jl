@@ -3,10 +3,7 @@ macro cast(ex)
 end
 
 macro main(ex)
-    quote
-        $(codegen_ast_cast(__module__, QuoteNode(__source__), ex))
-        $(codegen_project_entry(__module__, QuoteNode(__source__)))
-    end |> esc
+    esc(codegen_project_entry(__module__, QuoteNode(__source__), ex))
 end
 
 macro main()
@@ -127,7 +124,7 @@ function codegen_ast_cast_module(m, line, ex)
     end
 end
 
-function codegen_project_entry(m::Module, line)
+function codegen_project_entry(m::Module, line, ex = nothing)
     if has_comonicon_toml(m)
         options = read_configs(m)
         name = options.name        
@@ -135,22 +132,9 @@ function codegen_project_entry(m::Module, line)
         name = default_name(nameof(m))
     end
 
-    @gensym cmd entry doc
+    @gensym cmd entry
     quote
-        Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
-        $doc = @doc(COMMAND_ENTRY_DOC_STUB)
-        if $Frontend.has_docstring($doc)
-            $doc = $Frontend.read_description($doc)
-        else
-            $doc = nothing
-        end
-
-        $cmd = $IR.NodeCommand(
-            $name,
-            copy($m.CASTED_COMMANDS),
-            $doc,
-            $line
-        )
+        $(codegen_entry_cmd(m::Module, line, cmd, ex))
         $entry = $IR.CLIEntry($cmd, $(get_version(m)), $line)
         $Frontend.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
         command_main(ARGS::Vector{String}=ARGS) = $Runtime.interpret($entry, ARGS)
@@ -175,6 +159,39 @@ function codegen_project_entry(m::Module, line)
         comonicon_install(; kwargs...) = $Comonicon.install($m; kwargs...)
 
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
+    end
+end
+
+function codegen_entry_cmd(m::Module, line, cmd, ex)
+    if isnothing(ex)
+        @gensym doc
+        return quote
+            Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
+            $doc = @doc(COMMAND_ENTRY_DOC_STUB)
+            if $Frontend.has_docstring($doc)
+                $doc = $Frontend.read_description($doc)
+            else
+                $doc = nothing
+            end
+
+            $cmd = $IR.NodeCommand(
+                $name,
+                copy($m.CASTED_COMMANDS),
+                $doc,
+                $line
+            )
+        end
+    else
+        fn = JLFunction(ex)
+        args, options, flags = split_leaf_command(fn)
+        name = default_name(fn.name)
+        return quote
+            $(codegen_casted_commands(m))
+            $ex
+            Core.@__doc__ $(fn.name)
+            $cmd = $Frontend.cast($(fn.name), $name,
+                $args, $options, $flags, $line)
+        end
     end
 end
 

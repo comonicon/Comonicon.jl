@@ -9,6 +9,7 @@ end
 
 Base.convert(::Type{Description}, ::Nothing) = Description()
 Base.convert(::Type{Description}, x::String) = Description(x)
+Base.convert(::Type{Description}, x::AbstractString) = Description(String(x))
 
 Description(::Nothing) = Description(nothing, nothing)
 function Description(text::String)

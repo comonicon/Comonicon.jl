@@ -6,8 +6,6 @@ for more info.
 """
 module Comonicon
 
-
-
 include("options.jl")
 include("ir/ir.jl")
 include("runtime.jl")

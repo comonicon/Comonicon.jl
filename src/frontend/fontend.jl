@@ -4,6 +4,7 @@ using ..IR
 using ..Options
 using ..Comonicon: Comonicon
 using ..Runtime: Runtime
+using Pkg
 using Markdown
 using MatchCore
 using ExproniconLite
