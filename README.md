@@ -95,4 +95,4 @@ will get a standalone Julia script (unless the script depends on something else)
 MIT License
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://rogerluo.me/Comonicon.jl/dev/
+[docs-dev-url]: https://rogerluo.dev/Comonicon.jl/dev/
