@@ -331,9 +331,7 @@ function sysimg_url(mod::Module, configs::Options.Comonicon)
 
     if host == "github.com"
         url =
-            "https://github.com/" *
-            configs.download.user *
-            "/" *
+            "https://github.com/" * configs.download.user * "/" *
             configs.download.repo *
             "/releases/download/"
     else
