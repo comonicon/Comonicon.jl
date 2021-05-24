@@ -50,16 +50,16 @@ function split_leaf_command(fn::JLFunction)
 
     args = map(fn.args) do each
         if each isa Symbol
-            xcall(ComoniconCast, :JLArgument; name=QuoteNode(each))
+            xcall(Comonicon, :JLArgument; name=QuoteNode(each))
         elseif is_argument_with_type(each) # :($name::$type)
-            xcall(ComoniconCast, :JLArgument;
+            xcall(Comonicon, :JLArgument;
                 name=QuoteNode(each.args[1]),
                 type=wrap_type(fn, each.args[2])
             )
         elseif is_vararg_with_type(each) # :($name::$type...)
             name = each.args[1].args[1]
             type = each.args[1].args[2]
-            xcall(ComoniconCast, :JLArgument;
+            xcall(Comonicon, :JLArgument;
                 name=QuoteNode(name),
                 type=wrap_type(fn, type),
                 require=false,
@@ -69,20 +69,20 @@ function split_leaf_command(fn::JLFunction)
             name = each.args[1].args[1]
             type = each.args[1].args[2]
             value = each.args[2]
-            xcall(ComoniconCast, :JLArgument;
+            xcall(Comonicon, :JLArgument;
                 name=QuoteNode(name),
                 type=wrap_type(fn, type),
                 require=false,
                 default=hint(value),
             )
         elseif Meta.isexpr(each, :...) # :($name...)
-            xcall(ComoniconCast, :JLArgument;
+            xcall(Comonicon, :JLArgument;
                 name=QuoteNode(each.args[1]),
                 require=false,
                 vararg=true
             )
         elseif Meta.isexpr(each, :kw) && each.args[1] isa Symbol # Expr(:kw, name::Symbol, value)
-            xcall(ComoniconCast, :JLArgument;
+            xcall(Comonicon, :JLArgument;
                 name=QuoteNode(each.args[1]),
                 require=false,
                 default=hint(each.args[2]),
@@ -99,7 +99,7 @@ function split_leaf_command(fn::JLFunction)
             expr = each.args[1]
             value = each.args[2]
             if expr isa Symbol # Expr(:kw, name::Symbol, value)
-                push!(options, xcall(ComoniconCast, :JLOption, QuoteNode(expr), Any, hint(value)))
+                push!(options, xcall(Comonicon, :JLOption, QuoteNode(expr), Any, hint(value)))
             elseif Meta.isexpr(expr, :(::))
                 name = expr.args[1]
                 type = expr.args[2]
@@ -107,16 +107,16 @@ function split_leaf_command(fn::JLFunction)
                 if type === :Bool || type === Bool
                     value == false || error("Boolean options must use false as " *
                         "default value, and will be parsed as flags. got $name")
-                    push!(flags, xcall(ComoniconCast, :JLFlag, QuoteNode(name)))
+                    push!(flags, xcall(Comonicon, :JLFlag, QuoteNode(name)))
                 else
-                    push!(options, xcall(ComoniconCast, :JLOption, QuoteNode(name), type, hint(value)))
+                    push!(options, xcall(Comonicon, :JLOption, QuoteNode(name), type, hint(value)))
                 end
             end
         end
     end
-    args = Expr(:ref, :($ComoniconCast.JLArgument), args...)
-    options = Expr(:ref, :($ComoniconCast.JLOption), options...)
-    flags = Expr(:ref, :($ComoniconCast.JLFlag), flags...)
+    args = Expr(:ref, :($Comonicon.JLArgument), args...)
+    options = Expr(:ref, :($Comonicon.JLOption), options...)
+    flags = Expr(:ref, :($Comonicon.JLFlag), flags...)
     return args, options, flags
 end
 
@@ -134,7 +134,7 @@ function codegen_ast_cast_function(m, line, ex)
     return quote
         $ex
         Core.@__doc__ $(fn.name)
-        $cmd = $ComoniconCast.cast($(fn.name), $name,
+        $cmd = $Comonicon.cast($(fn.name), $name,
             $args, $options, $flags, $line)
         $m.CASTED_COMMANDS[$name] = $cmd
     end
@@ -147,7 +147,7 @@ function codegen_ast_cast_module(m, line, ex)
     return quote
         $(Expr(:toplevel, ex))
         Core.@__doc__ $name
-        $cmd = $ComoniconCast.cast($name, $cmd_name, $line)
+        $cmd = $Comonicon.cast($name, $cmd_name, $line)
         $m.CASTED_COMMANDS[$cmd_name] = $cmd
     end
 end
@@ -164,7 +164,7 @@ function codegen_project_entry(m::Module, line, ex = nothing)
     quote
         $(codegen_entry_cmd(m::Module, line, cmd, ex))
         $entry = $ComoniconTypes.CLIEntry($cmd, $(get_version(m)), $line)
-        $ComoniconCast.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
+        $Comonicon.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
         $m.eval($ComoniconTargetExpr.emit_expr($entry))
 
         # entry point for apps
@@ -177,6 +177,22 @@ function codegen_project_entry(m::Module, line, ex = nothing)
             end
         end
 
+        """
+            comonicon_install(;kwargs...)
+        Install the CLI manually. This will use the default configuration in `Comonicon.toml`,
+        if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
+        refer to [Comonicon documentation](https://docs.comonicon.org).
+        """
+        comonicon_install(; kwargs...) = $ComoniconBuilder.install($m; kwargs...)
+
+        """
+            comonicon_install_path([quiet=false])
+        Install the `PATH` and `FPATH` to your shell configuration file. You can use `comonicon_install_path(true)`,
+        to skip interactive prompt.
+        For more detailed reference, please refer to [Comonicon documentation](https://docs.comonicon.org).
+        """
+        comonicon_install_path() = $ComoniconBuilder.install_env_path()
+
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
     end
 end
@@ -187,8 +203,8 @@ function codegen_entry_cmd(m::Module, line, cmd, ex)
         return quote
             Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
             $doc = @doc(COMMAND_ENTRY_DOC_STUB)
-            if $ComoniconCast.has_docstring($doc)
-                $doc = $ComoniconCast.read_description($doc)
+            if $Comonicon.has_docstring($doc)
+                $doc = $Comonicon.read_description($doc)
             else
                 $doc = nothing
             end
@@ -208,7 +224,7 @@ function codegen_entry_cmd(m::Module, line, cmd, ex)
             $(codegen_casted_commands(m))
             $ex
             Core.@__doc__ $(fn.name)
-            $cmd = $ComoniconCast.cast($(fn.name), $name,
+            $cmd = $Comonicon.cast($(fn.name), $name,
                 $args, $options, $flags, $line)
         end
     end
