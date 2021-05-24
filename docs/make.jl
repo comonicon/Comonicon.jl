@@ -1,7 +1,7 @@
 using Documenter, Comonicon
 
 makedocs(;
-    modules = [Comonicon, Comonicon.Parse, Comonicon.CodeGen],
+    modules = [Comonicon],
     format = Documenter.HTML(prettyurls = !("local" in ARGS)),
     pages = [
         "Home" => "index.md",
