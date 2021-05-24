@@ -1,7 +1,7 @@
 using Documenter, Comonicon
 
 makedocs(;
-    modules = [Comonicon, Comonicon.Parse, Comonicon.CodeGen],
+    modules = [Comonicon],
     format = Documenter.HTML(prettyurls = !("local" in ARGS)),
     pages = [
         "Home" => "index.md",
@@ -13,8 +13,8 @@ makedocs(;
         "Code Generation" => "codegen.md",
         "Build and Install CLI" => "build.md",
     ],
-    repo = "https://github.com/Roger-luo/Comonicon.jl",
+    repo = "https://github.com/comonicon/Comonicon.jl",
     sitename = "Comonicon.jl",
 )
 
-deploydocs(; repo = "github.com/Roger-luo/Comonicon.jl")
+deploydocs(; repo = "github.com/comonicon/Comonicon.jl")

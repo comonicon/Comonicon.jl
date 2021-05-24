@@ -1,39 +1,25 @@
 """
 All the terminals are under my command. `Comonicon` is a CLI (Command Line Interface) generator
 that features light-weight dependency (optional to have zero dependency),
-fast start-up time and easy to use. See the [website](https://rogerluo.me/Comonicon.jl/)
+fast start-up time and easy to use. See the [website](https://comonicon.rogerluo.dev)
 for more info.
 """
 module Comonicon
 
-using Markdown
 using Pkg
-using Libdl
-using ExprTools
-using Crayons.Box
-
-export @asset_str
-
-include("path.jl")
-include("assets.jl")
-include("options.jl")
-include("types.jl")
-include("codegen/codegen.jl")
-include("parse/parse.jl")
+using Markdown
+using ExproniconLite
+using ComoniconTypes
+using ComoniconOptions
+using ComoniconBuilder
+using ComoniconTargetExpr
+using ComoniconZSHCompletion
 
 export @cast, @main
 
-using .Options
-using .Types
-using .Parse
-using .CodeGen
-
-include("tools/tools.jl")
-include("tools/build.jl")
-
-using .BuildTools
-
-# include("precompile.jl")
-# _precompile_()
+include("types.jl")
+include("cast.jl")
+include("markdown.jl")
+include("utils.jl")
 
 end # module
