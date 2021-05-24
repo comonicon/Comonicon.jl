@@ -106,16 +106,16 @@ end
 
 @test_throws ErrorException eval(:(
     module TestA
-    using ComoniconCast
+    using Comonicon
     @cast module Foo end
     end
 ))
 
 module TestB
-using ComoniconCast
+using Comonicon
 
 @cast module Foo
-    using ComoniconCast
+    using Comonicon
     @cast foo(x) = 1
 end
 end
@@ -128,7 +128,7 @@ end
 end
 
 module TestC
-    using ComoniconCast
+    using Comonicon
     @cast function command_a(a, b::String, c::Int; option_a="abc")
     end
 end
