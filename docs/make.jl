@@ -13,8 +13,8 @@ makedocs(;
         "Code Generation" => "codegen.md",
         "Build and Install CLI" => "build.md",
     ],
-    repo = "https://github.com/Roger-luo/Comonicon.jl",
+    repo = "https://github.com/comonicon/Comonicon.jl",
     sitename = "Comonicon.jl",
 )
 
-deploydocs(; repo = "github.com/Roger-luo/Comonicon.jl")
+deploydocs(; repo = "github.com/comonicon/Comonicon.jl")
