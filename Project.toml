@@ -21,6 +21,7 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
 Configurations = "0.15"
+ExproniconLite = "0.6"
 MatchCore = "0.1"
 TOML = "1"
 julia = "1.6"
