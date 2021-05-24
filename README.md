@@ -2,7 +2,7 @@
 
 *gith averminaluk ayh juldas mausan urdan*
 
-[![Build Status](https://travis-ci.com/Roger-luo/Comonicon.jl.svg?branch=master)](https://travis-ci.com/Roger-luo/Comonicon.jl)
+[![Build Status](https://github.com/comonicon/Comonicon.jl/workflows/CI/badge.svg)](https://github.com/comonicon/Comonicon.jl/actions)
 [![][docs-dev-img]][docs-dev-url]
 [![Coverage Status](https://coveralls.io/repos/github/Roger-luo/Comonicon.jl/badge.svg?branch=master)](https://coveralls.io/github/Roger-luo/Comonicon.jl?branch=master)
 
