@@ -2,6 +2,10 @@ using Test
 using ExproniconLite
 using ComoniconTypes
 using Comonicon
+using Comonicon: JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
+    cast, cast_args, cast_flags, cast_options, default_name,
+    get_version, split_leaf_command, split_docstring, read_arguments, read_description,
+    read_options, read_flags, split_hint, split_option
 
 args = [
     # name, type, require, vararg, default

@@ -15,10 +15,7 @@ using ComoniconBuilder
 using ComoniconTargetExpr
 using ComoniconZSHCompletion
 
-export JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
-    @cast, @main, cast, cast_args, cast_flags, cast_options, default_name,
-    get_version, split_leaf_command, split_docstring, read_arguments, read_description,
-    read_options, read_flags, split_hint, split_option
+export @cast, @main
 
 include("types.jl")
 include("cast.jl")
