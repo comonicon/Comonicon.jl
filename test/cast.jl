@@ -1,11 +1,7 @@
 using Test
+using ExproniconLite
+using ComoniconTypes
 using Comonicon
-using Expronicon
-using Comonicon.IR
-using Comonicon.Frontend
-# : cast, JLArgument, JLFlag, JLOption, Argument,
-#     Flag, Option, Description, split_leaf_command, codegen_ast_cast,
-#     NodeCommand, LeafCommand, CLIEntry
 
 args = [
     # name, type, require, vararg, default
@@ -93,29 +89,29 @@ end
 
     def = @expr JLFunction function foo(;option1::Bool=true)
     end
-    @test_throws Meta.ParseError split_leaf_command(def)
+    @test_throws ErrorException split_leaf_command(def)
     
     def = @expr JLFunction function foo(;option1::Bool)
     end
-    @test_throws Meta.ParseError split_leaf_command(def)
+    @test_throws ErrorException split_leaf_command(def)
 
     def = @expr JLFunction function foo(;option1)
     end
-    @test_throws Meta.ParseError split_leaf_command(def)
+    @test_throws ErrorException split_leaf_command(def)
 end
 
 @test_throws ErrorException eval(:(
     module TestA
-    using Comonicon
+    using ComoniconCast
     @cast module Foo end
     end
 ))
 
 module TestB
-using Comonicon
+using ComoniconCast
 
 @cast module Foo
-    using Comonicon
+    using ComoniconCast
     @cast foo(x) = 1
 end
 end
@@ -128,7 +124,7 @@ end
 end
 
 module TestC
-    using Comonicon
+    using ComoniconCast
     @cast function command_a(a, b::String, c::Int; option_a="abc")
     end
 end

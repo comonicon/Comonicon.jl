@@ -27,68 +27,96 @@ function codegen_ast_cast(m::Module, line, ex)
     end
 end
 
+function is_argument_with_type(ex)
+    ex isa Expr || return false
+    return Meta.isexpr(ex, :(::))
+end
+
+function is_vararg_with_type(ex)
+    ex isa Expr || return false
+    Meta.isexpr(ex, :(...)) || return false
+    return is_argument_with_type(ex.args[1])
+end
+
+function is_optional_argument_with_type(ex)
+    ex isa Expr || return false
+    Meta.isexpr(ex, :kw) || return false
+    return is_argument_with_type(ex.args[1])
+end
+
 function split_leaf_command(fn::JLFunction)
     # use ::<type> as hint if there is no docstring
     hint(value) = :("::" * $(xcall(Base, :repr, xcall(Base, :typeof, value))))
 
     args = map(fn.args) do each
-        @smatch each begin
-            ::Symbol => xcall(Frontend, :JLArgument; name=QuoteNode(each))
-            :($name::$type) => xcall(Frontend, :JLArgument;
-                name=QuoteNode(name),
-                type=wrap_type(fn, type)
+        if each isa Symbol
+            xcall(ComoniconCast, :JLArgument; name=QuoteNode(each))
+        elseif is_argument_with_type(each) # :($name::$type)
+            xcall(ComoniconCast, :JLArgument;
+                name=QuoteNode(each.args[1]),
+                type=wrap_type(fn, each.args[2])
             )
-            :($name::$type...) => xcall(Frontend, :JLArgument;
+        elseif is_vararg_with_type(each) # :($name::$type...)
+            name = each.args[1].args[1]
+            type = each.args[1].args[2]
+            xcall(ComoniconCast, :JLArgument;
                 name=QuoteNode(name),
                 type=wrap_type(fn, type),
                 require=false,
                 vararg=true
             )
-            Expr(:kw, :($name::$type), value) => xcall(Frontend, :JLArgument;
+        elseif is_optional_argument_with_type(each) # Expr(:kw, :($name::$type), value)
+            name = each.args[1].args[1]
+            type = each.args[1].args[2]
+            value = each.args[2]
+            xcall(ComoniconCast, :JLArgument;
                 name=QuoteNode(name),
                 type=wrap_type(fn, type),
                 require=false,
                 default=hint(value),
             )
-            :($name...) => xcall(Frontend, :JLArgument;
-                name=QuoteNode(name),
+        elseif Meta.isexpr(each, :...) # :($name...)
+            xcall(ComoniconCast, :JLArgument;
+                name=QuoteNode(each.args[1]),
                 require=false,
                 vararg=true
             )
-            Expr(:kw, name::Symbol, value) => xcall(Frontend, :JLArgument;
-                name=QuoteNode(name),
+        elseif Meta.isexpr(each, :kw) && each.args[1] isa Symbol # Expr(:kw, name::Symbol, value)
+            xcall(ComoniconCast, :JLArgument;
+                name=QuoteNode(each.args[1]),
                 require=false,
-                default=hint(value),
+                default=hint(each.args[2]),
             )
-            _ => throw(Meta.ParseError("invalid syntax: $ex"))
+        else
+            throw(Meta.ParseError("invalid syntax: $each"))
         end
     end
 
     flags, options = [], []
     if !isnothing(fn.kwargs)
         for each in fn.kwargs
-            @sswitch each begin
-                @case Expr(:kw, name::Symbol, value)
-                    push!(options, xcall(Frontend, :JLOption, QuoteNode(name), Any, hint(value)))
-                @case Expr(:kw, :($name::Bool), false)
-                    push!(flags, xcall(Frontend, :JLFlag, QuoteNode(name)))
-                @case Expr(:kw, :($name::Bool), true)
-                    throw(Meta.ParseError(
-                        "Boolean options must use false as " *
-                        "default value, and will be parsed as flags. got $name"
-                    ))
-                @case Expr(:kw, :($name::$type), value)
-                    push!(options, xcall(Frontend, :JLOption, QuoteNode(name), type, hint(value)))
-                @case ::Symbol || :($name::$type)
-                    throw(Meta.ParseError(
-                        "options should have default values or make it a positional argument"
-                    ))
+            Meta.isexpr(each, :kw) || error("options should have default values or make it a positional argument")
+            expr = each.args[1]
+            value = each.args[2]
+            if expr isa Symbol # Expr(:kw, name::Symbol, value)
+                push!(options, xcall(ComoniconCast, :JLOption, QuoteNode(expr), Any, hint(value)))
+            elseif Meta.isexpr(expr, :(::))
+                name = expr.args[1]
+                type = expr.args[2]
+
+                if type === :Bool || type === Bool
+                    value == false || error("Boolean options must use false as " *
+                        "default value, and will be parsed as flags. got $name")
+                    push!(flags, xcall(ComoniconCast, :JLFlag, QuoteNode(name)))
+                else
+                    push!(options, xcall(ComoniconCast, :JLOption, QuoteNode(name), type, hint(value)))
+                end
             end
         end
     end
-    args = Expr(:ref, :($Frontend.JLArgument), args...)
-    options = Expr(:ref, :($Frontend.JLOption), options...)
-    flags = Expr(:ref, :($Frontend.JLFlag), flags...)
+    args = Expr(:ref, :($ComoniconCast.JLArgument), args...)
+    options = Expr(:ref, :($ComoniconCast.JLOption), options...)
+    flags = Expr(:ref, :($ComoniconCast.JLFlag), flags...)
     return args, options, flags
 end
 
@@ -106,7 +134,7 @@ function codegen_ast_cast_function(m, line, ex)
     return quote
         $ex
         Core.@__doc__ $(fn.name)
-        $cmd = $Frontend.cast($(fn.name), $name,
+        $cmd = $ComoniconCast.cast($(fn.name), $name,
             $args, $options, $flags, $line)
         $m.CASTED_COMMANDS[$name] = $cmd
     end
@@ -119,7 +147,7 @@ function codegen_ast_cast_module(m, line, ex)
     return quote
         $(Expr(:toplevel, ex))
         Core.@__doc__ $name
-        $cmd = $Frontend.cast($name, $cmd_name, $line)
+        $cmd = $ComoniconCast.cast($name, $cmd_name, $line)
         $m.CASTED_COMMANDS[$cmd_name] = $cmd
     end
 end
@@ -135,9 +163,9 @@ function codegen_project_entry(m::Module, line, ex = nothing)
     @gensym cmd entry
     quote
         $(codegen_entry_cmd(m::Module, line, cmd, ex))
-        $entry = $IR.CLIEntry($cmd, $(get_version(m)), $line)
-        $Frontend.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
-        command_main(ARGS::Vector{String}=ARGS) = $Runtime.interpret($entry, ARGS)
+        $entry = $ComoniconTypes.CLIEntry($cmd, $(get_version(m)), $line)
+        $ComoniconCast.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
+        $m.eval($ComoniconTargetExpr.emit_expr($entry))
 
         # entry point for apps
         function julia_main()::Cint
@@ -149,15 +177,6 @@ function codegen_project_entry(m::Module, line, ex = nothing)
             end
         end
 
-        """
-            comonicon_install(;kwargs...)
-
-        Install the CLI manually. This will use the default configuration
-        in `Comonicon.toml`, if it exists. For more detailed reference, please refer to
-        [Comonicon documentation](https://rogerluo.me/Comonicon.jl/).
-        """
-        comonicon_install(; kwargs...) = $Comonicon.install($m; kwargs...)
-
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
     end
 end
@@ -168,13 +187,13 @@ function codegen_entry_cmd(m::Module, line, cmd, ex)
         return quote
             Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
             $doc = @doc(COMMAND_ENTRY_DOC_STUB)
-            if $Frontend.has_docstring($doc)
-                $doc = $Frontend.read_description($doc)
+            if $ComoniconCast.has_docstring($doc)
+                $doc = $ComoniconCast.read_description($doc)
             else
                 $doc = nothing
             end
 
-            $cmd = $IR.NodeCommand(
+            $cmd = $ComoniconTypes.NodeCommand(
                 $name,
                 copy($m.CASTED_COMMANDS),
                 $doc,
@@ -189,7 +208,7 @@ function codegen_entry_cmd(m::Module, line, cmd, ex)
             $(codegen_casted_commands(m))
             $ex
             Core.@__doc__ $(fn.name)
-            $cmd = $Frontend.cast($(fn.name), $name,
+            $cmd = $ComoniconCast.cast($(fn.name), $name,
                 $args, $options, $flags, $line)
         end
     end

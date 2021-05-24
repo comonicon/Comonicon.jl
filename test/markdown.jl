@@ -1,11 +1,11 @@
 using Test
 using Markdown
-using Comonicon
-using Comonicon.Frontend
-using Comonicon: split_docstring, has_docstring, read_arguments,
-    read_flags, read_options, read_description, read_section, read_content,
-    read_item, rm_format, docstring, md_to_string, split_option, split_hint,
-    JLMDOption, JLMDFlag
+using ComoniconTypes
+using ComoniconCast
+# using Comonicon: split_docstring, has_docstring, read_arguments,
+#     read_flags, read_options, read_description, read_section, read_content,
+#     read_item, rm_format, docstring, md_to_string, split_option, split_hint,
+#     JLMDOption, JLMDFlag
 
 @testset "read_arguments" begin
     doc = Markdown.parse("""

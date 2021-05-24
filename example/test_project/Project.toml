@@ -1,0 +1,5 @@
+name = "Foo"
+uuid = "863f3e99-da2a-4334-8734-de3dacbe5545"
+
+[deps]
+Comonicon = "863f3e99-da2a-4334-8734-de3dacbe5542"

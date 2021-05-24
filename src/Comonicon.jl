@@ -6,43 +6,23 @@ for more info.
 """
 module Comonicon
 
-include("options.jl")
-include("ir/ir.jl")
-include("runtime.jl")
+using Pkg
+using Markdown
+using ExproniconLite
+using ComoniconTypes
+using ComoniconOptions
+using ComoniconBuilder
+using ComoniconTargetExpr
+using ComoniconZSHCompletion
 
-include("frontend/fontend.jl")
-using .Frontend: @cast, @main
-export @cast, @main
-# include("codegen/ast.jl")
+export JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
+    @cast, @main, cast, cast_args, cast_flags, cast_options, default_name,
+    get_version, split_leaf_command, split_docstring, read_arguments, read_description,
+    read_options, read_flags, split_hint, split_option
 
-# using Markdown
-# using Pkg
-# using Libdl
-# using ExprTools
-# using Crayons.Box
-
-# export @asset_str
-
-# include("path.jl")
-# include("assets.jl")
-# include("options.jl")
-# include("types.jl")
-# include("codegen/codegen.jl")
-# include("parse/parse.jl")
-
-# export @cast, @main
-
-# using .Options
-# using .Types
-# using .Parse
-# using .CodeGen
-
-# include("tools/tools.jl")
-# include("tools/build.jl")
-
-# using .BuildTools
-
-# include("precompile.jl")
-# _precompile_()
+include("types.jl")
+include("cast.jl")
+include("markdown.jl")
+include("utils.jl")
 
 end # module
