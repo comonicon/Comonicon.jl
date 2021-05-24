@@ -4,7 +4,7 @@
 
 [![Build Status](https://github.com/comonicon/Comonicon.jl/workflows/CI/badge.svg)](https://github.com/comonicon/Comonicon.jl/actions)
 [![][docs-dev-img]][docs-dev-url]
-[![Coverage Status](https://coveralls.io/repos/github/Roger-luo/Comonicon.jl/badge.svg?branch=master)](https://coveralls.io/github/Roger-luo/Comonicon.jl?branch=master)
+[![codecov](https://codecov.io/gh/comonicon/Comonicon.jl/branch/main/graph/badge.svg?token=g0FlmB4YLj)](https://codecov.io/gh/comonicon/Comonicon.jl)
 
 Roger's magic book for command line interfaces.
 
