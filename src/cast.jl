@@ -199,34 +199,42 @@ end
 
 function codegen_entry_cmd(m::Module, line, cmd, ex)
     if isnothing(ex)
-        @gensym doc
-        return quote
-            Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
-            $doc = @doc(COMMAND_ENTRY_DOC_STUB)
-            if $Comonicon.has_docstring($doc)
-                $doc = $Comonicon.read_description($doc)
-            else
-                $doc = nothing
-            end
-
-            $cmd = $ComoniconTypes.NodeCommand(
-                $name,
-                copy($m.CASTED_COMMANDS),
-                $doc,
-                $line
-            )
-        end
+        return codegen_multiple_main_entry(m, line, cmd)
     else
-        fn = JLFunction(ex)
-        args, options, flags = split_leaf_command(fn)
-        name = default_name(fn.name)
-        return quote
-            $(codegen_casted_commands(m))
-            $ex
-            Core.@__doc__ $(fn.name)
-            $cmd = $Comonicon.cast($(fn.name), $name,
-                $args, $options, $flags, $line)
+        return codegen_single_main_entry(m, line, cmd, ex)
+    end
+end
+
+function codegen_multiple_main_entry(m::Module, line, cmd)
+    @gensym doc
+    return quote
+        Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
+        $doc = @doc(COMMAND_ENTRY_DOC_STUB)
+        if $Comonicon.has_docstring($doc)
+            $doc = $Comonicon.read_description($doc)
+        else
+            $doc = nothing
         end
+
+        $cmd = $ComoniconTypes.NodeCommand(
+            $name,
+            copy($m.CASTED_COMMANDS),
+            $doc,
+            $line
+        )
+    end
+end
+
+function codegen_single_main_entry(m::Module, line, cmd, ex)
+    fn = JLFunction(ex)
+    args, options, flags = split_leaf_command(fn)
+    name = default_name(fn.name)
+    return quote
+        $(codegen_casted_commands(m))
+        $ex
+        Core.@__doc__ $(fn.name)
+        $cmd = $Comonicon.cast($(fn.name), $name,
+            $args, $options, $flags, $line)
     end
 end
 
