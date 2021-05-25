@@ -50,7 +50,7 @@ function default_name(x::String)
     else
         name = x
     end
-    return replace(lowercase(name), '_'=>'-')
+    return replace(lowercase(name), '_' => '-')
 end
 
 default_name(x::Symbol) = default_name(string(x))

@@ -50,42 +50,46 @@ function split_leaf_command(fn::JLFunction)
 
     args = map(fn.args) do each
         if each isa Symbol
-            xcall(Comonicon, :JLArgument; name=QuoteNode(each))
+            xcall(Comonicon, :JLArgument; name = QuoteNode(each))
         elseif is_argument_with_type(each) # :($name::$type)
-            xcall(Comonicon, :JLArgument;
-                name=QuoteNode(each.args[1]),
-                type=wrap_type(fn, each.args[2])
+            xcall(
+                Comonicon,
+                :JLArgument;
+                name = QuoteNode(each.args[1]),
+                type = wrap_type(fn, each.args[2]),
             )
         elseif is_vararg_with_type(each) # :($name::$type...)
             name = each.args[1].args[1]
             type = each.args[1].args[2]
-            xcall(Comonicon, :JLArgument;
-                name=QuoteNode(name),
-                type=wrap_type(fn, type),
-                require=false,
-                vararg=true
+            xcall(
+                Comonicon,
+                :JLArgument;
+                name = QuoteNode(name),
+                type = wrap_type(fn, type),
+                require = false,
+                vararg = true,
             )
         elseif is_optional_argument_with_type(each) # Expr(:kw, :($name::$type), value)
             name = each.args[1].args[1]
             type = each.args[1].args[2]
             value = each.args[2]
-            xcall(Comonicon, :JLArgument;
-                name=QuoteNode(name),
-                type=wrap_type(fn, type),
-                require=false,
-                default=hint(value),
+            xcall(
+                Comonicon,
+                :JLArgument;
+                name = QuoteNode(name),
+                type = wrap_type(fn, type),
+                require = false,
+                default = hint(value),
             )
         elseif Meta.isexpr(each, :...) # :($name...)
-            xcall(Comonicon, :JLArgument;
-                name=QuoteNode(each.args[1]),
-                require=false,
-                vararg=true
-            )
+            xcall(Comonicon, :JLArgument; name = QuoteNode(each.args[1]), require = false, vararg = true)
         elseif Meta.isexpr(each, :kw) && each.args[1] isa Symbol # Expr(:kw, name::Symbol, value)
-            xcall(Comonicon, :JLArgument;
-                name=QuoteNode(each.args[1]),
-                require=false,
-                default=hint(each.args[2]),
+            xcall(
+                Comonicon,
+                :JLArgument;
+                name = QuoteNode(each.args[1]),
+                require = false,
+                default = hint(each.args[2]),
             )
         else
             throw(Meta.ParseError("invalid syntax: $each"))
@@ -95,7 +99,8 @@ function split_leaf_command(fn::JLFunction)
     flags, options = [], []
     if !isnothing(fn.kwargs)
         for each in fn.kwargs
-            Meta.isexpr(each, :kw) || error("options should have default values or make it a positional argument")
+            Meta.isexpr(each, :kw) ||
+                error("options should have default values or make it a positional argument")
             expr = each.args[1]
             value = each.args[2]
             if expr isa Symbol # Expr(:kw, name::Symbol, value)
@@ -105,8 +110,10 @@ function split_leaf_command(fn::JLFunction)
                 type = expr.args[2]
 
                 if type === :Bool || type === Bool
-                    value == false || error("Boolean options must use false as " *
-                        "default value, and will be parsed as flags. got $name")
+                    value == false || error(
+                        "Boolean options must use false as " *
+                        "default value, and will be parsed as flags. got $name",
+                    )
                     push!(flags, xcall(Comonicon, :JLFlag, QuoteNode(name)))
                 else
                     push!(options, xcall(Comonicon, :JLOption, QuoteNode(name), type, hint(value)))
@@ -134,8 +141,7 @@ function codegen_ast_cast_function(m, line, ex)
     return quote
         $ex
         Core.@__doc__ $(fn.name)
-        $cmd = $Comonicon.cast($(fn.name), $name,
-            $args, $options, $flags, $line)
+        $cmd = $Comonicon.cast($(fn.name), $name, $args, $options, $flags, $line)
         $m.CASTED_COMMANDS[$name] = $cmd
     end
 end
@@ -155,7 +161,7 @@ end
 function codegen_project_entry(m::Module, line, ex = nothing)
     if has_comonicon_toml(m)
         options = read_configs(m)
-        name = options.name        
+        name = options.name
     else
         name = default_name(nameof(m))
     end
@@ -216,12 +222,7 @@ function codegen_multiple_main_entry(m::Module, line, cmd)
             $doc = nothing
         end
 
-        $cmd = $ComoniconTypes.NodeCommand(
-            $name,
-            copy($m.CASTED_COMMANDS),
-            $doc,
-            $line
-        )
+        $cmd = $ComoniconTypes.NodeCommand($name, copy($m.CASTED_COMMANDS), $doc, $line)
     end
 end
 
@@ -233,8 +234,7 @@ function codegen_single_main_entry(m::Module, line, cmd, ex)
         $(codegen_casted_commands(m))
         $ex
         Core.@__doc__ $(fn.name)
-        $cmd = $Comonicon.cast($(fn.name), $name,
-            $args, $options, $flags, $line)
+        $cmd = $Comonicon.cast($(fn.name), $name, $args, $options, $flags, $line)
     end
 end
 
@@ -249,17 +249,28 @@ function cast(m::Module, name::String = default_name(m), line = LineNumberNode(0
 end
 
 function cast(
-        f::Function, name::String,
-        args::Vector{JLArgument}=JLArgument[],
-        options::Vector{JLOption}=JLOption[],
-        flags::Vector{JLFlag}=JLFlag[],
-        line = LineNumberNode(0)
-    )
+    f::Function,
+    name::String,
+    args::Vector{JLArgument} = JLArgument[],
+    options::Vector{JLOption} = JLOption[],
+    flags::Vector{JLFlag} = JLFlag[],
+    line = LineNumberNode(0),
+)
     doc = split_docstring(f)::JLMD
     args, vararg = cast_args(doc, args, line)
     flags = cast_flags(doc, flags, line)
     options = cast_options(doc, options, line)
-    return LeafCommand(f, name, args, count(x->x.require, args), vararg, flags, options, doc.desc, line)
+    return LeafCommand(
+        f,
+        name,
+        args,
+        count(x -> x.require, args),
+        vararg,
+        flags,
+        options,
+        doc.desc,
+        line,
+    )
 end
 
 function cast_args(doc::JLMD, args::Vector{JLArgument}, line)
@@ -271,7 +282,7 @@ function cast_args(doc::JLMD, args::Vector{JLArgument}, line)
             each.require,
             each.default,
             Description(get(doc.arguments, string(each.name), nothing)),
-            line
+            line,
         )
     end
 
@@ -283,59 +294,57 @@ function cast_args(doc::JLMD, args::Vector{JLArgument}, line)
 end
 
 function cast_flags(doc::JLMD, flags::Vector{JLFlag}, line)
-    cmd_flags = Dict{String, Flag}()
+    cmd_flags = Dict{String,Flag}()
     for each in flags
-        name = replace(string(each.name), '_'=>'-')
+        name = replace(string(each.name), '_' => '-')
         if haskey(doc.flags, name)
             doc_flag = doc.flags[name]::JLMDFlag
-            cmd_flags[name] = flg = Flag(;
-                sym=each.name,
-                name=name,
-                short=doc_flag.short,
-                description=Description(doc_flag.desc),
-                line=line,
-            )
+            cmd_flags[name] =
+                flg = Flag(;
+                    sym = each.name,
+                    name = name,
+                    short = doc_flag.short,
+                    description = Description(doc_flag.desc),
+                    line = line,
+                )
 
             if doc_flag.short
                 cmd_flags[name[1:1]] = flg
             end
         else
-            cmd_flags[name] = Flag(;
-                sym=each.name,
-                name=name,
-                line=line
-            )
+            cmd_flags[name] = Flag(; sym = each.name, name = name, line = line)
         end
     end
     return cmd_flags
 end
 
 function cast_options(doc::JLMD, options::Vector{JLOption}, line)
-    cmd_options = Dict{String, Option}()
+    cmd_options = Dict{String,Option}()
     for each in options
-        name = replace(string(each.name), '_'=>'-')
+        name = replace(string(each.name), '_' => '-')
         if haskey(doc.options, name)
             option = doc.options[name]::JLMDOption
-            cmd_options[name] = opt = Option(;
-                sym=each.name,
-                name=name,
-                hint=option.hint, # use user defined hint
-                type=each.type,
-                short=option.short,
-                description=option.desc,
-                line=line,
-            )
+            cmd_options[name] =
+                opt = Option(;
+                    sym = each.name,
+                    name = name,
+                    hint = option.hint, # use user defined hint
+                    type = each.type,
+                    short = option.short,
+                    description = option.desc,
+                    line = line,
+                )
 
             if option.short
                 cmd_options[name[1:1]] = opt
             end
         else
             cmd_options[name] = Option(;
-                sym=each.name,
-                name=name,
-                hint=each.hint,
-                type=each.type,
-                line=line,
+                sym = each.name,
+                name = name,
+                hint = each.hint,
+                type = each.type,
+                line = line,
             )
         end
     end

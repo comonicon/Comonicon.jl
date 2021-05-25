@@ -164,12 +164,14 @@ function split_option(content::String)
         short = lstrip(names[2])
         startswith(short, "-") || throw(Meta.ParseError("expect --option,-o, got --$content"))
         short, hint = split_hint(lstrip(short, '-'))
-        length(short) == 1 || throw(Meta.ParseError("short option can only use one letter, got --$content"))
-        first(short) == first(name) || throw(Meta.ParseError("short option must use the same first letter, got --$content"))
+        length(short) == 1 ||
+            throw(Meta.ParseError("short option can only use one letter, got --$content"))
+        first(short) == first(name) ||
+            throw(Meta.ParseError("short option must use the same first letter, got --$content"))
     else
         throw(Meta.ParseError("too much inputs, expect --option[,-o], got --$content"))
     end
-    name = replace(name, '_'=>'-')
+    name = replace(name, '_' => '-')
     return name, short, hint
 end
 
