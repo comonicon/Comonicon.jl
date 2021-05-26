@@ -139,7 +139,7 @@ end
     @test cmd isa LeafCommand
     option = cmd.options["option-a"]
     @test option.name == "option-a"
-    @test option.hint == "::String"
+    @test option.hint == "abc"
 end
 
 module TestD
