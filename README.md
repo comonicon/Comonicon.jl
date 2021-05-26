@@ -3,7 +3,6 @@
 *gith averminaluk ayh juldas mausan urdan*
 
 [![Build Status](https://github.com/comonicon/Comonicon.jl/workflows/CI/badge.svg)](https://github.com/comonicon/Comonicon.jl/actions)
-[![][docs-dev-img]][docs-dev-url]
 [![codecov](https://codecov.io/gh/comonicon/Comonicon.jl/branch/master/graph/badge.svg?token=zZjCxCiFTY)](https://codecov.io/gh/comonicon/Comonicon.jl)
 
 Roger's magic book for command line interfaces.
@@ -93,6 +92,3 @@ will get a standalone Julia script (unless the script depends on something else)
 ## License
 
 MIT License
-
-[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://rogerluo.dev/Comonicon.jl/dev/
