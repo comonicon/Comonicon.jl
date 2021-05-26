@@ -14,7 +14,7 @@ using ComoniconOptions
 using ComoniconTargetExpr
 using ComoniconZSHCompletion
 
-export @cast, @main
+export @cast, @main, write_cmd
 
 include("types.jl")
 include("cast.jl")
