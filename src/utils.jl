@@ -18,7 +18,7 @@ function get_version(m::Module)
         end
     end
 
-    if hasproperty(m, :COMMAND_VERSION)
+    if isdefined(m, :COMMAND_VERSION)
         return m.COMMAND_VERSION
     end
     return
@@ -30,7 +30,7 @@ end
 register `cmd` in the command registry `cmds`, which usually is
 a constant `CASTED_COMMANDS` under given module.
 """
-function set_cmd!(cmds::Dict, cmd, name = cmd_name(cmd))
+function set_cmd!(cmds::Dict, cmd, name = cmd.name)
     if haskey(cmds, name)
         @warn "replacing command $name in the registry"
     end

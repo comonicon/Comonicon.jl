@@ -136,7 +136,7 @@ function codegen_ast_cast_function(m::Module, @nospecialize(line), ex::Expr)
         Core.@__doc__ $(fn.name)
         $cmd = $Comonicon.cast($(fn.name), $name,
             $args, $options, $flags, $line)
-        $m.CASTED_COMMANDS[$name] = $cmd
+        $Comonicon.set_cmd!($m.CASTED_COMMANDS, $cmd, $name)
     end
 end
 
@@ -148,7 +148,7 @@ function codegen_ast_cast_module(m::Module, line, ex)
         $(Expr(:toplevel, ex))
         Core.@__doc__ $name
         $cmd = $Comonicon.cast($name, $cmd_name, $line)
-        $m.CASTED_COMMANDS[$cmd_name] = $cmd
+        $Comonicon.set_cmd!($m.CASTED_COMMANDS, $cmd, $cmd_name)
     end
 end
 

@@ -141,3 +141,21 @@ end
     @test option.name == "option-a"
     @test option.hint == "::String"
 end
+
+module TestD
+    using Test
+    using Comonicon
+    @cast foo(a) = nothing
+    @test_logs (:warn, "replacing command foo in the registry") @cast foo(a) = nothing
+end
+
+module TestC
+using Comonicon
+const COMMAND_VERSION = v"1.1.1"
+
+@cast foo(a) = nothing
+@main
+
+end
+
+@test TestC.CASTED_COMMANDS["main"].version == v"1.1.1"
