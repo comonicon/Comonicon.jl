@@ -1,9 +1,11 @@
+using Test
 using Comonicon
 
 # pkg activate <string> --shared=false
 
 module PkgCmd
 
+using Test
 using Comonicon
 
 """
@@ -19,7 +21,8 @@ activate the environment at `path`.
 - `--shared`: whether activate the shared environment
 """
 @cast function activate(path; shared::Bool = false)
-    println("activating $s (shared=$shared)")
+    @test path == "path"
+    @test shared == true
 end
 
 @main
