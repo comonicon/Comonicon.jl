@@ -191,22 +191,6 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
             end
         end
 
-        """
-            comonicon_install(;kwargs...)
-        Install the CLI manually. This will use the default configuration in `Comonicon.toml`,
-        if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
-        refer to [Comonicon documentation](https://docs.comonicon.org).
-        """
-        comonicon_install(; kwargs...) = $ComoniconBuilder.install($m; kwargs...)
-
-        """
-            comonicon_install_path([quiet=false])
-        Install the `PATH` and `FPATH` to your shell configuration file. You can use `comonicon_install_path(true)`,
-        to skip interactive prompt.
-        For more detailed reference, please refer to [Comonicon documentation](https://docs.comonicon.org).
-        """
-        comonicon_install_path() = $ComoniconBuilder.install_env_path()
-
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
     end
 end

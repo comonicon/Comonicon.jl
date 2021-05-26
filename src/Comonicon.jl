@@ -1,7 +1,7 @@
 """
 All the terminals are under my command. `Comonicon` is a CLI (Command Line Interface) generator
 that features light-weight dependency (optional to have zero dependency),
-fast start-up time and easy to use. See the [website](https://comonicon.rogerluo.dev)
+fast start-up time and easy to use. See the [website](https://comonicon.org)
 for more info.
 """
 module Comonicon
@@ -11,7 +11,6 @@ using Markdown
 using ExproniconLite
 using ComoniconTypes
 using ComoniconOptions
-using ComoniconBuilder
 using ComoniconTargetExpr
 using ComoniconZSHCompletion
 
