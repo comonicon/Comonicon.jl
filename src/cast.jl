@@ -73,7 +73,7 @@ function split_leaf_command(fn::JLFunction)
                 name=QuoteNode(name),
                 type=wrap_type(fn, type),
                 require=false,
-                default=hint(value),
+                default=string(value),
             )
         elseif Meta.isexpr(each, :...) # :($name...)
             xcall(Comonicon, :JLArgument;
@@ -85,7 +85,7 @@ function split_leaf_command(fn::JLFunction)
             xcall(Comonicon, :JLArgument;
                 name=QuoteNode(each.args[1]),
                 require=false,
-                default=hint(each.args[2]),
+                default=string(each.args[2]),
             )
         else
             throw(Meta.ParseError("invalid syntax: $each"))

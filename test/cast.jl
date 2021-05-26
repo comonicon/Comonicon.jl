@@ -10,8 +10,8 @@ using Comonicon: JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
 args = [
     # name, type, require, vararg, default
     JLArgument(:arg1, Any,     true, false, nothing),
-    JLArgument(:arg2, Int,     false, false, "::Int64"),
-    JLArgument(:arg3, String,  false, false, "::String"),
+    JLArgument(:arg2, Int,     false, false, "1"),
+    JLArgument(:arg3, String,  false, false, "abc"),
 ]
 
 flags = [
@@ -149,7 +149,7 @@ module TestD
     @test_logs (:warn, "replacing command foo in the registry") @cast foo(a) = nothing
 end
 
-module TestC
+module TestE
 using Comonicon
 const COMMAND_VERSION = v"1.1.1"
 
@@ -158,4 +158,41 @@ const COMMAND_VERSION = v"1.1.1"
 
 end
 
-@test TestC.CASTED_COMMANDS["main"].version == v"1.1.1"
+@test TestE.CASTED_COMMANDS["main"].version == v"1.1.1"
+
+module TestF
+using Test
+using Comonicon
+@test_throws LoadError eval(:(@cast(1 + 1)))
+end
+
+module TestVararg
+using Comonicon
+@cast test_vararg(x, xs...) = nothing
+@cast test_vararg_typed(x, xs::Int...) = nothing
+end
+
+@testset "test vararg" begin
+    @test TestVararg.CASTED_COMMANDS["test-vararg"].vararg.name === "xs"
+    @test TestVararg.CASTED_COMMANDS["test-vararg"].vararg.type === Any
+    @test TestVararg.CASTED_COMMANDS["test-vararg-typed"].vararg.name === "xs"
+    @test TestVararg.CASTED_COMMANDS["test-vararg-typed"].vararg.type === Int
+end
+
+module TestOptionalArg
+using Comonicon
+@cast test_optional(x, y=1) = nothing
+@cast test_optional_typed(x, y::Int=2) = nothing
+end
+
+@testset "test optional arg" begin
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].name == "y"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].require == false
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].default == "1"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].type === Any
+
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].name == "y"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].require == false
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].default == "2"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].type === Int
+end
