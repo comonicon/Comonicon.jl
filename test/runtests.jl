@@ -9,3 +9,7 @@ end
 @testset "markdown" begin
     include("markdown.jl")
 end
+
+@testset "projects" begin
+    include("projects.jl")
+end

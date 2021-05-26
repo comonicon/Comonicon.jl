@@ -153,16 +153,19 @@ end
 
 function split_option(content::String)
     content = strip(content)
-    startswith(content, "--") || throw(Meta.ParseError("expect --option[,-o], got $content"))
-    content = lstrip(content, '-')
-    names = split(content, ",")
+    startswith(content, "-") || throw(Meta.ParseError("expect --option[,-o], got $content"))
+    names = map(strip, split(content, ",")) # rm space
+
     if length(names) == 1 # long option
-        name, hint = split_hint(names[1])
+        name, hint = split_hint(lstrip(names[1], '-'))
         short = nothing
     elseif length(names) == 2 # short option
-        name = names[1]
-        short = lstrip(names[2])
-        startswith(short, "-") || throw(Meta.ParseError("expect --option,-o, got --$content"))
+        idx = findfirst(startswith("--"), names)
+        idx === nothing && error("cannot find long option, got $content")
+        name = lstrip(names[idx], '-')
+        short = idx == 1 ? names[2] : names[1]
+        short = lstrip(short, '-')
+
         short, hint = split_hint(lstrip(short, '-'))
         length(short) == 1 || throw(Meta.ParseError("short option can only use one letter, got --$content"))
         first(short) == first(name) || throw(Meta.ParseError("short option must use the same first letter, got --$content"))

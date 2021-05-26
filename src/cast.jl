@@ -3,11 +3,11 @@ macro cast(ex)
 end
 
 macro main(ex)
-    esc(codegen_project_entry(__module__, QuoteNode(__source__), ex))
+    esc(codegen_entry(__module__, QuoteNode(__source__), ex))
 end
 
 macro main()
-    esc(codegen_project_entry(__module__, QuoteNode(__source__)))
+    esc(codegen_entry(__module__, QuoteNode(__source__)))
 end
 
 function codegen_ast_cast(m::Module, line, ex)
@@ -125,7 +125,7 @@ function wrap_type(def::JLFunction, type)
     return Expr(:where, type, def.whereparams...)
 end
 
-function codegen_ast_cast_function(m, line, ex)
+function codegen_ast_cast_function(m::Module, @nospecialize(line), ex::Expr)
     fn = JLFunction(ex)
     args, options, flags = split_leaf_command(fn)
 
@@ -140,7 +140,7 @@ function codegen_ast_cast_function(m, line, ex)
     end
 end
 
-function codegen_ast_cast_module(m, line, ex)
+function codegen_ast_cast_module(m::Module, line, ex)
     name = name_only(ex)
     @gensym cmd
     cmd_name = default_name(name)
@@ -152,20 +152,34 @@ function codegen_ast_cast_module(m, line, ex)
     end
 end
 
-function codegen_project_entry(m::Module, line, ex = nothing)
-    if has_comonicon_toml(m)
-        options = read_configs(m)
-        name = options.name        
-    else
-        name = default_name(nameof(m))
-    end
-
+function codegen_create_entry(m::Module, line, @nospecialize(ex))
     @gensym cmd entry
     quote
         $(codegen_entry_cmd(m::Module, line, cmd, ex))
-        $entry = $ComoniconTypes.CLIEntry($cmd, $(get_version(m)), $line)
+        $entry = $ComoniconTypes.Entry($cmd, $(get_version(m)), $line)
         $Comonicon.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
         $m.eval($ComoniconTargetExpr.emit_expr($entry))
+    end
+end
+
+function codegen_entry(m::Module, line, @nospecialize(ex = nothing))
+    if m === Main
+        codegen_script_entry(m, line, ex)
+    else
+        codegen_project_entry(m, line, ex)
+    end
+end
+
+function codegen_script_entry(m::Module, line, @nospecialize(ex))
+    quote
+        $(codegen_create_entry(m, line, ex))
+        command_main()
+    end
+end
+
+function codegen_project_entry(m::Module, line, @nospecialize(ex))
+    quote
+        $(codegen_create_entry(m, line, ex))
 
         # entry point for apps
         function julia_main()::Cint
@@ -206,6 +220,13 @@ function codegen_entry_cmd(m::Module, line, cmd, ex)
 end
 
 function codegen_multiple_main_entry(m::Module, line, cmd)
+    if has_comonicon_toml(m)
+        options = ComoniconOptions.read_options(m)
+        name = options.name        
+    else
+        name = default_name(nameof(m))
+    end
+
     @gensym doc
     return quote
         Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing

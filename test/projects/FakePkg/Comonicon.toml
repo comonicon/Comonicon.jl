@@ -1,4 +1,4 @@
-name = "foo"
+name = "pkg"
 
 [install]
 completion=true

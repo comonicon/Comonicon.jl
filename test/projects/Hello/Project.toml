@@ -1,5 +1,5 @@
-name = "Foo"
-uuid = "9cc09137-cd31-4319-9d91-dfc41e461ca2"
+name = "Hello"
+uuid = "67988849-259b-4ecf-8960-64f0a83d6ebd"
 authors = ["Roger-luo <rogerluo.rl18@gmail.com>"]
 version = "0.1.0"
 
