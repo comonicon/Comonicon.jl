@@ -5,4 +5,5 @@ version = "0.1.0"
 
 [deps]
 Comonicon = "863f3e99-da2a-4334-8734-de3dacbe5542"
+ComoniconTargetExpr = "d6dfd36b-42f3-4a9f-a1cb-6f1a052fed42"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
