@@ -85,7 +85,7 @@ function `main` with one method `main(::Vector{String})`, which can be precompil
 
 ### Zero Dependency
 You can get rid of `Comonicon` entirely after you generate the command line parsing script
-via `write(filename, command_object)`. If means if you copy this file into your script, you
+via `write_cmd(filename, command_object)`. If means if you copy this file into your script, you
 will get a standalone Julia script (unless the script depends on something else).
 
 
