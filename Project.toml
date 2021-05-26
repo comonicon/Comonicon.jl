@@ -1,7 +1,7 @@
 name = "Comonicon"
 uuid = "863f3e99-da2a-4334-8734-de3dacbe5542"
 authors = ["Roger-luo and contributors"]
-version = "0.11.0"
+version = "0.11.1"
 
 [deps]
 ComoniconBuilder = "0acea522-3a8c-4b93-9211-1fc67cbf95d9"
@@ -23,3 +23,7 @@ ComoniconZSHCompletion = "0.2"
 Configurations = "0.15"
 ExproniconLite = "0.6"
 julia = "1.6"
+
+[extras]
+
+[targets]
