@@ -4,6 +4,7 @@ authors = ["Roger-luo and contributors"]
 version = "0.11.2"
 
 [deps]
+ComoniconBuilder = "0acea522-3a8c-4b93-9211-1fc67cbf95d9"
 ComoniconOptions = "a25bc8ac-9d24-42b2-8edd-3d267ec19fc5"
 ComoniconTargetExpr = "d6dfd36b-42f3-4a9f-a1cb-6f1a052fed42"
 ComoniconTypes = "d0eb39ce-029e-40d1-add6-e32b3165f6a3"
@@ -14,6 +15,7 @@ Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [compat]
+ComoniconBuilder = "0.1"
 ComoniconOptions = "0.1"
 ComoniconTargetExpr = "0.2"
 ComoniconTypes = "0.2"
