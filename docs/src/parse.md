@@ -12,5 +12,5 @@ The `@main` command will use generate a few functions in the module:
 ## References
 
 ```@autodocs
-Modules = [Comonicon.Parse]
+Modules = [Comonicon]
 ```

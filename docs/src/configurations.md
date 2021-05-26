@@ -6,5 +6,5 @@ under a Julia project project root directory.
 ## References
 
 ```@autodocs
-Modules = [Comonicon.Configurations]
+Modules = [ComoniconOptions]
 ```

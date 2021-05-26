@@ -6,6 +6,7 @@
 page/__site
 Manifest.toml
 /docs/build/
+/docs/src/assets/indigo.css
 *.jl.*.cov
 *.jl.cov
 *.jl.mem
@@ -17,7 +18,3 @@ package-lock.json
 /bin/
 /test/bin/
 /test/completions/
-/test/Foo/deps/
-/test/Foo/Manifest.toml
-/test/Foo/build
-!/test/Foo/deps/precompile.jl

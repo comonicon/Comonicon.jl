@@ -10,5 +10,5 @@ You can use various way to build and install your CLI, this includes:
 ## Reference
 
 ```@autodocs
-Modules = [Comonicon.PATH, Comonicon.BuildTools, Comonicon.Tools]
+Modules = [ComoniconBuilder]
 ```

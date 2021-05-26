@@ -1,8 +1,22 @@
-using Documenter, Comonicon
+using Documenter
+using Comonicon
+using ComoniconBuilder
+using ComoniconOptions
+using ComoniconTargetExpr
+using ComoniconTypes
+using ComoniconZSHCompletion
+using DocThemeIndigo
+
+indigo = DocThemeIndigo.install(Comonicon)
 
 makedocs(;
-    modules = [Comonicon],
-    format = Documenter.HTML(prettyurls = !("local" in ARGS)),
+    modules = [Comonicon, ComoniconBuilder, ComoniconOptions,
+        ComoniconTargetExpr, ComoniconTypes, ComoniconZSHCompletion],
+    format = Documenter.HTML(
+        prettyurls = !("local" in ARGS),
+        # canonical="https://comonicon.github.io/Configurations.jl",
+        assets=String[indigo],
+    ),
     pages = [
         "Home" => "index.md",
         "Conventions" => "conventions.md",

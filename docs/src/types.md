@@ -7,5 +7,5 @@ which are all in `Comonicon.Types`.
 ## References
 
 ```@autodocs
-Modules = [Comonicon.Types]
+Modules = [ComoniconTypes]
 ```
