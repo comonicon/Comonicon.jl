@@ -21,9 +21,9 @@ flags = [
 
 options = [
     # name, type, hint
-    JLOption(:option1, Any, "::Nothing"),
-    JLOption(:option2, Int, "::Int64"),
-    JLOption(:option3, String, "::String"),
+    JLOption(:option1, Any, "nothing"),
+    JLOption(:option2, Int, "1::Int"),
+    JLOption(:option3, String, "abc::String"),
 ]
 
 """

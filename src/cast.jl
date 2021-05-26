@@ -46,8 +46,6 @@ end
 
 function split_leaf_command(fn::JLFunction)
     # use ::<type> as hint if there is no docstring
-    hint(value) = :("::" * $(xcall(Base, :repr, xcall(Base, :typeof, value))))
-
     args = map(fn.args) do each
         if each isa Symbol
             xcall(Comonicon, :JLArgument; name=QuoteNode(each))
@@ -99,7 +97,7 @@ function split_leaf_command(fn::JLFunction)
             expr = each.args[1]
             value = each.args[2]
             if expr isa Symbol # Expr(:kw, name::Symbol, value)
-                push!(options, xcall(Comonicon, :JLOption, QuoteNode(expr), Any, hint(value)))
+                push!(options, xcall(Comonicon, :JLOption, QuoteNode(expr), Any, string(value)))
             elseif Meta.isexpr(expr, :(::))
                 name = expr.args[1]
                 type = expr.args[2]
@@ -109,7 +107,7 @@ function split_leaf_command(fn::JLFunction)
                         "default value, and will be parsed as flags. got $name")
                     push!(flags, xcall(Comonicon, :JLFlag, QuoteNode(name)))
                 else
-                    push!(options, xcall(Comonicon, :JLOption, QuoteNode(name), type, hint(value)))
+                    push!(options, xcall(Comonicon, :JLOption, QuoteNode(name), type, string(value) * "::" * string(type)))
                 end
             end
         end
