@@ -10,12 +10,18 @@ using DocThemeIndigo
 indigo = DocThemeIndigo.install(Comonicon)
 
 makedocs(;
-    modules = [Comonicon, ComoniconBuilder, ComoniconOptions,
-        ComoniconTargetExpr, ComoniconTypes, ComoniconZSHCompletion],
+    modules = [
+        Comonicon,
+        ComoniconBuilder,
+        ComoniconOptions,
+        ComoniconTargetExpr,
+        ComoniconTypes,
+        ComoniconZSHCompletion,
+    ],
     format = Documenter.HTML(
         prettyurls = !("local" in ARGS),
         # canonical="https://comonicon.github.io/Configurations.jl",
-        assets=String[indigo],
+        assets = String[indigo],
     ),
     pages = [
         "Home" => "index.md",

@@ -1,1 +1,2 @@
-using Foo; Foo.command_main()
+using Foo;
+Foo.command_main();

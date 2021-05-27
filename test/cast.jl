@@ -2,22 +2,36 @@ using Test
 using ExproniconLite
 using ComoniconTypes
 using Comonicon
-using Comonicon: JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
-    cast, cast_args, cast_flags, cast_options, default_name,
-    get_version, split_leaf_command, split_docstring, read_arguments, read_description,
-    read_options, read_flags, split_hint, split_option
+using Comonicon:
+    JLArgument,
+    JLOption,
+    JLFlag,
+    JLMD,
+    JLMDFlag,
+    JLMDOption,
+    cast,
+    cast_args,
+    cast_flags,
+    cast_options,
+    default_name,
+    get_version,
+    split_leaf_command,
+    split_docstring,
+    read_arguments,
+    read_description,
+    read_options,
+    read_flags,
+    split_hint,
+    split_option
 
 args = [
     # name, type, require, vararg, default
-    JLArgument(:arg1, Any,     true, false, nothing),
-    JLArgument(:arg2, Int,     false, false, "1"),
-    JLArgument(:arg3, String,  false, false, "abc"),
+    JLArgument(:arg1, Any, true, false, nothing),
+    JLArgument(:arg2, Int, false, false, "1"),
+    JLArgument(:arg3, String, false, false, "abc"),
 ]
 
-flags = [
-    JLFlag(:flag1),
-    JLFlag(:flag2),
-]
+flags = [JLFlag(:flag1), JLFlag(:flag2)]
 
 options = [
     # name, type, hint
@@ -47,10 +61,16 @@ a test function.
 - `--flag1, -f`: test flag.
 - `--flag2`: test flag.
 """
-function foo(arg1, arg2::Int, arg3::String;
-        option1=nothing, option2::Int=1, option3::String="abc",
-        flag1::Bool=false, flag2::Bool=false)
-end
+function foo(
+    arg1,
+    arg2::Int,
+    arg3::String;
+    option1 = nothing,
+    option2::Int = 1,
+    option3::String = "abc",
+    flag1::Bool = false,
+    flag2::Bool = false,
+) end
 
 @testset "cast(::Function, ...)" begin
     cmd = cast(foo, "foo", args, options, flags)
@@ -79,10 +99,16 @@ end
 end
 
 @testset "split_leaf_command" begin
-    def = @expr JLFunction function foo(arg1, arg2::Int=1, arg3::String="abc";
-        option1=nothing, option2::Int=1, option3::String="abc",
-        flag1::Bool=false, flag2::Bool=false)
-    end
+    def = @expr JLFunction function foo(
+        arg1,
+        arg2::Int = 1,
+        arg3::String = "abc";
+        option1 = nothing,
+        option2::Int = 1,
+        option3::String = "abc",
+        flag1::Bool = false,
+        flag2::Bool = false,
+    ) end
 
     args′, options′, flags′ = split_leaf_command(def)
     args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
@@ -91,32 +117,27 @@ end
     @test options == options′
     @test flags == flags′
 
-    def = @expr JLFunction function foo(;option1::Bool=true)
-    end
-    @test_throws ErrorException split_leaf_command(def)
-    
-    def = @expr JLFunction function foo(;option1::Bool)
-    end
+    def = @expr JLFunction function foo(; option1::Bool = true) end
     @test_throws ErrorException split_leaf_command(def)
 
-    def = @expr JLFunction function foo(;option1)
-    end
+    def = @expr JLFunction function foo(; option1::Bool) end
+    @test_throws ErrorException split_leaf_command(def)
+
+    def = @expr JLFunction function foo(; option1) end
     @test_throws ErrorException split_leaf_command(def)
 end
 
-@test_throws ErrorException eval(:(
-    module TestA
-    using Comonicon
-    @cast module Foo end
-    end
-))
+@test_throws ErrorException eval(:(module TestA
+using Comonicon
+@cast module Foo end
+end))
 
 module TestB
 using Comonicon
 
 @cast module Foo
-    using Comonicon
-    @cast foo(x) = 1
+using Comonicon
+@cast foo(x) = 1
 end
 end
 
@@ -128,9 +149,8 @@ end
 end
 
 module TestC
-    using Comonicon
-    @cast function command_a(a, b::String, c::Int; option_a="abc")
-    end
+using Comonicon
+@cast function command_a(a, b::String, c::Int; option_a = "abc") end
 end
 
 @testset "replace _ => -" begin
@@ -143,10 +163,10 @@ end
 end
 
 module TestD
-    using Test
-    using Comonicon
-    @cast foo(a) = nothing
-    @test_logs (:warn, "replacing command foo in the registry") @cast foo(a) = nothing
+using Test
+using Comonicon
+@cast foo(a) = nothing
+@test_logs (:warn, "replacing command foo in the registry") @cast foo(a) = nothing
 end
 
 module TestE
@@ -181,8 +201,8 @@ end
 
 module TestOptionalArg
 using Comonicon
-@cast test_optional(x, y=1) = nothing
-@cast test_optional_typed(x, y::Int=2) = nothing
+@cast test_optional(x, y = 1) = nothing
+@cast test_optional_typed(x, y::Int = 2) = nothing
 end
 
 @testset "test optional arg" begin

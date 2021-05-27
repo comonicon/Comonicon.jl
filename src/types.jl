@@ -29,7 +29,7 @@ end
 
 Base.@kwdef struct JLMD
     desc::String = ""
-    arguments::Dict{String, String} = Dict{String, String}()
-    options::Dict{String, JLMDOption} = Dict{String, JLMDOption}()
-    flags::Dict{String, JLMDFlag} = Dict{String, JLMDFlag}()
+    arguments::Dict{String,String} = Dict{String,String}()
+    options::Dict{String,JLMDOption} = Dict{String,JLMDOption}()
+    flags::Dict{String,JLMDFlag} = Dict{String,JLMDFlag}()
 end
