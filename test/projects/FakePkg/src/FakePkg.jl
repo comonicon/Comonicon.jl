@@ -32,7 +32,7 @@ fake activate
 
 - `-s, --shared`: fake flag share.
 """
-@cast function activate(env; shared::Bool=false)
+@cast function activate(env; shared::Bool = false)
     @test env == "fake"
     @test shared == true
 end

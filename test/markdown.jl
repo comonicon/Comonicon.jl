@@ -2,10 +2,27 @@ using Test
 using Markdown
 using ComoniconTypes
 using Comonicon
-using Comonicon: JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
-    cast, cast_args, cast_flags, cast_options, default_name,
-    get_version, split_leaf_command, split_docstring, read_arguments, read_description,
-    read_options, read_flags, split_hint, split_option
+using Comonicon:
+    JLArgument,
+    JLOption,
+    JLFlag,
+    JLMD,
+    JLMDFlag,
+    JLMDOption,
+    cast,
+    cast_args,
+    cast_flags,
+    cast_options,
+    default_name,
+    get_version,
+    split_leaf_command,
+    split_docstring,
+    read_arguments,
+    read_description,
+    read_options,
+    read_flags,
+    split_hint,
+    split_option
 
 @testset "read_arguments" begin
     doc = Markdown.parse("""
@@ -31,17 +48,17 @@ using Comonicon: JLArgument, JLOption, JLFlag, JLMD, JLMDFlag, JLMDOption,
 
     doc = Markdown.parse("""
     description of the command.
-    
+
     # Arguments
-    
+
     - `arg1`: argument 1.
     - `arg2`: argument 2.
     - `arg3`: argument 3.
     - `arg4`: argument 4.
     """)
-    
+
     @test read_description(doc) == "description of the command."
-    
+
     args = read_arguments(doc)
     @test args["arg1"] == "argument 1."
     @test args["arg2"] == "argument 2."
