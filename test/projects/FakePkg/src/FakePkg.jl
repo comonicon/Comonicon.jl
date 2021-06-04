@@ -4,6 +4,12 @@ using Test
 using Comonicon
 
 """
+fake noarguments
+
+"""
+@cast noarguments() = @test true
+
+"""
 fake add
 
 # Args

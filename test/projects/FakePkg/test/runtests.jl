@@ -11,6 +11,7 @@ using FakePkg
 
     @test FakePkg.command_main(["add", "-h"]) == 0
     @test FakePkg.command_main(["rm", "-h"]) == 0
+    @test FakePkg.command_main(["noarguments", "-h"]) == 0
 
     @test FakePkg.command_main(["rm", "CCC", "-h"]) == 0
     @test FakePkg.command_main(["add", "CCC", "-h"]) == 0
