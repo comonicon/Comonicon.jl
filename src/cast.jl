@@ -305,7 +305,7 @@ function cast_args(doc::JLMD, args::Vector{JLArgument}, line)
 
     # if no arguments
     if length(args) == 0
-       return Argument[], nothing
+        return Argument[], nothing
     end
 
     args = map(args) do each
