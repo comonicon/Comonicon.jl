@@ -20,10 +20,6 @@ ComoniconOptions = "0.1"
 ComoniconTargetExpr = "0.2"
 ComoniconTypes = "0.2"
 ComoniconZSHCompletion = "0.2"
-Configurations = "0.15"
+Configurations = "0.15, 0.16"
 ExproniconLite = "0.6"
 julia = "1.6"
-
-[extras]
-
-[targets]
