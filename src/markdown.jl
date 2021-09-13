@@ -147,7 +147,7 @@ end
 
 function md_to_string(md::Markdown.MD)
     return sprint(md; context = :color => true) do io, x
-        show(io, MIME("text/plain"), x)
+        show(io, MIME"text/plain"(), x)
     end
 end
 
