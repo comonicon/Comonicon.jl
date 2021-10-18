@@ -169,3 +169,29 @@ end
     @test doc.flags["long"] == JLMDFlag("long flag.", false)
     @test doc.options["long"] == JLMDOption(nothing, "long option using default hint.", false)
 end
+
+@testset "reverse order" begin
+    content = Markdown.parse("""
+    description of the command.
+
+    # Options
+
+    - `-o, --option=<value>`: some random option.
+    - `-o,--option_space=<value>`: some random option.
+    """)
+
+    doc = split_docstring(content)
+
+    @test doc.options["option"] == JLMDOption("value", "some random option.", true)
+    @test doc.options["option-space"] == JLMDOption("value", "some random option.", true)
+
+    content = Markdown.parse("""
+    description of the command.
+
+    # Options
+
+    - `-o, option=<value>`: some random option.
+    """)
+
+    @test_throws ErrorException split_docstring(content)
+end
