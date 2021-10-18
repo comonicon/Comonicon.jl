@@ -183,5 +183,15 @@ end
     doc = split_docstring(content)
     
     @test doc.options["option"] == JLMDOption("value", "some random option.", true)
-    @test doc.options["option-space"] == JLMDOption("value", "some random option.", true)        
+    @test doc.options["option-space"] == JLMDOption("value", "some random option.", true)
+
+    content = Markdown.parse("""
+    description of the command.
+    
+    # Options
+    
+    - `-o, option=<value>`: some random option.
+    """)
+
+    @test_throws ErrorException split_docstring(content)
 end
