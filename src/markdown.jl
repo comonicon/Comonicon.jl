@@ -56,8 +56,8 @@ function read_options(md::Markdown.MD)
     sec === nothing && return options
 
     for each in sec.items
-        name, doc = read_item(each[1])
-        name, short, hint = split_option(name)
+        code, doc = read_item(each[1])
+        name, short, hint = split_option(code)
         options[name] = JLMDOption(hint, doc, !isnothing(short))
     end
     return options
@@ -157,25 +157,26 @@ function split_option(content::String)
     names = map(strip, split(content, ",")) # rm space
 
     if length(names) == 1 # long option
-        name, hint = split_hint(lstrip(names[1], '-'))
+        long, hint = split_hint(lstrip(names[1], '-'))
         short = nothing
     elseif length(names) == 2 # short option
-        idx = findfirst(startswith("--"), names)
-        idx === nothing && error("cannot find long option, got $content")
-        name = lstrip(names[idx], '-')
-        short = idx == 1 ? names[2] : names[1]
-        short = lstrip(short, '-')
+        if startswith(names[1], "--") && !startswith(names[2], "--") && startswith(names[2], '-') # --option, -o
+            long, (short, hint) = lstrip(names[1], '-'), split_hint(lstrip(names[2], '-'))
+        elseif startswith(names[2], "--") && !startswith(names[1], "--") && startswith(names[1], '-') # -o, --option
+            (long, hint), short = split_hint(lstrip(names[2], '-')), lstrip(names[1], '-')
+        else
+            error("expect --option[, -o], got $content")
+        end
 
-        short, hint = split_hint(lstrip(short, '-'))
         length(short) == 1 ||
-            throw(Meta.ParseError("short option can only use one letter, got --$content"))
-        first(short) == first(name) ||
-            throw(Meta.ParseError("short option must use the same first letter, got --$content"))
+            throw(Meta.ParseError("short option can only use one letter, got $content"))
+        first(short) == first(long) ||
+            throw(Meta.ParseError("short option must use the same first letter, got $content"))
     else
-        throw(Meta.ParseError("too much inputs, expect --option[,-o], got --$content"))
+        throw(Meta.ParseError("too much inputs, expect --option[,-o], got $content"))
     end
-    name = replace(name, '_' => '-')
-    return name, short, hint
+    long = replace(long, '_' => '-')
+    return long, short, hint
 end
 
 function split_hint(content::AbstractString)
