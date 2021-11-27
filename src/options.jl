@@ -4,6 +4,8 @@ export read_options, has_comonicon_toml, @asset_str
 
 using TOML
 using Configurations
+using PackageCompiler: DEFAULT_EMBEDDING_WRAPPER
+using Pkg
 
 struct Asset
     package::Union{Nothing,String}
@@ -25,7 +27,7 @@ macro asset_str(s::String)
     return Asset(s)
 end
 
-function Base.show(io::IO, x::Asset)
+function Base.show(io::IO, ::MIME"text/plain", x::Asset)
     print(io, "asset\"")
     if x.package !== nothing
         printstyled(io, x.package, ": "; color=:green)
@@ -35,6 +37,17 @@ end
 
 Base.convert(::Type{Asset}, s::String) = Asset(s)
 
+function get_path(m::Module, x::Asset)
+    isnothing(x.package) && return pkgdir(m, x.path)
+    ctx = Pkg.Types.Context()
+    haskey(ctx.env.project.deps, x.package) ||
+        error("asset $x not in current project dependencies")
+
+    uuid = ctx.env.project.deps[x.package]
+    pkgid = Base.PkgId(uuid, x.package)
+    origin = get(Base.pkgorigins, pkgid, nothing)
+    return joinpath(dirname(dirname(origin.path)), x.path)
+end
 
 """
     Install
@@ -150,9 +163,11 @@ Application build configurations.
     assets::Vector{Asset} = Asset[]
     incremental::Bool = false
     filter_stdlibs::Bool = true
+    include_lazy_artifacts::Bool = true
     cpu_target::String = default_app_cpu_target()
     precompile::Precompile = Precompile()
-    c_driver_program::Union{String,Nothing} = nothing
+    c_driver_program::String = String(DEFAULT_EMBEDDING_WRAPPER)
+    shell_completions::Vector{String} = ["zsh"]
 end
 
 """

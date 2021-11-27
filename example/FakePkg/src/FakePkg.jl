@@ -2,6 +2,7 @@ module FakePkg
 
 using Test
 using Comonicon
+using PkgTemplates
 
 """
 fake noarguments

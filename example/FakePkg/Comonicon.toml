@@ -19,7 +19,7 @@ execution_file = ["deps/precompile.jl"]
 [application]
 incremental=true
 filter_stdlibs=false
-assets = ["PkgTemplate: templates", "assets/images"]
+assets = ["PkgTemplates: templates", "assets/test.txt", "assets/asset_dir"]
 
 [download]
 host="github.com"

@@ -1,6 +1,7 @@
 using Test
 using FakePkg
 using FromFile
+using Comonicon.Builder
 
 @testset "FakePkg" begin
     @test FakePkg.CASTED_COMMANDS["main"].root.name == "pkg"
@@ -26,6 +27,15 @@ using FromFile
     @test FakePkg.command_main(["registry", "rm", "abc"]) == 0
 end
 
+using Comonicon.Options: read_options, get_path, @asset_str
+
+@testset "test assets path" begin
+    options = read_options(FakePkg)
+    for asset in options.application.assets
+        @test ispath(get_path(FakePkg, asset))
+    end
+end
+
 @from "../../../test/utils.jl" import with_args
 
 @testset "build package" begin
@@ -38,5 +48,24 @@ end
     end == 0
     
     @test isfile(joinpath(".julia", "bin", "pkg"))
-    @test isfile(joinpath(".julia", "completions", "_pkg"))        
+    @test isfile(joinpath(".julia", "completions", "_pkg"))
+
+    @test with_args(["sysimg"]) do
+        FakePkg.comonicon_build()
+    end == 0
+
+    @test with_args(["sysimg", "tarball"]) do
+        FakePkg.comonicon_build()
+    end == 0
+
+    @test with_args(["app"]) do
+        FakePkg.comonicon_build()
+    end == 0
+
+    @test with_args(["app", "tarball"]) do
+        FakePkg.comonicon_build()
+    end == 0
+
+    @test isdir("build")
+    @test isfile(Builder.tarball_name(FakePkg, "pkg", "application"))
 end

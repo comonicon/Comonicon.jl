@@ -71,12 +71,11 @@ function install_sysimg(m::Module, options::Options.Comonicon)
     return
 end
 
-function completion_script(m::Module, options::Options.Comonicon)
+function completion_script(m::Module, options::Options.Comonicon, shell::String = detect_shell())
     isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
     main = m.CASTED_COMMANDS["main"]
 
-    shell = detect_shell()
     if shell == "zsh"
         return ZSHCompletions.emit(main)
     else
