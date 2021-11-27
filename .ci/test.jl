@@ -37,6 +37,7 @@ TestEnv.activate() do
     include("mock.jl")
     # start test
     for pkg in pkgs
-        include(joinpath(pkg.path, "test", "runtests.jl"))
+        Pkg.test(basename(pkg.path); coverage=true)
+        # include(joinpath(pkg.path, "test", "runtests.jl"))
     end
 end
