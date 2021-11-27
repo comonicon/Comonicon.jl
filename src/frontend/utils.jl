@@ -56,5 +56,5 @@ end
 default_name(x::Symbol) = default_name(string(x))
 
 function write_cmd(filename, cmd::Entry)
-    write(filename, string(emit_expr(cmd)))
+    write(filename, string(JuliaExpr.emit(cmd)))
 end

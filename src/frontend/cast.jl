@@ -169,9 +169,9 @@ function codegen_create_entry(m::Module, line, @nospecialize(ex))
     @gensym cmd entry
     quote
         $(codegen_entry_cmd(m::Module, line, cmd, ex))
-        $entry = $ComoniconTypes.Entry($cmd, $(get_version(m)), $line)
+        $entry = $Comonicon.AST.Entry($cmd, $(get_version(m)), $line)
         $Comonicon.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
-        $m.eval($ComoniconTargetExpr.emit_expr($entry))
+        $m.eval($JuliaExpr.emit($entry))
     end
 end
 
@@ -206,11 +206,14 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
 
         """
             comonicon_install(;kwargs...)
+
         Install the CLI manually. This will use the default configuration in `Comonicon.toml`,
         if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
         refer to [Comonicon documentation](https://docs.comonicon.org).
         """
-        comonicon_install(; kwargs...) = $ComoniconBuilder.install($m; kwargs...)
+        comonicon_install(; kwargs...) = $Comonicon.Builder.install($m; kwargs...)
+
+        comonicon_build(; kw...) = $Comonicon.Builder.command_main($m; kw...)
 
         """
             comonicon_install_path([quiet=false])
@@ -218,7 +221,7 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
         to skip interactive prompt.
         For more detailed reference, please refer to [Comonicon documentation](https://docs.comonicon.org).
         """
-        comonicon_install_path() = $ComoniconBuilder.install_env_path()
+        comonicon_install_path() = $Comonicon.Builder.install_env_path()
 
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
     end
@@ -250,7 +253,7 @@ function codegen_multiple_main_entry(m::Module, line, cmd)
             $doc = nothing
         end
 
-        $cmd = $ComoniconTypes.NodeCommand($name, copy($m.CASTED_COMMANDS), $doc, $line)
+        $cmd = $Comonicon.AST.NodeCommand($name, copy($m.CASTED_COMMANDS), $doc, $line)
     end
 end
 
