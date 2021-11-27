@@ -33,6 +33,10 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - name: "add TestEnv"
+        shell: julia --color=yes {0}
+        run: |
+          import Pkg; Pkg.add("TestEnv");
       - uses: julia-actions/julia-buildpkg@v1
       - name: "develop lib packages"
         run: julia --project .ci/test.jl
