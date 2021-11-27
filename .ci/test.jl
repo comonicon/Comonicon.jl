@@ -4,7 +4,7 @@ example_dir = joinpath(root, "example")
 
 # activate root
 using Pkg; Pkg.activate(root)
-
+comonicon_jl = PackageSpec(path=root)
 # collect packages
 pkgs = []
 if isempty(ARGS) # test all by default
@@ -15,14 +15,24 @@ if isempty(ARGS) # test all by default
 
     for each_example in readdir(example_dir)
         path = joinpath(example_dir, each_example)
-        isdir(path) && push!(pkgs, PackageSpec(;path))
+        isdir(path) || continue
+        package = PackageSpec(;path)
+        Pkg.activate(path)
+        Pkg.develop(comonicon_jl)
+        push!(pkgs, package)
     end
+    Pkg.activate(root)
 else
     for each in ARGS
         if each == "Comonicon"
-            push!(pkgs, PackageSpec(path=root))
+            push!(pkgs, comonicon_jl)
         else
-            push!(pkgs, PackageSpec(path=joinpath(root, each)))
+            path = joinpath(root, each)
+            isdir(path) || continue
+            package = PackageSpec(;path)
+            Pkg.activate(path)
+            Pkg.develop(comonicon_jl)
+            push!(pkgs, package)
         end
     end
 end
@@ -33,8 +43,6 @@ TestEnv.activate() do
     Pkg.develop(PackageSpec(path=root))
     foreach(Pkg.develop, pkgs)
     Pkg.status()
-    # load mocks
-    include("mock.jl")
     # start test
     for pkg in pkgs
         Pkg.test(basename(pkg.path); coverage=true)

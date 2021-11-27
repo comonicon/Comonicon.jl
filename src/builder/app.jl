@@ -1,6 +1,6 @@
 function build_application(m, options)
     isnothing(options.application) && return
-    build_dir = abspath(options.application.path)
+    build_dir = application_build_dir(m, options)    
     ispath(build_dir) || mkpath(build_dir)
     @info "application options: " options.application build_dir
     
@@ -31,7 +31,8 @@ end
 
 function build_application_completion(m::Module, options::Options.Comonicon)
     isempty(options.application.shell_completions) && return
-    completion_dir = joinpath(options.application.path, options.name, "completions")
+    build_dir = application_build_dir(m, options)
+    completion_dir = joinpath(build_dir, "completions")
     if !ispath(completion_dir)
         @info "creating path: $completion_dir"
         mkpath(completion_dir)
@@ -46,7 +47,7 @@ end
 
 function bundle_assets(m::Module, options::Options.Comonicon)
     isempty(options.application.assets) && return
-    build_dir = abspath(options.application.path)
+    build_dir = application_build_dir(m, options)
     share_dir = joinpath(build_dir, "share")
     ispath(share_dir) || mkpath(share_dir)
     for asset in options.application.assets
@@ -66,4 +67,8 @@ function build_application_tarball(m, options)
     cd(options.application.path) do
         run(`tar -czvf $tarball $(options.name)`)
     end
+end
+
+function application_build_dir(m, options)
+    return abspath(options.application.path, options.name)
 end

@@ -88,8 +88,15 @@ end
 
 function build_sysimg_tarball(m::Module, options::Options.Comonicon)
     dylib = sysimg_dylib(m, options)
-    tarball = joinpath(pwd(), tarball_name(m, options.name, "sysimg"))
-    run(`tar -czvf $tarball $dylib`)
+    tarball = tarball_name(m, options.name, "sysimg")
+
+    tmp_dir = mktempdir()
+    cd(tmp_dir) do
+        mkdir("sysimg")
+        cp(dylib, joinpath("sysimg", basename(dylib)))
+        run(`tar -czvf $tarball sysimg`)
+    end
+    mv(joinpath(tmp_dir, tarball), joinpath(pwd(), tarball))
     return
 end
 

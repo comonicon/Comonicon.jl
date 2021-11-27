@@ -21,3 +21,4 @@ package-lock.json
 
 build
 *.tar.gz
+.julia
