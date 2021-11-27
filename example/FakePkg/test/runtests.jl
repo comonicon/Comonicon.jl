@@ -1,5 +1,6 @@
 using Test
 using FakePkg
+using FromFile
 
 @testset "FakePkg" begin
     @test FakePkg.CASTED_COMMANDS["main"].root.name == "pkg"
@@ -23,4 +24,19 @@ using FakePkg
 
     @test FakePkg.command_main(["registry", "add", "abc"]) == 0
     @test FakePkg.command_main(["registry", "rm", "abc"]) == 0
+end
+
+@from "../../../test/utils.jl" import with_args
+
+@testset "build package" begin
+    @test with_args(["-h"]) do
+        FakePkg.comonicon_build()
+    end == 0
+    
+    @test with_args() do
+        FakePkg.comonicon_build()
+    end == 0
+    
+    @test isfile(joinpath(".julia", "bin", "pkg"))
+    @test isfile(joinpath(".julia", "completions", "_pkg"))        
 end

@@ -1,16 +1,9 @@
 using Test
 using Comonicon.Options
 using Comonicon.Builder: print_builder_help, command_main
+using FromFile
 
-function with_args(f, args::Vector{String})
-    old = copy(ARGS)
-    empty!(ARGS)
-    append!(ARGS, args)
-    ret = f()
-    empty!(ARGS)
-    append!(ARGS, old)
-    return ret
-end
+@from "../utils.jl" import with_args
 
 module TestCLI end
 

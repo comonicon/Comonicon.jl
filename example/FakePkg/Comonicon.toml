@@ -1,6 +1,7 @@
 name = "pkg"
 
 [install]
+path=".julia"
 completion=true
 quiet=false
 compile="min"
@@ -13,7 +14,7 @@ filter_stdlibs=false
 cpu_target="native"
 
 [sysimg.precompile]
-execution_file = ["deps/precopmile.jl"]
+execution_file = ["deps/precompile.jl"]
 
 [application]
 incremental=true

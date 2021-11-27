@@ -1,0 +1,93 @@
+#compdef _pkg pkg 
+function _pkg() {
+ # These are set by _arguments
+ local context state state_descr line
+ typeset -A opt_args
+ 
+ _arguments -C \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+  '(- 1 *)'{-V,--version}'[show version information]' \
+  "1: :((add\:'fake add' rm\:'fake rm' noarguments\:'fake noarguments' registry\:'fake registry' activate\:'fake activate'))" \
+  "*:: :->args" \
+ 
+ case $state in
+  (args)
+   case ${words[1]} in
+    add)
+     _pkg_add
+    ;;
+    rm)
+     _pkg_rm
+    ;;
+    noarguments)
+     _pkg_noarguments
+    ;;
+    registry)
+     _pkg_registry
+    ;;
+    activate)
+     _pkg_activate
+    ;;
+   esac
+ esac
+}
+
+
+function _pkg_add() {
+ _arguments \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+}
+
+
+function _pkg_rm() {
+ _arguments \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+}
+
+
+function _pkg_noarguments() {
+ _arguments \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+}
+
+
+function _pkg_registry() {
+ # These are set by _arguments
+ local context state state_descr line
+ typeset -A opt_args
+ 
+ _arguments -C \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+  "1: :((add\:'' rm\:''))" \
+  "*:: :->args" \
+ 
+ case $state in
+  (args)
+   case ${words[1]} in
+    add)
+     _pkg_registry_add
+    ;;
+    rm)
+     _pkg_registry_rm
+    ;;
+   esac
+ esac
+}
+
+
+function _pkg_registry_add() {
+ _arguments \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+}
+
+
+function _pkg_registry_rm() {
+ _arguments \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+}
+
+
+function _pkg_activate() {
+ _arguments \
+  '(- 1 *)'{-h,--help}'[show help information]' \
+}

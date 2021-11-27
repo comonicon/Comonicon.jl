@@ -26,7 +26,7 @@ function install_project_env(m::Module, options::Options.Comonicon)
 end
 
 function install_completion(m::Module, options::Options.Comonicon)
-    completions_dir = ensure_path(expanduser(joinpath(options.install.path, "completions")))
+    completions_dir = install_path(options, "completions")
     completion_file = joinpath(completions_dir, "_" * options.name)
     open(completion_file, "w+") do io
         print(io, completion_script(m, options))
@@ -35,7 +35,7 @@ function install_completion(m::Module, options::Options.Comonicon)
 end
 
 function install_entryfile(m::Module, options::Options.Comonicon)
-    bin = ensure_path(expanduser(joinpath(options.install.path, "bin")))
+    bin = install_path(options, "bin")
     # generate entry file at .juila/bin
     entryfile = joinpath(bin, options.name)
     open(entryfile, "w+") do io
@@ -43,6 +43,10 @@ function install_entryfile(m::Module, options::Options.Comonicon)
     end
     chmod(entryfile, 0o777)
     return
+end
+
+function install_path(options::Options.Comonicon, paths::String...)
+    ensure_path(expanduser(joinpath(options.install.path, paths...)))
 end
 
 function install_sysimg(m::Module, options::Options.Comonicon)
