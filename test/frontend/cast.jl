@@ -1,6 +1,6 @@
 using Test
 using ExproniconLite
-using ComoniconTypes
+using Comonicon.AST
 using Comonicon
 using Comonicon:
     JLArgument,

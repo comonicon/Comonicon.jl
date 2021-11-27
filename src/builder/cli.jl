@@ -1,7 +1,9 @@
 function print_builder_help(io::IO = stdout)
     println(io, "Comonicon - Builder CLI.")
     println(io)
-    println(io, "Builder CLI for Comonicon Applications")
+    print(io, "Builder CLI for Comonicon Applications. If not sepcified, run the command")
+    printstyled(io, " install "; color = :cyan); print(io, "by default.")
+    println(io)
     println(io)
     printstyled(io, "USAGE\n\n"; bold = true)
     printstyled(io, " "^4, "julia --project deps/build.jl [command]\n\n"; color = :cyan)
@@ -91,6 +93,10 @@ function command_main(m::Module, options::Options.Comonicon)
     end
 
     # otherwise print help
+    printstyled("unknown command: "; bold=true, color=:red)
+    printstyled(join(ARGS, " "); color=:red)
+    println()
+    println()
     print_builder_help()
     return
 end

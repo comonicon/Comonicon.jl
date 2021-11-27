@@ -236,8 +236,8 @@ function codegen_entry_cmd(m::Module, line, cmd, ex)
 end
 
 function codegen_multiple_main_entry(m::Module, line, cmd)
-    if has_comonicon_toml(m)
-        options = ComoniconOptions.read_options(m)
+    if Options.has_comonicon_toml(m)
+        options = Options.read_options(m)
         name = options.name
     else
         name = default_name(nameof(m))

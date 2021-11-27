@@ -1,4 +1,5 @@
 using Test
+using Comonicon
 using Comonicon.Options
 
 @testset "load options" begin

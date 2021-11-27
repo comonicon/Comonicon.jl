@@ -1,5 +1,5 @@
 function tarball_name(m::Module, name::String, postfix = "sysimg")
-    return "$name-$postfix-$(Comonicon.get_version(m))-julia-$VERSION-$(osname())-$(Sys.ARCH).tar.gz"
+    return "$name-$postfix-$(get_version(m))-julia-$VERSION-$(osname())-$(Sys.ARCH).tar.gz"
 end
 
 """

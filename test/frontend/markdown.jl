@@ -1,6 +1,8 @@
+module TestMarkdown
+
 using Test
 using Markdown
-using ComoniconTypes
+using Comonicon.AST
 using Comonicon
 using Comonicon:
     JLArgument,
@@ -195,3 +197,5 @@ end
 
     @test_throws ErrorException split_docstring(content)
 end
+
+end # TestMarkdown
