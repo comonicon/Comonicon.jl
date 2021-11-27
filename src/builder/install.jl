@@ -106,7 +106,7 @@ function entryfile_script(m::Module, options::Options.Comonicon)
     return """
     #!/usr/bin/env sh
     #=
-    JULIA_PROJECT=$(get_scratch!(m, "env")) \
+    JULIA_PROJECT=$(get_scratch!(m, "env")) \\
     exec $(join(cmds, " \\\n    "))
     =#
 
