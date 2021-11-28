@@ -6,7 +6,7 @@ example_dir = joinpath(root, "example")
 using Pkg; Pkg.activate(root)
 comonicon_jl = PackageSpec(path=root)
 # collect packages
-pkgs = PackageSpec[]
+pkgs = []
 names = String[]
 
 if isempty(ARGS) # test all by default
