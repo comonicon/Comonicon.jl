@@ -6,13 +6,16 @@ example_dir = joinpath(root, "example")
 using Pkg; Pkg.activate(root)
 comonicon_jl = PackageSpec(path=root)
 # collect packages
-pkgs = []
-
+pkgs = PackageSpec[]
+names = String[]
 
 if isempty(ARGS) # test all by default
     for each_lib in readdir(lib_dir)
         path = joinpath(lib_dir, each_lib)
-        isdir(path) && push!(pkgs, PackageSpec(;path))
+        if isdir(path)
+            push!(pkgs, PackageSpec(;path))
+            push!(names, each_lib)
+        end
     end
 
     for each_example in readdir(example_dir)
@@ -22,12 +25,15 @@ if isempty(ARGS) # test all by default
         Pkg.activate(path)
         Pkg.develop(comonicon_jl)
         push!(pkgs, package)
+        push!(names, each_example)
     end
     Pkg.activate(root)
+    push!(pkgs, comonicon_jl)
 else
     for each in ARGS
         if each == "Comonicon"
             push!(pkgs, comonicon_jl)
+            push!(names, each)
         else
             path = joinpath(root, each)
             isdir(path) || continue
@@ -35,16 +41,16 @@ else
             Pkg.activate(path)
             Pkg.develop(comonicon_jl)
             push!(pkgs, package)
+            push!(names, each)
         end
     end
 end
 
 using TestEnv
+
 TestEnv.activate() do
-    # always dev root package
-    Pkg.develop(PackageSpec(path=root))
     foreach(Pkg.develop, pkgs)
     Pkg.status()
     # start test
-    Pkg.test(pkgs; coverage=true)
+    Pkg.test(names; coverage=true)
 end
