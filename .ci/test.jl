@@ -7,6 +7,8 @@ using Pkg; Pkg.activate(root)
 comonicon_jl = PackageSpec(path=root)
 # collect packages
 pkgs = []
+
+
 if isempty(ARGS) # test all by default
     for each_lib in readdir(lib_dir)
         path = joinpath(lib_dir, each_lib)
@@ -44,8 +46,5 @@ TestEnv.activate() do
     foreach(Pkg.develop, pkgs)
     Pkg.status()
     # start test
-    for pkg in pkgs
-        Pkg.test(basename(pkg.path); coverage=true)
-        # include(joinpath(pkg.path, "test", "runtests.jl"))
-    end
+    Pkg.test(pkgs; coverage=true)
 end
