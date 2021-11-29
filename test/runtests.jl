@@ -2,10 +2,27 @@ using Comonicon
 using FromFile
 using Test
 
-@from "compat.jl"
-@from "options.jl"
-@from "ast/ast.jl"
-@from "frontend/cast.jl"
-@from "frontend/markdown.jl"
-@from "codegen/codegen.jl"
-@from "scripts.jl"
+@testset "compat" begin
+    include("compat.jl")
+end
+
+@testset "options" begin
+    include("options.jl")
+end
+
+@testset "ast" begin
+    include("ast/ast.jl")
+end
+
+@testset "frontend" begin
+    include("frontend/cast.jl")
+    inlcude("frontend/markdown.jl") 
+end
+
+@testset "codegen" begin
+    include("codegen/codegen.jl")
+end
+
+@testset "scripts" begin
+    include("scripts.jl")
+end
