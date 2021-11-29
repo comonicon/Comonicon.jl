@@ -25,5 +25,6 @@ include("codegen/zsh.jl")
 
 include("frontend/frontend.jl")
 include("builder/builder.jl")
+include("tools.jl")
 
 end # module

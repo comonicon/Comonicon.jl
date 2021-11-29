@@ -8,12 +8,15 @@ function install(m::Module, options::Options.Comonicon)
     install_project_env(m, options)
     # prepare .julia/bin/<command>
     install_entryfile(m, options)
-    # generate auto completion script
-    # at .julia/completions
-    install_completion(m, options)
     # download or build sysimg if configured
     # at .julia/scratchspaces/<uuid>/sysimg/lib<name>.dylib
     install_sysimg(m, options)
+
+    haskey(ENV, "SHELL") || return
+    shell = basename(ENV["SHELL"])
+    # generate auto completion script
+    # at .julia/completions
+    install_completion(m, options, shell)
     return
 end
 
@@ -22,18 +25,6 @@ function install_project_env(m::Module, options::Options.Comonicon)
      # rm old environment
     ispath(scratch_env_dir) && rm(scratch_env_dir; force=true, recursive=true)
     create_command_env(m, get_scratch!(m, "env"); test_deps=false)
-    return
-end
-
-function install_completion(m::Module, options::Options.Comonicon)
-    haskey(ENV, "SHELL") || return
-    shell = basename(ENV["SHELL"])
-    completions_dir = install_path(options, "completions")
-    completion_file = joinpath(completions_dir, "_" * options.name)
-    shell in ["zsh"] || return # only emit supported shell
-    open(completion_file, "w+") do io
-        print(io, completion_script(m, options, shell))
-    end
     return
 end
 
@@ -71,6 +62,16 @@ function install_sysimg(m::Module, options::Options.Comonicon)
         filter_stdlibs = false,
         cpu_target = "native"
     )
+    return
+end
+
+function install_completion(m::Module, options::Options.Comonicon, shell::String)
+    completions_dir = install_path(options, "completions")
+    completion_file = joinpath(completions_dir, "_" * options.name)
+    shell in ["zsh"] || return # only emit supported shell
+    open(completion_file, "w+") do io
+        print(io, completion_script(m, options, shell))
+    end
     return
 end
 
