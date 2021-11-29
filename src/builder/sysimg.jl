@@ -58,7 +58,11 @@ function create_command_env(m::Module, envpath::String=mktempdir(); test_deps::B
     Pkg.Types.write_project(cmd_project, cmd_project_path)
 
     # update Manifest from project
-    pkg_manifest = Pkg.Operations.abspath!(ctx.env, ctx.env.manifest)
+    if v"1.6" ≤ VERSION < v"1.7"
+        pkg_manifest = Pkg.Operations.abspath!(ctx, ctx.env.manifest)
+    elseif VERSION ≤ v"1.7"
+        pkg_manifest = Pkg.Operations.abspath!(ctx.env, ctx.env.manifest)
+    end
     # TODO: merge test into the package manifest
     # how does TestENV do it? it's a bit unclear
     # cmd_env = Pkg.Types.EnvCache(cmd_project_path)
