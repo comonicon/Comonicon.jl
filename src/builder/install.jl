@@ -30,6 +30,7 @@ function install_completion(m::Module, options::Options.Comonicon)
     shell = basename(ENV["SHELL"])
     completions_dir = install_path(options, "completions")
     completion_file = joinpath(completions_dir, "_" * options.name)
+    shell in ["zsh"] || return # only emit supported shell
     open(completion_file, "w+") do io
         print(io, completion_script(m, options, shell))
     end
