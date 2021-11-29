@@ -1,0 +1,10 @@
+name = "FakePkg"
+uuid = "67988841-259b-4ecf-8960-64f0a83d6ebd"
+authors = ["Roger-luo <rogerluo.rl18@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Comonicon = "863f3e99-da2a-4334-8734-de3dacbe5542"
+PkgTemplates = "14b8a8f1-9102-5b29-a752-f990bacb7fe1"
+FromFile = "ff7dd447-1dcb-4ce3-b8ac-22a812192de7"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

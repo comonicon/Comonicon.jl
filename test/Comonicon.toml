@@ -1,0 +1,26 @@
+name = "foo"
+
+[install]
+completion=true
+quiet=false
+compile="min"
+optimize=2
+
+[sysimg]
+path="deps"
+incremental=true
+filter_stdlibs=false
+cpu_target="native"
+
+[sysimg.precompile]
+execution_file = ["deps/precopmile.jl"]
+
+[application]
+incremental=true
+filter_stdlibs=false
+assets = ["PkgTemplate: templates", "assets/images"]
+
+[download]
+host="github.com"
+user="Roger-luo"
+repo="Foo.jl"

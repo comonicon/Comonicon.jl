@@ -1,0 +1,27 @@
+name = "pkg"
+
+[install]
+path=".julia"
+completion=true
+quiet=false
+compile="min"
+optimize=2
+
+[sysimg]
+path="deps"
+incremental=true
+filter_stdlibs=false
+cpu_target="native"
+
+[sysimg.precompile]
+execution_file = ["deps/precompile.jl"]
+
+[application]
+incremental=true
+filter_stdlibs=false
+assets = ["PkgTemplates: templates", "assets/test.txt", "assets/asset_dir"]
+
+[download]
+host="github.com"
+user="Roger-luo"
+repo="Foo.jl"

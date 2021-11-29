@@ -1,31 +1,28 @@
 using Comonicon
+using FromFile
 using Test
-using Pkg
 
-@testset "cast" begin
-    include("cast.jl")
+@testset "compat" begin
+    include("compat.jl")
 end
 
-@testset "markdown" begin
-    include("markdown.jl")
+@testset "options" begin
+    include("options.jl")
 end
 
-@testset "projects" begin
-    include("projects.jl")
+@testset "ast" begin
+    include("ast/ast.jl")
 end
 
-empty!(ARGS)
-push!(ARGS, "arg", "--opt1=2", "--opt2", "3", "-f")
-@test Base.include(Main, "scripts/hello.jl") == 0
+@testset "frontend" begin
+    include("frontend/cast.jl")
+    include("frontend/markdown.jl") 
+end
 
-empty!(ARGS)
-push!(ARGS, "activate", "-h")
-@test Base.include(Main, "scripts/pkg.jl") == 0
+@testset "codegen" begin
+    include("codegen/codegen.jl")
+end
 
-empty!(ARGS)
-push!(ARGS, "activate", "path", "--shared")
-@test Base.include(Main, "scripts/pkg.jl") == 0
-
-empty!(ARGS)
-push!(ARGS, "Author - Year.pdf")
-@test Base.include(Main, "scripts/searchpdf.jl") == 0
+@testset "scripts" begin
+    include("scripts.jl")
+end

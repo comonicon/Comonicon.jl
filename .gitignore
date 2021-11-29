@@ -18,3 +18,7 @@ package-lock.json
 /bin/
 /test/bin/
 /test/completions/
+
+build
+*.tar.gz
+.julia

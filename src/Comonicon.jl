@@ -9,17 +9,21 @@ module Comonicon
 using Pkg
 using Markdown
 using ExproniconLite
-using ComoniconTypes
-using ComoniconOptions
-using ComoniconBuilder
-using ComoniconTargetExpr
-using ComoniconZSHCompletion
+# using ComoniconTypes
+# using ComoniconOptions
+# using ComoniconBuilder
+# using ComoniconTargetExpr
+# using ComoniconZSHCompletion
 
-export @cast, @main, write_cmd
+export @cast, @main
 
-include("types.jl")
-include("cast.jl")
-include("markdown.jl")
-include("utils.jl")
+include("compat.jl")
+include("options.jl")
+include("ast/ast.jl")
+include("codegen/julia.jl")
+include("codegen/zsh.jl")
+
+include("frontend/frontend.jl")
+include("builder/builder.jl")
 
 end # module
