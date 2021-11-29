@@ -16,7 +16,7 @@ end
 
 @testset "frontend" begin
     include("frontend/cast.jl")
-    inlcude("frontend/markdown.jl") 
+    include("frontend/markdown.jl") 
 end
 
 @testset "codegen" begin
