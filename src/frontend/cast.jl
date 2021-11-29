@@ -213,15 +213,23 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
         """
         comonicon_install(; kwargs...) = $Comonicon.Builder.install($m; kwargs...)
 
+        """
+            comonicon_build(; kw...)
+
+        Launch the Comonicon build CLI. This is usually used in the `deps/build.jl`
+        to install the CLI while installing the package.
+        """
         comonicon_build(; kw...) = $Comonicon.Builder.command_main($m; kw...)
 
         """
-            comonicon_install_path([quiet=false])
-        Install the `PATH` and `FPATH` to your shell configuration file. You can use `comonicon_install_path(true)`,
-        to skip interactive prompt.
-        For more detailed reference, please refer to [Comonicon documentation](https://docs.comonicon.org).
+            comonicon_install_path(;[yes=false])
+
+        Install the `PATH` and `FPATH` to your shell configuration file.
+        You can use `comonicon_install_path(;yes=true)` to skip interactive prompt.
+        For more detailed reference, please refer to
+        [Comonicon documentation](https://docs.comonicon.org).
         """
-        comonicon_install_path() = $Comonicon.Builder.install_env_path()
+        comonicon_install_path(;yes=false) = $Comonicon.Builder.install_env_path($m;yes)
 
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
     end

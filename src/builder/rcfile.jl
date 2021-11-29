@@ -1,13 +1,15 @@
-function install_env_variables(m::Module, options::Options.Comonicon, shell::String)
-    rcfile = detect_rcfile(shell)
+function install_env_path(m::Module, options::Options.Comonicon = Options.read_options(m);
+        shell::String = basename(ENV["SHELL"]), home_dir=homedir(), env=ENV, yes::Bool = false)
 
-    msg = "cannot detect $install_path/bin in PATH, do you want to add it in PATH?"
-    if !contains_path(rcfile, install_path, env) && prompt(msg, yes)
+    rcfile = detect_rcfile(shell, home_dir)
+    install_path = expanduser(options.install.path)
+    msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
+    if !contains_path(rcfile, install_path, env) && Tools.prompt(msg, yes)
         write_path(rcfile, install_path)
     end
 
-    msg = "cannot detect $install_path/completions in FPATH, do you want to add it in FPATH?"
-    if !contains_fpath(rcfile, install_path, env) && prompt(msg, yes)
+    msg = "cannot detect $(options.install.path)/completions in FPATH, do you want to add it in FPATH?"
+    if !contains_fpath(rcfile, install_path, env) && Tools.prompt(msg, yes)
         write_fpath(rcfile, install_path)
     end
 
@@ -65,9 +67,7 @@ end
 
 relhome(path) = joinpath("\$HOME", relpath(path, homedir()))
 
-function detect_rcfile(shell::String)
-    home = homedir()
-
+function detect_rcfile(shell::String=basename(ENV["SHELL"]), home = homedir())
     if shell == "zsh"
         rcfile = joinpath((haskey(ENV, "ZDOTDIR") ? ENV["ZDOTDIR"] : home), ".zshrc")
     elseif shell == "bash"
