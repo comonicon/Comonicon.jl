@@ -18,4 +18,5 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 [compat]
 Configurations = "0.17"
 ExproniconLite = "0.6"
+Scratch = "1.1"
 julia = "1.6"
