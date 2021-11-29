@@ -26,10 +26,12 @@ function install_project_env(m::Module, options::Options.Comonicon)
 end
 
 function install_completion(m::Module, options::Options.Comonicon)
+    haskey(ENV, "SHELL") || return
+    shell = basename(ENV["SHELL"])
     completions_dir = install_path(options, "completions")
     completion_file = joinpath(completions_dir, "_" * options.name)
     open(completion_file, "w+") do io
-        print(io, completion_script(m, options))
+        print(io, completion_script(m, options, shell))
     end
     return
 end
@@ -71,7 +73,7 @@ function install_sysimg(m::Module, options::Options.Comonicon)
     return
 end
 
-function completion_script(m::Module, options::Options.Comonicon, shell::String = detect_shell())
+function completion_script(m::Module, options::Options.Comonicon, shell::String)
     isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
     main = m.CASTED_COMMANDS["main"]
@@ -125,14 +127,4 @@ function ensure_path(path::String)
         mkpath(path)
     end
     return path
-end
-
-"""
-    detect_shell()
-
-Detect shell type via `SHELL` environment variable.
-"""
-function detect_shell()
-    haskey(ENV, "SHELL") || error("cannot find available shell command")
-    return basename(ENV["SHELL"])
 end
