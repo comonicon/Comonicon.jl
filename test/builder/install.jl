@@ -1,3 +1,5 @@
+module TestBuilderInstall
+
 using Test
 using Scratch
 using Comonicon.Options
@@ -35,7 +37,7 @@ end
     @test occursin("--compile=yes \\\n", script)
     @test occursin("--optimize=2 \\\n", script)
     @test occursin("-- \"\${BASH_SOURCE[0]}\"", script)
-    @test occursin("using Main.TestInstall\nexit(Main.TestInstall.command_main())", script)        
+    @test occursin("using Main.TestBuilderInstall.TestInstall\nexit(Main.TestBuilderInstall.TestInstall.command_main())", script)        
 end
 
 @testset "test completion script" begin
@@ -59,3 +61,5 @@ end
         @test detect_rcfile("zsh") == joinpath("zsh_dir", ".zshrc")
     end
 end
+
+end # TestBuilderInstall

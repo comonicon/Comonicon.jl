@@ -1,3 +1,5 @@
+module TestBuilderRCFile
+
 using Test
 using Comonicon
 using Comonicon.Builder: contains_path, contains_fpath,
@@ -57,3 +59,6 @@ end
         @test contains_fpath(joinpath(home_dir, ".zshrc"), usr_dir)
     end
 end
+
+
+end # TestBuilderRCFile
