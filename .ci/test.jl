@@ -10,6 +10,7 @@ pkgs = []
 names = String[]
 
 if isempty(ARGS) # test all by default
+    push!(names, "Comonicon")
     for each_lib in readdir(lib_dir)
         path = joinpath(lib_dir, each_lib)
         if isdir(path)
