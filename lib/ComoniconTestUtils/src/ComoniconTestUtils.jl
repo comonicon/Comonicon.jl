@@ -1,7 +1,14 @@
 module ComoniconTestUtils
 
-export @test_args, @test_kwargs, rand_argument, rand_option, rand_flag,
-    rand_node_command, rand_leaf_command, rand_command, rand_input
+export @test_args,
+    @test_kwargs,
+    rand_argument,
+    rand_option,
+    rand_flag,
+    rand_node_command,
+    rand_leaf_command,
+    rand_command,
+    rand_input
 
 using Faker
 using Random
@@ -30,28 +37,28 @@ macro test_kwargs(ex)
     end |> esc
 end
 
-function rand_name(len=6)
+function rand_name(len = 6)
     a = rand('a':'z') # make sure first 1 are not -
-    b = randstring(['a':'z'..., '-'], len-2)
+    b = randstring(['a':'z'..., '-'], len - 2)
     c = rand('a':'z') # make sure last 3 are not -
     return a * b * c
 end
 
 function rand_description()
-    Faker.paragraph(number=4)
+    Faker.paragraph(number = 4)
 end
 
 @option struct OptionParams
     name::Maybe{String} = nothing
-    type=nothing
-    short::Maybe{Bool}=nothing
-    hint::Maybe{String}=nothing # if the value of hint is nothing, use Some(nothing)
-    description::Maybe{String}=nothing
+    type = nothing
+    short::Maybe{Bool} = nothing
+    hint::Maybe{String} = nothing # if the value of hint is nothing, use Some(nothing)
+    description::Maybe{String} = nothing
 end
 
 maybe(x, or) = isnothing(x) ? or : x
 
-rand_option(;kw...) = rand_option(from_kwargs(OptionParams; kw...))
+rand_option(; kw...) = rand_option(from_kwargs(OptionParams; kw...))
 
 function rand_option(params::OptionParams)
     name = maybe(params.name, rand_name())
@@ -62,46 +69,45 @@ function rand_option(params::OptionParams)
 
     # unpack Some(nothing)
     hint = hint isa Some ? hint.value : hint
-    Option(;sym=Symbol(name), type, short, hint, description)
+    Option(; sym = Symbol(name), type, short, hint, description)
 end
 
 @option struct FlagParams
     name::Maybe{String} = nothing
-    short::Maybe{Bool}=nothing
-    description::Maybe{String}=nothing
+    short::Maybe{Bool} = nothing
+    description::Maybe{String} = nothing
 end
 
-rand_flag(;kw...) = rand_option(from_kwargs(FlagParams; kw...))
+rand_flag(; kw...) = rand_option(from_kwargs(FlagParams; kw...))
 
 function rand_flag(params::FlagParams)
     name = maybe(params.name, rand_name())
     short = maybe(params.short, rand(Bool))
     description = maybe(params.description, rand_description())
 
-    Flag(;sym=Symbol(name), short, description)
+    Flag(; sym = Symbol(name), short, description)
 end
 
 @option struct ArgParams
     name::Maybe{String} = nothing
-    type=nothing
-    require::Maybe{Bool}=nothing
-    vararg::Maybe{Bool}=nothing
+    type = nothing
+    require::Maybe{Bool} = nothing
+    vararg::Maybe{Bool} = nothing
     default::Maybe{String} = nothing
-    description::Maybe{String}=nothing
+    description::Maybe{String} = nothing
 end
 
-rand_argument(;kw...) = rand_argument(from_kwargs(ArgParams;kw...))
+rand_argument(; kw...) = rand_argument(from_kwargs(ArgParams; kw...))
 
 function rand_argument(params::ArgParams)
     name = maybe(params.name, rand_name())
     type = maybe(params.type, rand([Int, Float32, Float64, String]))
     require = maybe(params.require, rand(Bool))
     vararg = maybe(params.vararg, rand(Bool))
-    default = params.require ? nothing :
-            isnothing(params.default) ? Faker.word() : params.default
+    default = params.require ? nothing : isnothing(params.default) ? Faker.word() : params.default
     description = maybe(params.description, rand_description())
 
-    Argument(;name, type, vararg, require, default, description)
+    Argument(; name, type, vararg, require, default, description)
 end
 
 @option struct LeafParams
@@ -114,16 +120,16 @@ end
     args::ArgParams = ArgParams() # don't generate vararg by default
     options::OptionParams = OptionParams()
     flags::FlagParams = FlagParams()
-    description::Maybe{String}=nothing
+    description::Maybe{String} = nothing
 end
 
-rand_leaf_command(;kw...) = rand_leaf_command(from_kwargs(LeafParams; kw...))
+rand_leaf_command(; kw...) = rand_leaf_command(from_kwargs(LeafParams; kw...))
 
 function rand_leaf_command(params::LeafParams)
     name = maybe(params.name, rand_name())
     description = maybe(params.description, rand_description())
-    options = Dict{String, Option}()
-    flags = Dict{String, Flag}()
+    options = Dict{String,Option}()
+    flags = Dict{String,Flag}()
     for _ in 1:params.noptions
         opt = rand_option(params.options)
         options[opt.name] = opt
@@ -136,43 +142,49 @@ function rand_leaf_command(params::LeafParams)
 
     args = Argument[]
     for _ in 1:params.nrequire
-        push!(args, rand_argument(;
-            name=params.args.name,
-            type=params.args.type,
-            vararg=false,
-            require=true,
-            default=params.args.default,
-            description=params.args.description,
-        ))
+        push!(
+            args,
+            rand_argument(;
+                name = params.args.name,
+                type = params.args.type,
+                vararg = false,
+                require = true,
+                default = params.args.default,
+                description = params.args.description,
+            ),
+        )
     end
 
     for _ in 1:params.noptional
-        push!(args, rand_argument(;
-            name=params.args.name,
-            type=params.args.type,
-            vararg=false,
-            require=false,
-            default=nothing,
-            description=params.args.description,
-        ))
+        push!(
+            args,
+            rand_argument(;
+                name = params.args.name,
+                type = params.args.type,
+                vararg = false,
+                require = false,
+                default = nothing,
+                description = params.args.description,
+            ),
+        )
     end
 
     has_vararg = maybe(params.vararg, rand(Bool))
 
     if has_vararg
         vararg = rand_argument(;
-            name=params.args.name,
-            type=params.args.type,
-            vararg=true,
-            require=false,
-            default=nothing,
-            description=params.args.description,
+            name = params.args.name,
+            type = params.args.type,
+            vararg = true,
+            require = false,
+            default = nothing,
+            description = params.args.description,
         )
     else
         vararg = nothing
     end
 
-    LeafCommand(;fn=test_function, name, args, vararg, options, flags, description)
+    LeafCommand(; fn = test_function, name, args, vararg, options, flags, description)
 end
 
 @option struct NodeParams
@@ -180,20 +192,20 @@ end
     nsubcmd::Int = 3
     max_depth::Int = 4 # maximum hierachy of node commands
     subcmd_contains_node::Bool = rand(Bool)
-    description::Maybe{String}=nothing
+    description::Maybe{String} = nothing
     leaf::LeafParams = LeafParams()
 end
 
-rand_node_command(;kw...) = rand_node_command(from_kwargs(NodeParams; kw...))
+rand_node_command(; kw...) = rand_node_command(from_kwargs(NodeParams; kw...))
 
-function rand_node_command(params::NodeParams, depth::Int=0)
+function rand_node_command(params::NodeParams, depth::Int = 0)
     name = maybe(params.name, rand_name())
     description = maybe(params.description, rand_description())
-    subcmds = Dict{String, Any}()
+    subcmds = Dict{String,Any}()
     for _ in 1:params.nsubcmd
         # limit max depth
         if params.subcmd_contains_node && rand() < 0.5 && depth < params.max_depth
-            cmd = rand_node_command(params, depth+1)
+            cmd = rand_node_command(params, depth + 1)
             subcmds[cmd.name] = cmd
         else
             cmd = rand_leaf_command(params.leaf)
@@ -201,7 +213,7 @@ function rand_node_command(params::NodeParams, depth::Int=0)
         end
     end
 
-    NodeCommand(;name, subcmds, description)
+    NodeCommand(; name, subcmds, description)
 end
 
 @option struct CommandParams
@@ -211,17 +223,17 @@ end
     node::NodeParams = NodeParams()
 end
 
-rand_command(;kw...) = rand_command(from_kwargs(CommandParams;kw...))
+rand_command(; kw...) = rand_command(from_kwargs(CommandParams; kw...))
 
 function rand_command(params::CommandParams)
     has_node_command = maybe(params.has_node_command, rand(Bool))
     if has_node_command
-        root = rand_node_command(params.node)    
+        root = rand_node_command(params.node)
     else
         root = rand_leaf_command(params.leaf)
     end
 
-    return Entry(;root, version=params.version)
+    return Entry(; root, version = params.version)
 end
 
 @option struct InputParams
@@ -232,12 +244,12 @@ end
     variable_noptions::Bool = true
 end
 
-rand_input(x;kw...) = rand_input(x, from_kwargs(InputParams; kw...))
+rand_input(x; kw...) = rand_input(x, from_kwargs(InputParams; kw...))
 
 rand_input(::Type{Any}, ::InputParams) = Faker.word()
 rand_input(::Type{String}, ::InputParams) = randstring('a':'z', 5)
 rand_input(::Type{Int}, ::InputParams) = Faker.random_int()
-rand_input(::Type{T}, ::InputParams) where T = string(rand(T))
+rand_input(::Type{T}, ::InputParams) where {T} = string(rand(T))
 rand_input(entry::Entry, params::InputParams) = rand_input(entry.root, params)
 
 function rand_input(entry::LeafCommand, params::InputParams)
@@ -249,7 +261,7 @@ function rand_input(entry::LeafCommand, params::InputParams)
             push!(args, rand_input(each.type, params))
         end
     end
-    
+
     if !isnothing(entry.vararg)
         for _ in 1:rand(1:params.max_nvararg)
             push!(args, rand_input(entry.vararg.type, params))
@@ -275,9 +287,9 @@ function rand_input(entry::LeafCommand, params::InputParams)
         value = rand_input(option.type, params)
 
         if rand(Bool) # use_assign
-            push!(options, (name * "=" * value, ))
+            push!(options, (name * "=" * value,))
         elseif short && rand(Bool) # use -o<value>
-            push!(options, (name * value, ))
+            push!(options, (name * value,))
         else # use arg
             push!(options, (name, value))
         end
@@ -291,7 +303,7 @@ function rand_input(entry::LeafCommand, params::InputParams)
         elseif rand(Bool) && !isempty(flags)
             push!(inputs, pop!(flags))
 
-        # at least push one of them
+            # at least push one of them
         elseif !isempty(options)
             push!(inputs, pop!(options)...)
         elseif !isempty(args)

@@ -8,7 +8,7 @@ end
 section(io) = print(io, "\n\n")
 function section(io::IO, title)
     section(io)
-    printstyled(io, title; bold=true)
+    printstyled(io, title; bold = true)
     section(io)
 end
 
@@ -37,9 +37,9 @@ end
 Base.show(io::IO, ::MIME"text/plain", cmd::ComoniconExpr) = print_cmd(io, cmd)
 
 function Base.show(io::IO, ::MIME"text/plain", cmd::Description)
-    printstyled(io, "brief:\n"; color=:light_black)
+    printstyled(io, "brief:\n"; color = :light_black)
     println(io, cmd.brief)
-    printstyled(io, "content:\n"; color=:light_black)
+    printstyled(io, "content:\n"; color = :light_black)
     print(io, cmd.content)
 end
 
@@ -65,12 +65,11 @@ print_cmd(io::IO, cmd::Flag, t::Terminal) = _print_dash(io, cmd, t)
 
 function print_cmd(io::IO, cmd::Option, t::Terminal)
     _print_dash(io, cmd, t)
-    isnothing(cmd.hint) ||
-        printstyled(io, tab(1), "<", cmd.hint, ">"; color=t.color.args)
+    isnothing(cmd.hint) || printstyled(io, tab(1), "<", cmd.hint, ">"; color = t.color.args)
     return
 end
 
-function _print_dash(io::IO, cmd::Union{Option, Flag}, t::Terminal)
+function _print_dash(io::IO, cmd::Union{Option,Flag}, t::Terminal)
     color = t.color.dash
     if cmd.short
         printstyled(io, "-", first(cmd.name), ", "; color)
@@ -85,7 +84,7 @@ end
 
 function print_cmd(io::IO, cmd::Entry, t::Terminal)
     section(io)
-    printstyled(io, tab(2), cmd.root.name; color=t.color.name, bold=true)
+    printstyled(io, tab(2), cmd.root.name; color = t.color.name, bold = true)
     isnothing(cmd.version) || print(io, " v", cmd.version)
     section(io)
     t.brief = false
@@ -123,7 +122,7 @@ function print_head(io::IO, cmd::LeafCommand, t::Terminal)
     print(io, tab(2))
     print_name(io, cmd, t)
     if has_args(cmd)
-        printstyled(io, tab(1), "<args>"; color=t.color.args)
+        printstyled(io, tab(1), "<args>"; color = t.color.args)
     end
 
     isempty(cmd.args) || printstyled(io, tab(1), "[options]"; color = t.color.dash)
@@ -132,7 +131,7 @@ function print_head(io::IO, cmd::LeafCommand, t::Terminal)
 end
 
 function print_name(io::IO, cmd, t::Terminal)
-    printstyled(io, cmd.name; color=t.color.name, bold=true)
+    printstyled(io, cmd.name; color = t.color.name, bold = true)
 end
 
 function print_signature(io::IO, cmd, t::Terminal)
@@ -141,7 +140,7 @@ end
 
 function print_signature(io::IO, cmd::NodeCommand, t::Terminal)
     print_name(io, cmd, t)
-    printstyled(io, tab(1), "<command>"; color=t.color.name)
+    printstyled(io, tab(1), "<command>"; color = t.color.name)
 end
 
 function print_signature(io::IO, cmd::LeafCommand, t::Terminal)
@@ -160,8 +159,8 @@ end
 function print_body(io::IO, cmd::Entry, t::Terminal)
     print_body(io, cmd.root, t)
     version_flag = "-V, --version"
-    printstyled(io, tab(2), version_flag; color=t.color.dash)
-    print_indent_content(io, "print version information", t, length(version_flag)+2)
+    printstyled(io, tab(2), version_flag; color = t.color.dash)
+    print_indent_content(io, "print version information", t, length(version_flag) + 2)
     println(io)
 end
 
@@ -210,8 +209,8 @@ end
 
 function print_help(io::IO, t::Terminal)
     help_flag = "-h, --help"
-    printstyled(io, tab(2), help_flag; color=t.color.dash)
-    print_indent_content(io, "print this help message", t, length(help_flag)+2)
+    printstyled(io, tab(2), help_flag; color = t.color.dash)
+    print_indent_content(io, "print this help message", t, length(help_flag) + 2)
     println(io)
 end
 
@@ -224,7 +223,7 @@ function print_sig_brief(io::IO, cmd, t::Terminal)
     print_signature(io, cmd, t)
     isnothing(cmd.description.brief) && return
 
-    print_indent_content(io, cmd.description.brief, t, length(s)+2)
+    print_indent_content(io, cmd.description.brief, t, length(s) + 2)
     return
 end
 

@@ -19,9 +19,9 @@ end
 
 function install_project_env(m::Module, options::Options.Comonicon)
     scratch_env_dir = get_scratch!(m, "env")
-     # rm old environment
-    ispath(scratch_env_dir) && rm(scratch_env_dir; force=true, recursive=true)
-    create_command_env(m, get_scratch!(m, "env"); test_deps=false)
+    # rm old environment
+    ispath(scratch_env_dir) && rm(scratch_env_dir; force = true, recursive = true)
+    create_command_env(m, get_scratch!(m, "env"); test_deps = false)
     return
 end
 
@@ -66,11 +66,7 @@ function install_sysimg(m::Module, options::Options.Comonicon)
         end
     end
 
-    build_sysimg(m, options;
-        incremental=true,
-        filter_stdlibs = false,
-        cpu_target = "native"
-    )
+    build_sysimg(m, options; incremental = true, filter_stdlibs = false, cpu_target = "native")
     return
 end
 
@@ -84,7 +80,7 @@ function completion_script(m::Module, options::Options.Comonicon, shell::String)
     else
         error(
             "$shell autocompletion is not supported, " *
-            "please open an issue at $COMONICON_URL for feature request."
+            "please open an issue at $COMONICON_URL for feature request.",
         )
     end
 end

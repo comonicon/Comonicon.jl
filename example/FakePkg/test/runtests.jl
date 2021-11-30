@@ -42,11 +42,11 @@ end
     @test with_args(["-h"]) do
         FakePkg.comonicon_build()
     end == 0
-    
+
     @test with_args() do
         FakePkg.comonicon_build()
     end == 0
-    
+
     @test isfile(joinpath(".julia", "bin", "pkg"))
     if haskey(ENV, "SHELL") && basename(ENV["SHELL"]) == "zsh"
         @test isfile(joinpath(".julia", "completions", "_pkg"))

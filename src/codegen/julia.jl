@@ -6,15 +6,15 @@ using ExproniconLite
 
 help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
 # printing in expression
-emit_help(x, ptr::Int=1; color = true) = quote
+emit_help(x, ptr::Int = 1; color = true) = quote
     if !isnothing(findnext(isequal("-h"), ARGS, $ptr)) ||
-        !isnothing(findnext(isequal("--help"), ARGS, $ptr))
+       !isnothing(findnext(isequal("--help"), ARGS, $ptr))
         print($(help_str(x; color = color)))
         return 0
     end
 end
 
-function emit_error(cmd, msg::String; color::Bool=true)
+function emit_error(cmd, msg::String; color::Bool = true)
     msg = "Error: $msg, use -h or --help to check more detailed help info"
     return quote
         printstyled($msg; color = :red, bold = true)
@@ -25,7 +25,7 @@ function emit_error(cmd, msg::String; color::Bool=true)
     end
 end
 
-function emit_error(cmd, msg::Expr; color::Bool=true)
+function emit_error(cmd, msg::Expr; color::Bool = true)
     msg.head === :string || throw(Meta.ParseError("expect string expression, got $msg"))
 
     ex = Expr(:string, "Error: ")
@@ -51,14 +51,14 @@ end
 
 Emit `Expr` from a `Entry`.
 """
-function emit(cmd::Entry, ptr::Int=1)
+function emit(cmd::Entry, ptr::Int = 1)
     jlfn = JLFunction(;
-        name=:command_main,
-        args=[Expr(:kw, :(ARGS::Vector{String}), :ARGS)],
-        body=quote
+        name = :command_main,
+        args = [Expr(:kw, :(ARGS::Vector{String}), :ARGS)],
+        body = quote
             $(emit_scan_version(cmd))
             $(emit_body(cmd.root, ptr))
-        end
+        end,
     )
     return codegen_ast(jlfn)
 end
@@ -72,16 +72,19 @@ function emit_scan_version(cmd::Entry)
     end
 end
 
-function emit_body(cmd::NodeCommand, ptr::Int=1)
+function emit_body(cmd::NodeCommand, ptr::Int = 1)
     nargs_assert = quote
         if length(ARGS) < $ptr
-            $(emit_error(cmd, "valid sub-commands for command $(cmd.name) are: $(join(keys(cmd.subcmds), ", "))"))
+            $(emit_error(
+                cmd,
+                "valid sub-commands for command $(cmd.name) are: $(join(keys(cmd.subcmds), ", "))",
+            ))
         end
     end
 
     jl = JLIfElse()
     for (name, subcmd) in cmd.subcmds
-        jl[:(ARGS[$ptr] == $name)] = emit_body(subcmd, ptr+1)
+        jl[:(ARGS[$ptr] == $name)] = emit_body(subcmd, ptr + 1)
     end
     jl.otherwise = emit_error(cmd, :("Error: unknown command $(ARGS[$ptr])"))
     return quote
@@ -95,7 +98,7 @@ function emit_body(cmd::NodeCommand, ptr::Int=1)
     end
 end
 
-function emit_body(cmd::LeafCommand, ptr::Int=1)
+function emit_body(cmd::LeafCommand, ptr::Int = 1)
     @gensym idx
     quote
         $(emit_help(cmd, ptr))
@@ -109,13 +112,13 @@ function emit_body(cmd::LeafCommand, ptr::Int=1)
     end
 end
 
-function emit_dash_body(cmd::LeafCommand, idx::Symbol, ptr::Int=1)
+function emit_dash_body(cmd::LeafCommand, idx::Symbol, ptr::Int = 1)
     @gensym token token_ptr args kwargs
 
     quote # parse option/flag
         $kwargs = []
         $token_ptr = $ptr
-        while $token_ptr ≤ $idx-1
+        while $token_ptr ≤ $idx - 1
             $token = ARGS[$token_ptr]
             if startswith($token, "-")
                 $(emit_kwarg(cmd, token, kwargs, token_ptr))
@@ -130,11 +133,12 @@ function emit_dash_body(cmd::LeafCommand, idx::Symbol, ptr::Int=1)
     end
 end
 
-function emit_norm_body(cmd::LeafCommand, ptr::Int=1)
+function emit_norm_body(cmd::LeafCommand, ptr::Int = 1)
     @gensym token_ptr args kwargs token
 
     quote
-        $args = []; $kwargs = [];
+        $args = []
+        $kwargs = []
         sizehint!($args, $(cmd.nrequire))
         $token_ptr = $ptr
         while $token_ptr ≤ length(ARGS)
@@ -167,11 +171,14 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
 
     # check maximum number of arguments
     if isnothing(cmd.vararg)
-        push!(ret.args, quote
-            if $(length(cmd.args)) < $nargs
-                $(emit_error(cmd, "expect at most $(length(cmd.args)) positional arguments"))
-            end
-        end)
+        push!(
+            ret.args,
+            quote
+                if $(length(cmd.args)) < $nargs
+                    $(emit_error(cmd, "expect at most $(length(cmd.args)) positional arguments"))
+                end
+            end,
+        )
     end
 
     call = Expr(:call, cmd.fn)
@@ -215,7 +222,7 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
             end
         else
             ifelse.otherwise = quote
-                $varargs = map($args[$(length(cmd.args)+1):end]) do value
+                $varargs = map($args[$(length(cmd.args) + 1):end]) do value
                     $(emit_parse_value(cmd, type, :value))
                 end
                 $call
@@ -234,7 +241,7 @@ function emit_kwarg(cmd::LeafCommand, token::Symbol, kwargs::Symbol, token_ptr)
     end
 
     @gensym sym key value
-    
+
     ifelse = JLIfElse()
     # short flag
     ifelse[:(length($token) == 2)] = quote
@@ -256,7 +263,7 @@ function emit_kwarg(cmd::LeafCommand, token::Symbol, kwargs::Symbol, token_ptr)
 
     return quote
         $(codegen_ast(ifelse))
-        push!($kwargs, $sym=>$value)
+        push!($kwargs, $sym => $value)
     end
 end
 
@@ -275,7 +282,14 @@ function emit_short_flag(cmd::LeafCommand, token::Symbol, sym::Symbol, key::Symb
     return codegen_ast(ifelse)
 end
 
-function emit_short_option(cmd::LeafCommand, token::Symbol, sym::Symbol, key::Symbol, value::Symbol, token_ptr)
+function emit_short_option(
+    cmd::LeafCommand,
+    token::Symbol,
+    sym::Symbol,
+    key::Symbol,
+    value::Symbol,
+    token_ptr,
+)
     ifelse = JLIfElse()
     for (_, option) in cmd.options
         if option.short
@@ -301,7 +315,14 @@ function emit_short_option(cmd::LeafCommand, token::Symbol, sym::Symbol, key::Sy
     return codegen_ast(ifelse)
 end
 
-function emit_long_option_or_flag(cmd::LeafCommand, token::Symbol, sym::Symbol, key::Symbol, value::Symbol, token_ptr)
+function emit_long_option_or_flag(
+    cmd::LeafCommand,
+    token::Symbol,
+    sym::Symbol,
+    key::Symbol,
+    value::Symbol,
+    token_ptr,
+)
     ifelse = JLIfElse()
     for (name, flag) in cmd.flags
         ifelse[:($key == $name)] = quote
@@ -348,7 +369,7 @@ function emit_option(option::Option, token::Symbol, value::Symbol, token_ptr::Sy
             $value = ARGS[$token_ptr]
         end
         $value = $(emit_parse_value(option, option.type, value))
-    end    
+    end
 end
 
 end

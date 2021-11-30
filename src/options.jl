@@ -30,9 +30,9 @@ end
 function Base.show(io::IO, ::MIME"text/plain", x::Asset)
     print(io, "asset\"")
     if x.package !== nothing
-        printstyled(io, x.package, ": "; color=:green)
+        printstyled(io, x.package, ": "; color = :green)
     end
-    printstyled(io, x.path, "\""; color=:cyan)
+    printstyled(io, x.path, "\""; color = :cyan)
 end
 
 Base.convert(::Type{Asset}, s::String) = Asset(s)
@@ -40,8 +40,7 @@ Base.convert(::Type{Asset}, s::String) = Asset(s)
 function get_path(m::Module, x::Asset)
     isnothing(x.package) && return pkgdir(m, x.path)
     ctx = Pkg.Types.Context()
-    haskey(ctx.env.project.deps, x.package) ||
-        error("asset $x not in current project dependencies")
+    haskey(ctx.env.project.deps, x.package) || error("asset $x not in current project dependencies")
 
     uuid = ctx.env.project.deps[x.package]
     pkgid = Base.PkgId(uuid, x.package)
@@ -210,7 +209,7 @@ end
 
 Find `Comonicon.toml` or `JuliaComonicon.toml` in given path.
 """
-function find_comonicon_toml(path::String, files=["Comonicon.toml", "JuliaComonicon.toml"])
+function find_comonicon_toml(path::String, files = ["Comonicon.toml", "JuliaComonicon.toml"])
     # user input file path
     basename(path) in files && return path
 

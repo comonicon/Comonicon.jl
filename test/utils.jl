@@ -1,4 +1,4 @@
-function with_args(f, args::Vector{String}=String[])
+function with_args(f, args::Vector{String} = String[])
     old = copy(ARGS)
     empty!(ARGS)
     append!(ARGS, args)
