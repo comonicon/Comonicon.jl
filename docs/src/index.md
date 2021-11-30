@@ -2,7 +2,8 @@
 
 *gith averminaluk ayh juldas mausan urdan*
 
-[![Build Status](https://travis-ci.com/Roger-luo/Comonicon.jl.svg?branch=master)](https://travis-ci.com/Roger-luo/Comonicon.jl)
+[![Build Status](https://github.com/comonicon/Comonicon.jl/workflows/CI/badge.svg)](https://github.com/comonicon/Comonicon.jl/actions)
+[![codecov](https://codecov.io/gh/comonicon/Comonicon.jl/branch/master/graph/badge.svg?token=zZjCxCiFTY)](https://codecov.io/gh/comonicon/Comonicon.jl)
 
 Roger's magic book for command line interfaces.
 
