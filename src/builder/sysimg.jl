@@ -58,7 +58,7 @@ function create_command_env(m::Module, envpath::String=mktempdir(); test_deps::B
     Pkg.Types.write_project(cmd_project, cmd_project_path)
 
     # update Manifest from project
-    if v"1.6" ≤ VERSION < v"1.7"
+    if v"1.6" ≤ VERSION < v"1.7-"
         pkg_manifest = Pkg.Operations.abspath!(ctx, ctx.env.manifest)
     elseif VERSION ≤ v"1.7"
         pkg_manifest = Pkg.Operations.abspath!(ctx.env, ctx.env.manifest)
