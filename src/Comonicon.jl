@@ -22,6 +22,7 @@ include("options.jl")
 include("ast/ast.jl")
 include("codegen/julia.jl")
 include("codegen/zsh.jl")
+include("tools.jl")
 
 include("frontend/frontend.jl")
 include("builder/builder.jl")

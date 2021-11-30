@@ -23,6 +23,11 @@ end
     include("codegen/codegen.jl")
 end
 
+@testset "builder" begin
+    include("builder/install.jl")
+    include("builder/cli.jl")
+end
+
 @testset "scripts" begin
     include("scripts.jl")
 end

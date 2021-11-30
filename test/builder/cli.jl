@@ -1,3 +1,5 @@
+module TestBuilderCLI
+
 using Test
 using Comonicon.Options
 using Comonicon.Builder: print_builder_help, command_main
@@ -16,4 +18,6 @@ module TestCLI end
     @test with_args(["aaahelp"]) do
         command_main(TestCLI, options)
     end === nothing
+end
+
 end

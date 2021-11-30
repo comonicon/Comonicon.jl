@@ -2,7 +2,7 @@ module Builder
 
 using ..Options: Options
 using ..ZSHCompletions
-using ..Comonicon: get_version
+using ..Comonicon: get_version, Tools
 using PackageCompiler
 using Logging
 using TOML: TOML
@@ -18,5 +18,6 @@ include("install.jl")
 include("sysimg.jl")
 include("app.jl")
 include("tarball.jl")
+include("rcfile.jl")
 
 end
