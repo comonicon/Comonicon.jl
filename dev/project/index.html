@@ -7,7 +7,37 @@
 ├── src
 │   └── Demo.jl
 └── test
-    └── runtests.jl</code></pre><p>usually it&#39;s more convenient to create a Julia project via <a href="https://github.com/Roger-luo/IonCLI.jl">IonCLI</a>, after you install IonCLI, you can type the following command in your terminal</p><pre><code class="language-sh hljs">ion create Demo --template=comonicon</code></pre><h2 id="Use-@cast-to-define-multiple-commands"><a class="docs-heading-anchor" href="#Use-@cast-to-define-multiple-commands">Use <code>@cast</code> to define multiple commands</a><a id="Use-@cast-to-define-multiple-commands-1"></a><a class="docs-heading-anchor-permalink" href="#Use-@cast-to-define-multiple-commands" title="Permalink"></a></h2><p>In a large project, one might need to define multiple commands. This can be done via <code>@cast</code>.</p><div class="admonition is-warning"><header class="admonition-header">Missing docstring.</header><div class="admonition-body"><p>Missing docstring for <code>@cast</code>. Check Documenter&#39;s build log for details.</p></div></div><p><code>@cast</code> is similar to <code>@main</code> before functions, but it won&#39;t execute anything, but only create the command and register the command to a global variable <code>CASTED_COMMANDS</code> in the current module. And it will create <code>NodeCommand</code>s before modules, and the sub-commands of the <code>NodeCommand</code> can be created via <code>@cast</code> inside the module.</p><p>After you create the commands via <code>@cast</code>, you can declare an entry at the bottom of your module via <code>@main</code>. A simple example looks like the following</p><pre><code class="language-julia hljs">module Demo
+    └── runtests.jl</code></pre><p>usually it&#39;s more convenient to create a Julia project via <a href="https://github.com/Roger-luo/IonCLI.jl">IonCLI</a>, after you install IonCLI, you can type the following command in your terminal</p><pre><code class="language-sh hljs">ion create Demo --template=comonicon</code></pre><h2 id="Use-@cast-to-define-multiple-commands"><a class="docs-heading-anchor" href="#Use-@cast-to-define-multiple-commands">Use <code>@cast</code> to define multiple commands</a><a id="Use-@cast-to-define-multiple-commands-1"></a><a class="docs-heading-anchor-permalink" href="#Use-@cast-to-define-multiple-commands" title="Permalink"></a></h2><p>In a large project, one might need to define multiple commands. This can be done via <code>@cast</code>.</p><article class="docstring"><header><a class="docstring-binding" id="Comonicon.@cast" href="#Comonicon.@cast"><code>Comonicon.@cast</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia hljs">@cast &lt;function definition&gt;
+@cast &lt;module definition&gt;</code></pre><p>Denote a Julia expression is a command. If the expression is a function definition, it will be parsed as a leaf command, if the expression is a module definition or module name, it will be parsed as a node command. This macro must be used with <a href="../#Comonicon.@main"><code>@main</code></a> to create a multi-command CLI.</p><p><strong>Quick Example</strong></p><pre><code class="language-julia hljs"># in a script or module
+
+&quot;&quot;&quot;
+sum two numbers.
+
+# Args
+
+- `x`: first number
+- `y`: second number
+
+# Options
+
+- `-p, --precision=&lt;type&gt;`: precision of the calculation.
+
+# Flags
+
+- `-f, --fastmath`: enable fastmath.
+
+&quot;&quot;&quot;
+@cast function sum(x, y; precision::String=&quot;float32&quot;, fastmath::Bool=false)
+    # implementation
+    return
+end
+
+&quot;product two numbers&quot;
+@cast function prod(x, y)
+    return
+end
+
+@main</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/comonicon/Comonicon.jl">source</a></section></article><p><code>@cast</code> is similar to <code>@main</code> before functions, but it won&#39;t execute anything, but only create the command and register the command to a global variable <code>CASTED_COMMANDS</code> in the current module. And it will create <code>NodeCommand</code>s before modules, and the sub-commands of the <code>NodeCommand</code> can be created via <code>@cast</code> inside the module.</p><p>After you create the commands via <code>@cast</code>, you can declare an entry at the bottom of your module via <code>@main</code>. A simple example looks like the following</p><pre><code class="language-julia hljs">module Demo
 
 using Comonicon
 
@@ -54,4 +84,4 @@ incremental=true
 filter_stdlibs=false
 
 [application.precompile]
-statements_file = [&quot;deps/statements.jl&quot;]</code></pre><h2 id="Further-Reference"><a class="docs-heading-anchor" href="#Further-Reference">Further Reference</a><a id="Further-Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Further-Reference" title="Permalink"></a></h2><p>The CLI we just used to create this project serves as the best practice for Comonicon, you can take it as a reference: <a href="https://github.com/Roger-luo/IonCLI.jl">IonCLI.jl</a>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../conventions/">« Conventions</a><a class="docs-footer-nextpage" href="../types/">Command Types »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Tuesday 30 November 2021 16:12">Tuesday 30 November 2021</span>. Using Julia version 1.6.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+statements_file = [&quot;deps/statements.jl&quot;]</code></pre><h2 id="Further-Reference"><a class="docs-heading-anchor" href="#Further-Reference">Further Reference</a><a id="Further-Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Further-Reference" title="Permalink"></a></h2><p>The CLI we just used to create this project serves as the best practice for Comonicon, you can take it as a reference: <a href="https://github.com/Roger-luo/IonCLI.jl">IonCLI.jl</a>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../conventions/">« Conventions</a><a class="docs-footer-nextpage" href="../types/">Command Types »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Tuesday 30 November 2021 22:05">Tuesday 30 November 2021</span>. Using Julia version 1.6.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
