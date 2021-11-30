@@ -69,23 +69,21 @@ function command_main(m::Module, options::Options.Comonicon)
         end
         return
     elseif first(ARGS) == "sysimg" && !isnothing(options.sysimg)
-        if length(ARGS) == 1
-            build_sysimg(m, options)
-            return
-        elseif length(ARGS) == 2 && ARGS[2] == "tarball"
+        build_sysimg(m, options)
+        if length(ARGS) == 2 && ARGS[2] == "tarball"
             build_sysimg_tarball(m, options)
-            return
         end
+        return
     elseif first(ARGS) == "app" && !isnothing(options.application)
-        if length(ARGS) == 1
-            build_application(m, options)
-            return
-        elseif length(ARGS) == 2 && ARGS[2] == "tarball"
-            build_application_tarball(m, options)
+        build_application(m, options)
+        if length(ARGS) == 2 && ARGS[2] == "tarball"
+            build_application_tarball(m, options)    
             return
         end
     elseif first(ARGS) == "tarball" && (!isnothing(options.sysimg) || !isnothing(options.application))
         if length(ARGS) == 1
+            build_sysimg(m, options)
+            build_application(m, options)
             build_sysimg_tarball(m, options) == 0 || return
             build_application_tarball(m, options) == 0 || return
             return
