@@ -9,11 +9,6 @@ module Comonicon
 using Pkg
 using Markdown
 using ExproniconLite
-# using ComoniconTypes
-# using ComoniconOptions
-# using ComoniconBuilder
-# using ComoniconTargetExpr
-# using ComoniconZSHCompletion
 
 export @cast, @main
 
