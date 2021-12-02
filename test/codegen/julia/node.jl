@@ -10,20 +10,14 @@ function called()
 end
 
 cmd = Entry(;
-    version=v"1.2.0",
-    root=NodeCommand(;
-        name="node",
-        subcmds=Dict(
-            "cmd1" => LeafCommand(;
-                fn=called,
-                name="cmd1",
-            ),
-            "cmd2" => LeafCommand(;
-                fn=called,
-                name="cmd2",
-            )
-        )
-    )
+    version = v"1.2.0",
+    root = NodeCommand(;
+        name = "node",
+        subcmds = Dict(
+            "cmd1" => LeafCommand(; fn = called, name = "cmd1"),
+            "cmd2" => LeafCommand(; fn = called, name = "cmd2"),
+        ),
+    ),
 )
 
 eval(emit(cmd))

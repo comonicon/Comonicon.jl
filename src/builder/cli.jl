@@ -2,7 +2,8 @@ function print_builder_help(io::IO = stdout)
     println(io, "Comonicon - Builder CLI.")
     println(io)
     print(io, "Builder CLI for Comonicon Applications. If not sepcified, run the command")
-    printstyled(io, " install "; color = :cyan); print(io, "by default.")
+    printstyled(io, " install "; color = :cyan)
+    print(io, "by default.")
     println(io)
     println(io)
     printstyled(io, "USAGE\n\n"; bold = true)
@@ -26,11 +27,7 @@ function print_builder_help(io::IO = stdout)
 
     printstyled(io, "EXAMPLE\n\n"; bold = true)
     printstyled(io, " "^4, "julia --project deps/build.jl install\n\n"; color = :cyan)
-    println(
-        io,
-        " "^4,
-        "install the CLI to ~/.julia/bin.\n\n",
-    )
+    println(io, " "^4, "install the CLI to ~/.julia/bin.\n\n")
     printstyled(io, " "^4, "julia --project deps/build.jl sysimg\n\n"; color = :cyan)
     println(
         io,
@@ -77,7 +74,7 @@ function command_main(m::Module, options::Options.Comonicon)
     elseif first(ARGS) == "app" && !isnothing(options.application)
         build_application(m, options)
         if length(ARGS) == 2 && ARGS[2] == "tarball"
-            build_application_tarball(m, options)    
+            build_application_tarball(m, options)
             return
         end
     elseif first(ARGS) == "tarball" && (!isnothing(options.sysimg) || !isnothing(options.application))
@@ -91,8 +88,8 @@ function command_main(m::Module, options::Options.Comonicon)
     end
 
     # otherwise print help
-    printstyled("unknown command: "; bold=true, color=:red)
-    printstyled(join(ARGS, " "); color=:red)
+    printstyled("unknown command: "; bold = true, color = :red)
+    printstyled(join(ARGS, " "); color = :red)
     println()
     println()
     print_builder_help()

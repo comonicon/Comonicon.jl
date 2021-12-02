@@ -10,11 +10,11 @@ using FromFile
 module TestCLI end
 
 @testset "CLI help info" begin
-    options = Options.Comonicon(name="test")
+    options = Options.Comonicon(name = "test")
     @test with_args(["-h"]) do
         command_main(TestCLI, options)
     end === nothing
-    
+
     @test with_args(["aaahelp"]) do
         command_main(TestCLI, options)
     end === nothing
