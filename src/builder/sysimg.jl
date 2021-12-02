@@ -1,11 +1,12 @@
-function build_sysimg(m::Module, options::Options.Comonicon;
-        incremental = options.sysimg.incremental,
-        cpu_target = options.sysimg.cpu_target,
-        filter_stdlibs = options.sysimg.filter_stdlibs,
-    )
+function build_sysimg(
+    m::Module,
+    options::Options.Comonicon;
+    incremental = options.sysimg.incremental,
+    cpu_target = options.sysimg.cpu_target,
+    filter_stdlibs = options.sysimg.filter_stdlibs,
+)
 
-    precompile_execution_file =
-        String[pkgdir(m, x) for x in options.sysimg.precompile.execution_file]
+    precompile_execution_file = String[pkgdir(m, x) for x in options.sysimg.precompile.execution_file]
     precompile_statements_file =
         String[pkgdir(m, x) for x in options.sysimg.precompile.statements_file]
 
@@ -13,7 +14,9 @@ function build_sysimg(m::Module, options::Options.Comonicon;
         [nameof(m)];
         sysimage_path = sysimg_dylib(m, options),
         project = create_command_env(m),
-        incremental, cpu_target, filter_stdlibs,
+        incremental,
+        cpu_target,
+        filter_stdlibs,
         precompile_execution_file,
         precompile_statements_file,
     )
@@ -34,9 +37,9 @@ Create an environment to execute the CLI command.
 
 - `test_deps`: include test deps or not.
 """
-function create_command_env(m::Module, envpath::String=mktempdir(); test_deps::Bool=true)
+function create_command_env(m::Module, envpath::String = mktempdir(); test_deps::Bool = true)
     project = Pkg.Types.projectfile_path(pkgdir(m))
-    ctx = Pkg.Types.Context(env=Pkg.Types.EnvCache(project))
+    ctx = Pkg.Types.Context(env = Pkg.Types.EnvCache(project))
     cmd_project = Pkg.Types.Project()
     merge!(cmd_project.deps, ctx.env.project.deps)
     merge!(cmd_project.compat, ctx.env.project.compat)
@@ -84,7 +87,7 @@ function create_command_env(m::Module, envpath::String=mktempdir(); test_deps::B
     Pkg.Types.write_manifest(pkg_manifest, cmd_manifest_path)
     current_project = Base.current_project()
     Pkg.activate(envpath)
-    Pkg.develop(Pkg.PackageSpec(path=pkgdir(m)))
+    Pkg.develop(Pkg.PackageSpec(path = pkgdir(m)))
     Pkg.update()
     Pkg.activate(current_project)
     return envpath

@@ -430,7 +430,7 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
         For more detailed reference, please refer to
         [Comonicon documentation](https://docs.comonicon.org).
         """
-        comonicon_install_path(;yes=false) = $Comonicon.Builder.install_env_path($m;yes)
+        comonicon_install_path(; yes = false) = $Comonicon.Builder.install_env_path($m; yes)
 
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
     end

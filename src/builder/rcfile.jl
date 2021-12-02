@@ -1,5 +1,11 @@
-function install_env_path(m::Module, options::Options.Comonicon = Options.read_options(m);
-        shell::String = basename(ENV["SHELL"]), home_dir=homedir(), env=ENV, yes::Bool = false)
+function install_env_path(
+    m::Module,
+    options::Options.Comonicon = Options.read_options(m);
+    shell::String = basename(ENV["SHELL"]),
+    home_dir = homedir(),
+    env = ENV,
+    yes::Bool = false,
+)
 
     rcfile = detect_rcfile(shell, home_dir)
     install_path = expanduser(options.install.path)
@@ -51,7 +57,7 @@ function contains_shell_var(rcfile, var, value, env)
     for each in split(env[var], ":")
         (each == relhome(value) || each == value) && return true
     end
-    return false    
+    return false
 end
 
 function export_shell_var(rcfile, var, path)
@@ -67,7 +73,7 @@ end
 
 relhome(path) = joinpath("\$HOME", relpath(path, homedir()))
 
-function detect_rcfile(shell::String=basename(ENV["SHELL"]), home = homedir())
+function detect_rcfile(shell::String = basename(ENV["SHELL"]), home = homedir())
     if shell == "zsh"
         rcfile = joinpath((haskey(ENV, "ZDOTDIR") ? ENV["ZDOTDIR"] : home), ".zshrc")
     elseif shell == "bash"
@@ -79,7 +85,7 @@ function detect_rcfile(shell::String=basename(ENV["SHELL"]), home = homedir())
     else
         error(
             "auto installation for $shell is not supported, " *
-            "please open an issue under $COMONICON_URL"
+            "please open an issue under $COMONICON_URL",
         )
     end
 end

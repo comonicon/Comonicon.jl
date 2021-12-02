@@ -10,14 +10,8 @@ function foo(a::Int)
 end
 
 cmd = Entry(;
-    version=v"1.1.0",
-    root=LeafCommand(;
-        fn=:foo,
-        name="leaf",
-        args=[
-            Argument(;name="a", type=Int),
-        ]
-    )
+    version = v"1.1.0",
+    root = LeafCommand(; fn = :foo, name = "leaf", args = [Argument(; name = "a", type = Int)]),
 )
 
 eval(emit(cmd))
@@ -46,16 +40,9 @@ cmd = Entry(
         "main",
         Argument[],
         0,
-        Argument("xs",
-            Any,
-            true,
-            false,
-            nothing,
-            Description(nothing, nothing),
-            LineNumberNode(0),
-        ),
-        Dict{String, Flag}(),
-        Dict{String, Option}(),
+        Argument("xs", Any, true, false, nothing, Description(nothing, nothing), LineNumberNode(0)),
+        Dict{String,Flag}(),
+        Dict{String,Option}(),
         Description("", ""),
         LineNumberNode(0),
     ),

@@ -11,7 +11,7 @@ function collect_lib()
     for each_lib in readdir(lib_dir)
         path = joinpath(lib_dir, each_lib)
         isdir(path) || continue
-        push!(lib_pkgs, PackageSpec(;path))
+        push!(lib_pkgs, PackageSpec(; path))
         push!(lib_names, each_lib)
     end
     return lib_pkgs, lib_names
@@ -26,7 +26,7 @@ function collect_example()
     for each_example in readdir(example_dir)
         path = joinpath(example_dir, each_example)
         isdir(path) || continue
-        push!(example_pkgs, PackageSpec(;path))
+        push!(example_pkgs, PackageSpec(; path))
         push!(example_names, each_example)
     end
     return example_pkgs, example_names
@@ -36,7 +36,7 @@ function generate_example_manifest(pkgs)
     # we need to generate Manifest.toml for examples
     # to build sysimg and app
     root = dirname(@__DIR__)
-    comonicon_jl = PackageSpec(path=root)
+    comonicon_jl = PackageSpec(path = root)
     for pkg in pkgs
         Pkg.activate(pkg.path)
         Pkg.develop(comonicon_jl)
@@ -51,10 +51,10 @@ develop package set at current activate environment.
 
 - `set`: package set name, can be `Comonicon`, `lib`, `example`, `all`.
 """
-@cast function dev(set::String="all")
+@cast function dev(set::String = "all")
     root = dirname(@__DIR__)
     if set == "Comonicon"
-        Pkg.develop(PackageSpec(path=root))
+        Pkg.develop(PackageSpec(path = root))
     elseif set == "lib"
         lib_pkgs, lib_names = collect_lib()
         foreach(Pkg.develop, lib_pkgs)
@@ -75,9 +75,9 @@ run Comonicon tests.
 
 - `--coverage`: enable code coverage tracking.
 """
-@cast function runtest(testset::String="all"; coverage::Bool=false)
+@cast function runtest(testset::String = "all"; coverage::Bool = false)
     root = dirname(@__DIR__)
-    comonicon_jl = PackageSpec(path=root)
+    comonicon_jl = PackageSpec(path = root)
 
     lib_pkgs, lib_names = collect_lib()
     example_pkgs, example_names = collect_example()

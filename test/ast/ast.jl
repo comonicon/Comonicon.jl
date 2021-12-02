@@ -5,7 +5,7 @@ using Faker
 desc = Description(Faker.text())
 @test endswith(desc.brief, ".") # brief should be a sentence
 
-arg = Argument(;name="arg", type=Int)
+arg = Argument(; name = "arg", type = Int)
 
 macro test_show(mime, ex)
     Meta.isexpr(ex, :block) || error("expect begin ... end")
@@ -32,29 +32,23 @@ end
 end
 
 @test_show MIME"text/plain" begin
-    "<arg>" in Argument(;name="arg")
-    "[arg...]" in Argument(;name="arg", vararg=true)
-    "<arg::Int64>" in Argument(;name="arg", type=Int)
-    "--option-a" in Option(;sym=:option_a)
-    "--option-a <hint>" in Option(;sym=:option_a, hint="hint")
-    "--flag-a" in Flag(;sym=:flag_a)
+    "<arg>" in Argument(; name = "arg")
+    "[arg...]" in Argument(; name = "arg", vararg = true)
+    "<arg::Int64>" in Argument(; name = "arg", type = Int)
+    "--option-a" in Option(; sym = :option_a)
+    "--option-a <hint>" in Option(; sym = :option_a, hint = "hint")
+    "--flag-a" in Flag(; sym = :flag_a)
 end
 
 leaf = LeafCommand(;
-    fn=identity,
-    name="leaf",
-    args=[Argument(;name="arg", description=Faker.text())],
-    flags=Dict(
-        "flag-a" => Flag(;
-            sym=:flag_a,
-            description="flag a."
-        ),
-        "flag-b" => Flag(;
-            sym=:flag_b,
-            description="flag b."
-        )
+    fn = identity,
+    name = "leaf",
+    args = [Argument(; name = "arg", description = Faker.text())],
+    flags = Dict(
+        "flag-a" => Flag(; sym = :flag_a, description = "flag a."),
+        "flag-b" => Flag(; sym = :flag_b, description = "flag b."),
     ),
-    description=Faker.text(),
+    description = Faker.text(),
 )
 
 @test_show MIME"text/plain" begin
@@ -64,10 +58,10 @@ leaf = LeafCommand(;
     "Flags\n\n" in leaf
 end
 
-@test_throws ErrorException NodeCommand(;name="abc", subcmds=Dict{String, Any}())
+@test_throws ErrorException NodeCommand(; name = "abc", subcmds = Dict{String,Any}())
 
 
-node = NodeCommand(;name="foo", subcmds=Dict("leaf"=>leaf))
+node = NodeCommand(; name = "foo", subcmds = Dict("leaf" => leaf))
 
 @test_show MIME"text/plain" begin
     "  foo <command>" in node

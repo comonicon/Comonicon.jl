@@ -5,9 +5,7 @@ using DocThemeIndigo
 indigo = DocThemeIndigo.install(Comonicon)
 
 makedocs(;
-    modules = [
-        Comonicon,
-    ],
+    modules = [Comonicon],
     format = Documenter.HTML(
         prettyurls = !("local" in ARGS),
         # canonical="https://comonicon.github.io/Configurations.jl",

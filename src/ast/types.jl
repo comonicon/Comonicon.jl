@@ -1,10 +1,10 @@
-const Maybe{T} = Union{Nothing, T}
+const Maybe{T} = Union{Nothing,T}
 
 abstract type ComoniconExpr end
 
 Base.@kwdef struct Description <: ComoniconExpr
-    brief::Union{Nothing, String} = nothing
-    content::Union{Nothing, String} = nothing
+    brief::Union{Nothing,String} = nothing
+    content::Union{Nothing,String} = nothing
 end
 
 Base.convert(::Type{Description}, ::Nothing) = Description()
@@ -36,7 +36,7 @@ end
 
 Base.@kwdef struct Option <: ComoniconExpr
     sym::Symbol
-    name::String = replace(string(sym), '_'=>'-')
+    name::String = replace(string(sym), '_' => '-')
     hint::Maybe{String} = nothing
     type = Any
     short::Bool = false
@@ -46,7 +46,7 @@ end
 
 Base.@kwdef struct Flag <: ComoniconExpr
     sym::Symbol
-    name::String = replace(string(sym), '_'=>'-')
+    name::String = replace(string(sym), '_' => '-')
     short::Bool = false
     description::Description = Description()
     line::Maybe{LineNumberNode} = nothing
@@ -54,7 +54,7 @@ end
 
 Base.@kwdef struct NodeCommand <: ComoniconExpr
     name::String
-    subcmds::Dict{String, Any}
+    subcmds::Dict{String,Any}
     description::Description = Description()
     line::Maybe{LineNumberNode} = nothing
 
@@ -68,26 +68,24 @@ Base.@kwdef struct LeafCommand <: ComoniconExpr
     fn::Any
     name::String
     args::Vector{Argument} = Argument[]
-    nrequire::Int = count(x->x.require, args)
+    nrequire::Int = count(x -> x.require, args)
     vararg::Maybe{Argument} = nothing
-    flags::Dict{String, Flag} = Dict{String, Flag}()
-    options::Dict{String, Option} = Dict{String, Option}()
+    flags::Dict{String,Flag} = Dict{String,Flag}()
+    options::Dict{String,Option} = Dict{String,Option}()
     description::Description = Description()
     line::Maybe{LineNumberNode} = nothing
 
-    function LeafCommand(fn, name, arg, nrequire, vararg,
-            flags, options, description, line)
+    function LeafCommand(fn, name, arg, nrequire, vararg, flags, options, description, line)
 
-        isnothing(vararg) || vararg.vararg == true ||
-            error("expect vararg $(vararg.name) " * 
-                "to have property vararg=true")
-        new(fn, name, arg, nrequire, vararg,
-            flags, options, description, line)
+        isnothing(vararg) ||
+            vararg.vararg == true ||
+            error("expect vararg $(vararg.name) " * "to have property vararg=true")
+        new(fn, name, arg, nrequire, vararg, flags, options, description, line)
     end
 end
 
 Base.@kwdef struct Entry <: ComoniconExpr
-    root::Union{NodeCommand, LeafCommand}
+    root::Union{NodeCommand,LeafCommand}
     version::Maybe{VersionNumber} = nothing
     line::Maybe{LineNumberNode} = nothing
 end
