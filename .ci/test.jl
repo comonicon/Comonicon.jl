@@ -81,6 +81,7 @@ run Comonicon tests.
 
     lib_pkgs, lib_names = collect_lib()
     example_pkgs, example_names = collect_example()
+    generate_example_manifest(example_pkgs)
 
     TestEnv.activate() do
         Pkg.develop(comonicon_jl)
