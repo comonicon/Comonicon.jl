@@ -409,18 +409,10 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
             comonicon_install(;kwargs...)
 
         Install the CLI manually. This will use the default configuration in `Comonicon.toml`,
-        if it exists. See also [`comonicon_build`](@ref). For more detailed reference, please
-        refer to [Comonicon documentation](https://docs.comonicon.org).
+        if it exists. For more detailed reference, please refer to
+        [Comonicon documentation](https://docs.comonicon.org).
         """
-        comonicon_install(; kwargs...) = $Comonicon.Builder.install($m; kwargs...)
-
-        """
-            comonicon_build(; kw...)
-
-        Launch the Comonicon build CLI. This is usually used in the `deps/build.jl`
-        to install the CLI while installing the package.
-        """
-        comonicon_build(; kw...) = $Comonicon.Builder.command_main($m; kw...)
+        comonicon_install(; kwargs...) = $Comonicon.Builder.command_main($m; kwargs...)
 
         """
             comonicon_install_path(;[yes=false])

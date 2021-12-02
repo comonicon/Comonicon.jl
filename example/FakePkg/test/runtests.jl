@@ -40,11 +40,11 @@ end
 
 @testset "build package" begin
     @test with_args(["-h"]) do
-        FakePkg.comonicon_build()
+        FakePkg.comonicon_install()
     end == 0
 
     @test with_args() do
-        FakePkg.comonicon_build()
+        FakePkg.comonicon_install()
     end == 0
 
     @test isfile(joinpath(".julia", "bin", "pkg"))
@@ -53,19 +53,19 @@ end
     end
 
     @test with_args(["sysimg"]) do
-        FakePkg.comonicon_build()
+        FakePkg.comonicon_install()
     end == 0
 
     @test with_args(["sysimg", "tarball"]) do
-        FakePkg.comonicon_build()
+        FakePkg.comonicon_install()
     end == 0
 
     @test with_args(["app"]) do
-        FakePkg.comonicon_build()
+        FakePkg.comonicon_install()
     end == 0
 
     @test with_args(["app", "tarball"]) do
-        FakePkg.comonicon_build()
+        FakePkg.comonicon_install()
     end == 0
 
     @test isdir("build")
