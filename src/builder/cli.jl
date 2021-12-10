@@ -75,8 +75,8 @@ function command_main(m::Module, options::Options.Comonicon)
         build_application(m, options)
         if length(ARGS) == 2 && ARGS[2] == "tarball"
             build_application_tarball(m, options)
-            return
         end
+        return
     elseif first(ARGS) == "tarball" && (!isnothing(options.sysimg) || !isnothing(options.application))
         if length(ARGS) == 1
             build_sysimg(m, options)
