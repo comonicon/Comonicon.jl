@@ -46,14 +46,13 @@ end
 
 function command_main(m::Module; kw...)::Cint
     options = Options.read_options(m; kw...)
-    command_main(m, options)
-    return 0
+    return command_main(m, options)
 end
 
 function command_main(m::Module, options::Options.Comonicon)
     if "-h" in ARGS || "--help" in ARGS || "help" in ARGS
         print_builder_help()
-        return
+        return 0
     elseif isempty(ARGS) || (first(ARGS) == "install" && length(ARGS) == 1)
         if options.install.quiet
             logger = NullLogger()
@@ -64,26 +63,26 @@ function command_main(m::Module, options::Options.Comonicon)
         with_logger(logger) do
             install(m, options)
         end
-        return
+        return 0
     elseif first(ARGS) == "sysimg" && !isnothing(options.sysimg)
         build_sysimg(m, options)
         if length(ARGS) == 2 && ARGS[2] == "tarball"
             build_sysimg_tarball(m, options)
         end
-        return
+        return 0
     elseif first(ARGS) == "app" && !isnothing(options.application)
         build_application(m, options)
         if length(ARGS) == 2 && ARGS[2] == "tarball"
             build_application_tarball(m, options)
         end
-        return
+        return 0
     elseif first(ARGS) == "tarball" && (!isnothing(options.sysimg) || !isnothing(options.application))
         if length(ARGS) == 1
             build_sysimg(m, options)
             build_application(m, options)
-            build_sysimg_tarball(m, options) == 0 || return
-            build_application_tarball(m, options) == 0 || return
-            return
+            build_sysimg_tarball(m, options) == 0 || return 0
+            build_application_tarball(m, options) == 0 || return 0
+            return 0
         end
     end
 
@@ -93,5 +92,5 @@ function command_main(m::Module, options::Options.Comonicon)
     println()
     println()
     print_builder_help()
-    return
+    return 1
 end
