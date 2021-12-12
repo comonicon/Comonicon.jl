@@ -13,11 +13,11 @@ module TestCLI end
     options = Options.Comonicon(name = "test")
     @test with_args(["-h"]) do
         command_main(TestCLI, options)
-    end === nothing
+    end === 0
 
     @test with_args(["aaahelp"]) do
         command_main(TestCLI, options)
-    end === nothing
+    end === 1
 end
 
 end
