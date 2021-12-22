@@ -27,7 +27,7 @@ end
     options = Options.Comonicon(name = "test")
     script = entryfile_script(TestInstall, options)
 
-    @test occursin("#!/usr/bin/env sh", script)
+    @test occursin("#!/usr/bin/env bash", script)
     @test occursin("JULIA_PROJECT=$(get_scratch!(TestInstall, "env"))", script)
     julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())
     @test occursin("exec $julia_exe \\\n", script)
