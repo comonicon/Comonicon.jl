@@ -107,7 +107,7 @@ function entryfile_script(m::Module, options::Options.Comonicon)
     push!(cmds, "-- \"\${BASH_SOURCE[0]}\" \"\$@\"")
 
     return """
-    #!/usr/bin/env sh
+    #!/usr/bin/env bash
     #=
     JULIA_PROJECT=$(get_scratch!(m, "env")) \\
     exec $(join(cmds, " \\\n    "))
