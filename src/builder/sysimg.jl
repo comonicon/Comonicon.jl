@@ -63,8 +63,10 @@ function create_command_env(m::Module, envpath::String = mktempdir(); test_deps:
     # update Manifest from project
     if v"1.6" ≤ VERSION < v"1.7-"
         pkg_manifest = Pkg.Operations.abspath!(ctx, ctx.env.manifest)
-    elseif VERSION ≤ v"1.7"
+    elseif v"1.7" ≤ VERSION < v"1.8-"
         pkg_manifest = Pkg.Operations.abspath!(ctx.env, ctx.env.manifest)
+    else
+        error("unsupported Julia version: $VERSION")
     end
     # TODO: merge test into the package manifest
     # how does TestENV do it? it's a bit unclear
