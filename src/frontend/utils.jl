@@ -55,6 +55,11 @@ end
 
 default_name(x::Symbol) = default_name(string(x))
 
+"""
+    write_cmd(filename, cmd::Entry)
+
+Write a command to `filename`.
+"""
 function write_cmd(filename, cmd::Entry)
     write(filename, string(JuliaExpr.emit(cmd)))
 end
