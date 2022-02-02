@@ -2,7 +2,7 @@ module JuliaExpr
 
 using ..AST
 using ..Options
-using ..Comonicon: CommandException, CommandTerminate
+using ..Comonicon: CommandException, CommandExit
 using ExproniconLite
 
 help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
@@ -244,7 +244,7 @@ function emit_exception_handle(cmd::LeafCommand, call, color::Bool = true)
             # NOTE:
             # terminate should return 0
             # other exception will return 1
-            if e isa $CommandTerminate
+            if e isa $CommandExit
                 print("command exit")
                 return 0
             elseif e isa $CommandException

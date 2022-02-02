@@ -31,3 +31,7 @@ end
 @testset "scripts" begin
     include("scripts.jl")
 end
+
+@testset "tools" begin
+    include("tools.jl")
+end

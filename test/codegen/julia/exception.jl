@@ -5,11 +5,11 @@ module TestException
 using Comonicon
 
 @cast function throw_error()
-    throw(CommandError("a command error thrown", 128))
+    cmd_error("a command error thrown", 128)
 end
 
 @cast function throw_terminate()
-    throw(CommandTerminate())
+    cmd_exit()
 end
 
 @cast function unhandled_error()

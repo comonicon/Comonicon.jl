@@ -10,7 +10,7 @@ using Pkg
 using Markdown
 using ExproniconLite
 
-export @cast, @main, CommandError, CommandTerminate
+export @cast, @main, cmd_error, cmd_exit
 
 include("compat.jl")
 include("options.jl")
