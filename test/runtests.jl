@@ -34,8 +34,6 @@ end
 
 # the script workaround doesn't work on MacOS
 # https://github.com/actions/runner/issues/241
-if Sys.islinux()
-    @testset "tools" begin
-        include("tools.jl")
-    end
-end
+# @testset "tools" begin
+#     include("tools.jl")
+# end
