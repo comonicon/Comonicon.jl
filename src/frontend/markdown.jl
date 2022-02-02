@@ -180,15 +180,16 @@ function split_option(content::String)
 end
 
 function split_hint(content::AbstractString)
+    msg = "expect --option[,-o]=<hint> or --option[,-o] <hint>, got $content"
     content = strip(content)
-    if occursin('=', content)
-        splited = split(content, '=')
-    else
-        splited = split(content)
-    end
-    length(splited) == 1 && return splited[1], nothing
+    m = match(r"([^\s]+)(?:\s+|=)(<.+>)", content)
 
-    length(splited) == 2 && startswith(splited[2], '<') && endswith(splited[2], '>') ||
-        throw(Meta.ParseError("expect --option[,-o]=<hint> or --option[,-o] <hint>"))
-    return splited[1], strip(splited[2], ['<', '>'])
+    # no hint, just -o, --option
+    # shouldn't contain inner space
+    if m === nothing
+        any(x->isspace(x) || isequal(x, '='), content) && throw(Meta.ParseError(msg))
+        return content, nothing
+    end
+
+    return m[1], strip(m[2], ['<', '>'])
 end

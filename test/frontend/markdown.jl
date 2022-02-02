@@ -198,4 +198,29 @@ end
     @test_throws ErrorException split_docstring(content)
 end
 
+@testset "hint with space" begin
+    doc = Markdown.parse("""
+    release a package.
+
+    # Arguments
+
+    - `version_spec`: version number you want to release. Can be a specific version, "current"
+        or either of
+    - `path`: path to the project you want to release.
+
+    # Options
+
+    - `-r,--registry <registry name>`: registry you want to register the package.
+        If the package has not been registered, ion will try to register
+        the package in the General registry. Or the user needs to specify
+        the registry to register using this option.
+    - `-b, --branch <branch name>`: branch you want to register.
+    - `--note <release note>`: optional, release note you would like to specify.
+    """)
+
+    options = read_options(doc)
+    @test options["note"].hint == "release note"
+    @test options["registry"].hint == "registry name"
+end
+
 end # TestMarkdown
