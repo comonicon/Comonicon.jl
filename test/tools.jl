@@ -1,6 +1,8 @@
 using Test
 using Comonicon
 using Comonicon.Tools: prompt
+using InteractiveUtils
+@info "interactive" isinteractive()
 
 @testset "prompt(msg) input=$yes" for yes in ['Y', 'y', '\n', '\r']
     print(stdin.buffer, yes)
