@@ -6,11 +6,16 @@ using ..Comonicon: CommandException, CommandExit
 using ExproniconLite
 
 help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
+
+function print_help_str(x)
+    :($print_cmd($x))
+end
 # printing in expression
 emit_help(x, ptr::Int = 1; color = true) = quote
     if !isnothing(findnext(isequal("-h"), ARGS, $ptr)) ||
        !isnothing(findnext(isequal("--help"), ARGS, $ptr))
-        print($(help_str(x; color = color)))
+       $(print_help_str(x))
+        # print($(help_str(x; color = color)))
         return 0
     end
 end
@@ -20,7 +25,8 @@ function emit_error(cmd, msg::String; color::Bool = true)
     return quote
         printstyled($msg; color = :red, bold = true)
         println()
-        print($(help_str(cmd; color = color)))
+        $(print_help_str(cmd))
+        # print($(help_str(cmd; color = color)))
         println()
         return 1
     end
@@ -41,7 +47,8 @@ function emit_error(cmd, msg::Expr; color::Bool = true)
     return quote
         printstyled($msg; color = :red, bold = true)
         println()
-        print($(help_str(cmd; color = color)))
+        $(print_help_str(cmd))
+        # print($(help_str(cmd; color = color)))
         println()
         return 1
     end
@@ -90,7 +97,8 @@ function emit_body(cmd::NodeCommand, ptr::Int = 1)
     jl.otherwise = emit_error(cmd, :("Error: unknown command $(ARGS[$ptr])"))
     return quote
         if length(ARGS) == $ptr && (ARGS[$(ptr)] == "-h" || ARGS[$(ptr)] == "--help")
-            print($(help_str(cmd)))
+            $(print_help_str(cmd))
+            # print($(help_str(cmd)))
             return 0
         end
 
@@ -250,7 +258,8 @@ function emit_exception_handle(cmd::LeafCommand, call, color::Bool = true)
             elseif e isa $CommandException
                 showerror(stdout, e)
                 println()
-                print($(help_str(cmd; color = color)))
+                $(print_help_str(cmd))
+                # print($(help_str(cmd; color = color)))
                 println()
                 return e.exitcode
             else
