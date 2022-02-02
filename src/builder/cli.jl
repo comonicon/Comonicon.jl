@@ -45,11 +45,11 @@ function print_builder_help(io::IO = stdout)
 end
 
 function command_main(m::Module; kw...)::Cint
-    options = Options.read_options(m; kw...)
+    options = Configs.read_options(m; kw...)
     return command_main(m, options)
 end
 
-function command_main(m::Module, options::Options.Comonicon)
+function command_main(m::Module, options::Configs.Comonicon)
     if "-h" in ARGS || "--help" in ARGS || "help" in ARGS
         print_builder_help()
         return 0

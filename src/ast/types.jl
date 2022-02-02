@@ -88,4 +88,7 @@ Base.@kwdef struct Entry <: ComoniconExpr
     root::Union{NodeCommand,LeafCommand}
     version::Maybe{VersionNumber} = nothing
     line::Maybe{LineNumberNode} = nothing
+    options::Maybe{Configs.Comonicon} = nothing
 end
+
+Entry(root, version, line) = Entry(root, version, line, nothing)

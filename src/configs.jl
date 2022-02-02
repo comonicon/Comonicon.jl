@@ -1,4 +1,4 @@
-module Options
+module Configs
 
 export read_options, has_comonicon_toml, @asset_str
 
@@ -172,7 +172,7 @@ end
 """
     Help
 
-Options for printing CLI help info.
+Configs for printing CLI help info.
 
 # Keywords
 

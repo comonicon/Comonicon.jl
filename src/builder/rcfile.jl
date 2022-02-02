@@ -1,6 +1,6 @@
 function install_env_path(
     m::Module,
-    options::Options.Comonicon = Options.read_options(m);
+    options::Configs.Comonicon = Configs.read_options(m);
     shell::String = basename(ENV["SHELL"]),
     home_dir = homedir(),
     env = ENV,

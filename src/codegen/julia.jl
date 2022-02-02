@@ -1,7 +1,7 @@
 module JuliaExpr
 
 using ..AST
-using ..Options
+using ..Configs
 using ..Comonicon: CommandException, CommandExit
 using ExproniconLite
 

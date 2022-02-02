@@ -9,9 +9,9 @@ home_dir = mktempdir()
 test_dir = pkgdir(Comonicon, "test")
 usr_dir = joinpath(test_dir, "usr")
 
-options = Comonicon.Options.Comonicon(
+options = Comonicon.Configs.Comonicon(
     name = "test",
-    install = Comonicon.Options.Install(path = usr_dir, completion = false),
+    install = Comonicon.Configs.Install(path = usr_dir, completion = false),
     sysimg = nothing,
 )
 

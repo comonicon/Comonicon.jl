@@ -29,7 +29,7 @@ function build_application(m, options)
     return
 end
 
-function build_application_completion(m::Module, options::Options.Comonicon)
+function build_application_completion(m::Module, options::Configs.Comonicon)
     isempty(options.application.shell_completions) && return
     build_dir = application_build_dir(m, options)
     completion_dir = joinpath(build_dir, "completions")
@@ -45,7 +45,7 @@ function build_application_completion(m::Module, options::Options.Comonicon)
     return
 end
 
-function bundle_assets(m::Module, options::Options.Comonicon)
+function bundle_assets(m::Module, options::Configs.Comonicon)
     isempty(options.application.assets) && return
     build_dir = application_build_dir(m, options)
     share_dir = joinpath(build_dir, "share")
@@ -57,7 +57,7 @@ function bundle_assets(m::Module, options::Options.Comonicon)
             dst = joinpath(build_dir, "share", asset.package, asset.path)
         end
         ispath(dirname(dst)) || mkpath(dirname(dst))
-        cp(Options.get_path(m, asset), dst; force = true, follow_symlinks = true)
+        cp(Configs.get_path(m, asset), dst; force = true, follow_symlinks = true)
     end
     return
 end
