@@ -10,10 +10,11 @@ using Pkg
 using Markdown
 using ExproniconLite
 
-export @cast, @main
+export @cast, @main, CommandError, CommandTerminate
 
 include("compat.jl")
 include("options.jl")
+include("exceptions.jl")
 include("ast/ast.jl")
 include("codegen/julia.jl")
 include("codegen/zsh.jl")

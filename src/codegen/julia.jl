@@ -2,6 +2,7 @@ module JuliaExpr
 
 using ..AST
 using ..Options
+using ..Comonicon: CommandException, CommandTerminate
 using ExproniconLite
 
 help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
@@ -193,7 +194,7 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
 
     ifelse = JLIfElse()
     ifelse[:($nargs == $(cmd.nrequire))] = quote
-        $call
+        $(emit_exception_handle(cmd, call))
         return 0
     end
 
@@ -202,7 +203,7 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
         type = cmd.args[i].type
         push!(call.args, emit_parse_value(cmd, type, :($args[$i])))
         ifelse[:($nargs == $i)] = quote
-            $call
+            $(emit_exception_handle(cmd, call))
             return 0
         end
     end
@@ -217,7 +218,7 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
         if type === Any || type === String || type === AbstractString
             ifelse.otherwise = quote
                 $varargs = $args[$(length(cmd.args))+1:end]
-                $call
+                $(emit_exception_handle(cmd, call))
                 return 0
             end
         else
@@ -225,7 +226,7 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
                 $varargs = map($args[$(length(cmd.args) + 1):end]) do value
                     $(emit_parse_value(cmd, type, :value))
                 end
-                $call
+                $(emit_exception_handle(cmd, call))
                 return 0
             end
         end
@@ -233,6 +234,30 @@ function emit_leaf_call(cmd::LeafCommand, args::Symbol, kwargs::Symbol)
 
     push!(ret.args, codegen_ast(ifelse))
     return ret
+end
+
+function emit_exception_handle(cmd::LeafCommand, call, color::Bool = true)
+    quote
+        try
+            $call
+        catch e
+            # NOTE:
+            # terminate should return 0
+            # other exception will return 1
+            if e isa $CommandTerminate
+                print("command exit")
+                return 0
+            elseif e isa $CommandException
+                showerror(stdout, e)
+                println()
+                print($(help_str(cmd; color = color)))
+                println()
+                return e.exitcode
+            else
+                rethrow(e)
+            end
+        end
+    end
 end
 
 function emit_kwarg(cmd::LeafCommand, token::Symbol, kwargs::Symbol, token_ptr)
