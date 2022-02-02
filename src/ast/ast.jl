@@ -1,6 +1,5 @@
 module AST
 
-using ..Configs
 export ComoniconExpr, Description, LeafCommand, NodeCommand, Entry, Argument, Option, Flag, print_cmd
 
 include("types.jl")

@@ -368,19 +368,12 @@ end
 
 function codegen_create_entry(m::Module, line, @nospecialize(ex))
     @gensym cmd entry
-    if Configs.has_comonicon_toml(m)
-        options = Configs.read_options(m)
-        name = options.name
-    else
-        options = nothing
-        name = default_name(nameof(m))
-    end
-
+    configs = Configs.read_options(m)
     quote
-        $(codegen_entry_cmd(m::Module, line, cmd, name, ex))
-        $entry = $Comonicon.AST.Entry($cmd, $(get_version(m)), $line, $options)
+        $(codegen_entry_cmd(m::Module, line, cmd, configs, ex))
+        $entry = $Comonicon.AST.Entry($cmd, $(get_version(m)), $line)
         $Comonicon.set_cmd!($m.CASTED_COMMANDS, $entry, "main")
-        $m.eval($JuliaExpr.emit($entry))
+        $m.eval($JuliaExpr.emit($entry, $configs))
     end
 end
 
@@ -436,15 +429,17 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
     end
 end
 
-function codegen_entry_cmd(m::Module, line, cmd, name, ex)
+function codegen_entry_cmd(m::Module, line, cmd, configs, ex)
     if isnothing(ex)
-        return codegen_multiple_main_entry(m, line, cmd, name)
+        return codegen_multiple_main_entry(m, line, cmd, configs)
     else
         return codegen_single_main_entry(m, line, cmd, ex)
     end
 end
 
-function codegen_multiple_main_entry(m::Module, line, cmd, name)
+function codegen_multiple_main_entry(m::Module, line, cmd, configs)
+    name = configs.name
+
     @gensym doc
     return quote
         Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing

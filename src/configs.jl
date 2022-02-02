@@ -259,7 +259,9 @@ end
 Read `Comonicon.toml` or `JuliaComonicon.toml` in given module's project path.
 """
 function read_toml(mod::Module)
-    return read_toml(pkgdir(mod))
+    path = pkgdir(mod)
+    path === nothing && return Dict{String, Any}()
+    return read_toml(path)
 end
 
 function has_comonicon_toml(m::Module)
