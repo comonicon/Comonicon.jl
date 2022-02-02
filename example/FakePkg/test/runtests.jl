@@ -27,7 +27,7 @@ using Comonicon.Builder
     @test FakePkg.command_main(["registry", "rm", "abc"]) == 0
 end
 
-using Comonicon.Options: read_options, get_path, @asset_str
+using Comonicon.Configs: read_options, get_path, @asset_str
 
 @testset "test assets path" begin
     options = read_options(FakePkg)
