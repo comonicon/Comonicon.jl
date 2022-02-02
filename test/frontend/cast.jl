@@ -216,3 +216,16 @@ end
     @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].default == "2"
     @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].type === Int
 end
+
+module Test110
+
+using Comonicon
+
+@main function main(;niterations::Int=3000, seed::Int=1234, radius::Float64=1.5)
+end
+
+end
+
+@testset "issue 110" begin
+    @test Test110.command_main(String[]) == 0
+end
