@@ -221,8 +221,7 @@ module Test110
 
 using Comonicon
 
-@main function main(;niterations::Int=3000, seed::Int=1234, radius::Float64=1.5)
-end
+@main function main(; niterations::Int = 3000, seed::Int = 1234, radius::Float64 = 1.5) end
 
 end
 

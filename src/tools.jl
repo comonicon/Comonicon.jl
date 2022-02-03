@@ -18,7 +18,7 @@ Prompt with message to ask user Yes or No.
     3 times to ask user to input the answer then throw an [`CommandError`](@ref).
 """
 function prompt(msg::AbstractString; yes::Bool = false, require::Bool = false)
-    prompt(;yes, require) do
+    prompt(; yes, require) do
         print(msg)
     end
 end
@@ -39,7 +39,7 @@ Prompt with custom printing to ask user Yes or No.
 - `require`: require user to input the answer explicitly. This will repeat
     3 times to ask user to input the answer then throw an [`CommandError`](@ref).
 """
-prompt(f; yes::Bool=false, require::Bool = false) = prompt(f, stdin; yes, require)
+prompt(f; yes::Bool = false, require::Bool = false) = prompt(f, stdin; yes, require)
 
 function prompt(f, io::IO; yes::Bool = false, require::Bool = false)
     if yes

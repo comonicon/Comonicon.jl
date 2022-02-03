@@ -14,10 +14,9 @@ end
     readavailable(stdin.buffer)
 end
 
-@testset "prompt(msg;yes) input=$input" for input in
-        ['Y', 'y', '\n', '\r','N', 'n', 'a', 'b']
+@testset "prompt(msg;yes) input=$input" for input in ['Y', 'y', '\n', '\r', 'N', 'n', 'a', 'b']
     print(stdin.buffer, input)
-    @test prompt("input something"; yes=true) == true
+    @test prompt("input something"; yes = true) == true
     readavailable(stdin.buffer)
 end
 
@@ -25,18 +24,18 @@ end
     print(stdin.buffer, '\n')
     print(stdin.buffer, '\n')
     print(stdin.buffer, 'Y')
-    @test prompt("input something"; require=true) == true
+    @test prompt("input something"; require = true) == true
     readavailable(stdin.buffer)
 
     print(stdin.buffer, '\n')
     print(stdin.buffer, '\n')
     print(stdin.buffer, 'n')
-    @test prompt("input something"; require=true) == false
+    @test prompt("input something"; require = true) == false
     readavailable(stdin.buffer)
 
     print(stdin.buffer, '\n')
     print(stdin.buffer, '\n')
     print(stdin.buffer, '\n')
-    @test_throws Comonicon.CommandError prompt("input something"; require=true)
+    @test_throws Comonicon.CommandError prompt("input something"; require = true)
     readavailable(stdin.buffer)
 end

@@ -187,7 +187,7 @@ function split_hint(content::AbstractString)
     # no hint, just -o, --option
     # shouldn't contain inner space
     if m === nothing
-        any(x->isspace(x) || isequal(x, '='), content) && throw(Meta.ParseError(msg))
+        any(x -> isspace(x) || isequal(x, '='), content) && throw(Meta.ParseError(msg))
         return content, nothing
     end
 
