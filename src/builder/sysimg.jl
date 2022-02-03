@@ -1,6 +1,6 @@
 function build_sysimg(
     m::Module,
-    options::Options.Comonicon;
+    options::Configs.Comonicon;
     incremental = options.sysimg.incremental,
     cpu_target = options.sysimg.cpu_target,
     filter_stdlibs = options.sysimg.filter_stdlibs,
@@ -95,7 +95,7 @@ function create_command_env(m::Module, envpath::String = mktempdir(); test_deps:
     return envpath
 end
 
-function build_sysimg_tarball(m::Module, options::Options.Comonicon)
+function build_sysimg_tarball(m::Module, options::Configs.Comonicon)
     dylib = sysimg_dylib(m, options)
     tarball = tarball_name(m, options.name, "sysimg")
 
@@ -109,7 +109,7 @@ function build_sysimg_tarball(m::Module, options::Options.Comonicon)
     return
 end
 
-function download_sysimg(m::Module, options::Options.Comonicon)
+function download_sysimg(m::Module, options::Configs.Comonicon)
     url = sysimg_url(m, options)
     isnothing(url) && error("$m does not have a host")
     tarball = download(url)
@@ -120,7 +120,7 @@ function download_sysimg(m::Module, options::Options.Comonicon)
     return
 end
 
-function sysimg_url(m::Module, options::Options.Comonicon)
+function sysimg_url(m::Module, options::Configs.Comonicon)
     isnothing(options.download) && return
     host = options.download.host
     if host == "github.com"
@@ -139,7 +139,7 @@ function sysimg_url(m::Module, options::Options.Comonicon)
     return url
 end
 
-function sysimg_dylib(m::Module, options::Options.Comonicon)
+function sysimg_dylib(m::Module, options::Configs.Comonicon)
     dylib_name = "lib$(options.name).$(Libdl.dlext)"
     sysimg_dir = get_scratch!(m, "sysimg")
     return joinpath(sysimg_dir, dylib_name)

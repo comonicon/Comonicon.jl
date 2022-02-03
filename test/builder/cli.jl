@@ -1,7 +1,7 @@
 module TestBuilderCLI
 
 using Test
-using Comonicon.Options
+using Comonicon.Configs
 using Comonicon.Builder: print_builder_help, command_main
 using FromFile
 
@@ -10,7 +10,7 @@ using FromFile
 module TestCLI end
 
 @testset "CLI help info" begin
-    options = Options.Comonicon(name = "test")
+    options = Configs.Comonicon(name = "test")
     @test with_args(["-h"]) do
         command_main(TestCLI, options)
     end === 0

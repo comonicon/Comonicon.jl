@@ -24,7 +24,7 @@ Base.@kwdef mutable struct Color
 end
 
 Base.@kwdef mutable struct Terminal
-    width::Int = displaysize(stdout)[2]
+    width::Int = max(displaysize(stdout)[2], 80) # always have a minimum size
     left::Int = floor(Int, 0.4 * width) # left column max width
     right::Int = floor(Int, 0.4 * width) # right column max width
 

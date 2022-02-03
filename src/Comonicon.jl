@@ -13,7 +13,7 @@ using ExproniconLite
 export @cast, @main, cmd_error, cmd_exit
 
 include("compat.jl")
-include("options.jl")
+include("configs.jl")
 include("exceptions.jl")
 include("ast/ast.jl")
 include("codegen/julia.jl")

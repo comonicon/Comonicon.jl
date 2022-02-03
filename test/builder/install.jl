@@ -2,7 +2,7 @@ module TestBuilderInstall
 
 using Test
 using Scratch
-using Comonicon.Options
+using Comonicon.Configs
 using Comonicon.Builder: ensure_path, entryfile_script, completion_script, detect_rcfile
 
 @testset "ensure_path" begin
@@ -24,7 +24,7 @@ using Comonicon
 end
 
 @testset "entryfile_script" begin
-    options = Options.Comonicon(name = "test")
+    options = Configs.Comonicon(name = "test")
     script = entryfile_script(TestInstall, options)
 
     @test occursin("#!/usr/bin/env bash", script)
@@ -43,7 +43,7 @@ end
 end
 
 @testset "test completion script" begin
-    options = Options.Comonicon(name = "test")
+    options = Configs.Comonicon(name = "test")
     withenv("SHELL" => "/bin/zsh") do
         script = completion_script(TestInstall, options, "zsh")
         @test occursin("#compdef _testinstall testinstall \n", script)

@@ -1,6 +1,6 @@
 module Builder
 
-using ..Options: Options
+using ..Configs: Configs
 using ..ZSHCompletions
 using ..Comonicon: get_version, Tools
 using PackageCompiler

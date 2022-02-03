@@ -1,9 +1,9 @@
 function install(m::Module; kw...)
-    options = Options.read_options(m; kw...)
+    options = Configs.read_options(m; kw...)
     return install(m, options)
 end
 
-function install(m::Module, options::Options.Comonicon)
+function install(m::Module, options::Configs.Comonicon)
     # prepare env (only scratch space is mutable)
     install_project_env(m, options)
     # prepare .julia/bin/<command>
@@ -20,7 +20,7 @@ function install(m::Module, options::Options.Comonicon)
     return
 end
 
-function install_project_env(m::Module, options::Options.Comonicon)
+function install_project_env(m::Module, options::Configs.Comonicon)
     scratch_env_dir = get_scratch!(m, "env")
     # rm old environment
     ispath(scratch_env_dir) && rm(scratch_env_dir; force = true, recursive = true)
@@ -28,7 +28,7 @@ function install_project_env(m::Module, options::Options.Comonicon)
     return
 end
 
-function install_entryfile(m::Module, options::Options.Comonicon)
+function install_entryfile(m::Module, options::Configs.Comonicon)
     bin = install_path(options, "bin")
     # generate entry file at .juila/bin
     entryfile = joinpath(bin, options.name)
@@ -39,11 +39,11 @@ function install_entryfile(m::Module, options::Options.Comonicon)
     return
 end
 
-function install_path(options::Options.Comonicon, paths::String...)
+function install_path(options::Configs.Comonicon, paths::String...)
     ensure_path(expanduser(joinpath(options.install.path, paths...)))
 end
 
-function install_sysimg(m::Module, options::Options.Comonicon)
+function install_sysimg(m::Module, options::Configs.Comonicon)
     isnothing(options.sysimg) && return
     sysimg = sysimg_dylib(m, options)
 
@@ -61,7 +61,7 @@ function install_sysimg(m::Module, options::Options.Comonicon)
     return
 end
 
-function install_completion(m::Module, options::Options.Comonicon, shell::String)
+function install_completion(m::Module, options::Configs.Comonicon, shell::String)
     completions_dir = install_path(options, "completions")
     completion_file = joinpath(completions_dir, "_" * options.name)
     shell in ["zsh"] || return # only emit supported shell
@@ -71,7 +71,7 @@ function install_completion(m::Module, options::Options.Comonicon, shell::String
     return
 end
 
-function completion_script(m::Module, options::Options.Comonicon, shell::String)
+function completion_script(m::Module, options::Configs.Comonicon, shell::String)
     isdefined(m, :CASTED_COMMANDS) || error("cannot find Comonicon CLI entry")
     haskey(m.CASTED_COMMANDS, "main") || error("cannot find Comonicon CLI entry")
     main = m.CASTED_COMMANDS["main"]
@@ -86,7 +86,7 @@ function completion_script(m::Module, options::Options.Comonicon, shell::String)
     end
 end
 
-function entryfile_script(m::Module, options::Options.Comonicon)
+function entryfile_script(m::Module, options::Configs.Comonicon)
     cmds = String[]
 
     julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())

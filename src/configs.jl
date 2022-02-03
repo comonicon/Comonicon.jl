@@ -1,4 +1,4 @@
-module Options
+module Configs
 
 export read_options, has_comonicon_toml, @asset_str
 
@@ -170,6 +170,22 @@ Application build configurations.
 end
 
 """
+    Help
+
+Configs for printing CLI help info.
+
+# Keywords
+
+- `color`: whether print with color in help page.
+- `static`: whether genrate help info at compile time
+    (the format won't be adaptive to displaysize anymore)
+"""
+@option struct Help
+    color::Bool = true
+    static::Bool = true
+end
+
+"""
     Comonicon
 
 Build configurations for Comonicon. One can set this option
@@ -179,6 +195,8 @@ project directory and read in using [`read_configs`](@ref).
 ## Keywords
 
 - `name`: required, the name of CLI file to install.
+- `color`: whether print with color in help page.
+- `static_displaysize`: whether format the display at compile time to reduce latency, default is `false`
 - `install`: installation options, see also [`Install`](@ref).
 - `sysimg`: system image build options, see also [`SysImg`](@ref).
 - `download`: download options, see also [`Download`](@ref).
@@ -187,6 +205,7 @@ project directory and read in using [`read_configs`](@ref).
 @option struct Comonicon
     name::String
 
+    help::Help = Help()
     install::Install = Install()
     sysimg::Maybe{SysImg} = nothing
     download::Union{Download,Nothing} = nothing
@@ -240,7 +259,9 @@ end
 Read `Comonicon.toml` or `JuliaComonicon.toml` in given module's project path.
 """
 function read_toml(mod::Module)
-    return read_toml(pkgdir(mod))
+    path = pkgdir(mod)
+    path === nothing && return Dict{String, Any}()
+    return read_toml(path)
 end
 
 function has_comonicon_toml(m::Module)
