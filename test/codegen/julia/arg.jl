@@ -40,7 +40,7 @@ cmd = Entry(
         "main",
         Argument[],
         0,
-        Argument("xs", Any, true, false, nothing, Description(nothing, nothing), LineNumberNode(0)),
+        Argument("xs", Any, true, false, nothing, Description(), LineNumberNode(0)),
         Dict{String,Flag}(),
         Dict{String,Option}(),
         Description("", ""),

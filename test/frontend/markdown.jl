@@ -20,6 +20,7 @@ using Comonicon:
     split_leaf_command,
     split_docstring,
     read_arguments,
+    read_intro,
     read_description,
     read_options,
     read_flags,
@@ -32,6 +33,12 @@ using Comonicon:
 
     description of the command.
 
+    # Intro
+
+    asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa
+    dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd
+    dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw.
+
     # Args
 
     - `arg1`: argument 1.
@@ -41,6 +48,9 @@ using Comonicon:
     """)
 
     @test read_description(doc) == "description of the command."
+    @test read_intro(doc) == "asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa " *
+    "dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd " *
+    "dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw."
 
     args = read_arguments(doc)
     @test args["arg1"] == "argument 1."

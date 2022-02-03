@@ -477,7 +477,8 @@ end
 
 function cast(m::Module, name::String = default_name(m), line = LineNumberNode(0))
     isdefined(m, :CASTED_COMMANDS) || error("module $m does not contain any @cast commands")
-    NodeCommand(name, copy(m.CASTED_COMMANDS), split_docstring(m), line)
+    desc, intro = split_docstring(m)
+    NodeCommand(name, copy(m.CASTED_COMMANDS), Description(desc, intro), line)
 end
 
 function cast(
@@ -500,7 +501,7 @@ function cast(
         vararg,
         flags,
         options,
-        doc.desc,
+        Description(doc.desc, doc.intro),
         line,
     )
 end
