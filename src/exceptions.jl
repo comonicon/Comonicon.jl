@@ -15,8 +15,8 @@ struct CommandError <: CommandException
     exitcode::Int
 end
 
-cmd_error(msg::String, code::Int=1) = throw(CommandError(msg, code))
-cmd_exit(code::Int=0) = throw(CommandExit(code))
+cmd_error(msg::String, code::Int = 1) = throw(CommandError(msg, code))
+cmd_exit(code::Int = 0) = throw(CommandExit(code))
 
 function Base.showerror(io::IO, e::CommandError)
     print(io, "CommandError: ", e.msg, " exit with ", e.exitcode)
