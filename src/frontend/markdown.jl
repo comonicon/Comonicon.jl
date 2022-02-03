@@ -1,3 +1,9 @@
+const PARSED_SECTION = [
+    "Intro", "Introduction", # long description
+    "Arguments", "Args", # arguments
+    "Options", "Flags" # kwargs
+]
+
 function split_docstring(f::Function)
     doc = Base.Docs.doc(f)
     return split_docstring(doc)
@@ -5,17 +11,18 @@ end
 
 function split_docstring(m::Module)
     doc = Base.Docs.doc(m)
-    has_docstring(doc) || return
-    return read_description(doc)
+    has_docstring(doc) || return "", ""
+    return read_description(doc), read_intro(doc)
 end
 
 function split_docstring(doc::Markdown.MD)
     has_docstring(doc) || return JLMD()
     desc = read_description(doc)
+    intro = read_intro(doc)
     args = read_arguments(doc)
     flags = read_flags(doc)
     options = read_options(doc)
-    return JLMD(desc, args, options, flags)
+    return JLMD(desc, intro, args, options, flags)
 end
 
 function has_docstring(doc::Markdown.MD)
@@ -24,10 +31,19 @@ function has_docstring(doc::Markdown.MD)
     return !flag
 end
 
+function read_intro(md::Markdown.MD)
+    sec = read_section(md, ["Intro", "Introduction"])
+    isempty(sec) && return ""
+    length(sec) == 1 || error("section Intro/Introduction can only have one paragraph")
+    return strip(md_to_string(Markdown.MD(sec, md.meta)))
+end
+
 function read_arguments(md::Markdown.MD)
     args = Dict{String,String}()
     sec = read_section(md, ["Arguments", "Args"])
-    sec === nothing && return args
+    isempty(sec) && return args
+    length(sec) == 1 || error("section Arguments/Args can only have one paragraph")
+    sec = sec[]
 
     for each in sec.items
         name, doc = read_item(each[1])
@@ -39,7 +55,9 @@ end
 function read_flags(md::Markdown.MD)
     flags = Dict{String,JLMDFlag}()
     sec = read_section(md, "Flags")
-    sec === nothing && return flags
+    isempty(sec) && return flags
+    length(sec) == 1 || error("section Flags can only have one paragraph")
+    sec = sec[]
 
     for each in sec.items
         name, doc = read_item(each[1])
@@ -53,7 +71,9 @@ end
 function read_options(md::Markdown.MD)
     options = Dict{String,JLMDOption}()
     sec = read_section(md, "Options")
-    sec === nothing && return options
+    isempty(sec) && return options
+    length(sec) == 1 || error("section Options can only have one paragraph")
+    sec = sec[]
 
     for each in sec.items
         code, doc = read_item(each[1])
@@ -72,35 +92,39 @@ function read_description(md::Markdown.MD)
     end
 
     for line in lines
-        if line isa Markdown.Header{1} && line.text[1] in ["Arguments", "Args", "Options", "Flags"]
+        if line isa Markdown.Header{1} && line.text[1] in PARSED_SECTION
             break
         else
             push!(intro, line)
         end
     end
+    isempty(intro) && return ""
     return strip(md_to_string(Markdown.MD(intro, md.meta)))
 end
 
 function read_section(md::Markdown.MD, title::Vector{String})
     for each in title
         sec = read_section(md, each)
-        sec === nothing || return sec
+        isempty(sec) || return sec
     end
-    return
+    return []
 end
 
-function read_section(md::Markdown.MD, title::String)
+function read_section(md::Markdown.MD, title::String)::Vector{Any}
     ct = read_content(md)
     nlines = length(ct)
+    content = []
     for k in 1:nlines
         line = ct[k]
         if line isa Markdown.Header{1} && line.text[1] == title
-            if k + 1 <= nlines
-                return ct[k+1]
+            k + 1 ≤ nlines || return content # return on last line
+            for idx in k+1:nlines
+                ct[idx] isa Markdown.Header{1} && return content # another title
+                push!(content, ct[idx])
             end
         end
     end
-    return
+    return content
 end
 
 read_content(x) = x
@@ -145,8 +169,12 @@ function docstring(x)
     end
 end
 
-function md_to_string(md::Markdown.MD)
-    return sprint(md; context = :color => true) do io, x
+function md_to_string(md::Markdown.MD) # don't print newlines for one paragraph
+    return sprint(md; context = (
+                :color => true,
+                :displaysize => (typemax(Int), 1000)
+            )
+        ) do io, x
         show(io, MIME"text/plain"(), x)
     end
 end

@@ -2,9 +2,6 @@ using Comonicon.AST
 using Test
 using Faker
 
-desc = Description(Faker.text())
-@test endswith(desc.brief, ".") # brief should be a sentence
-
 arg = Argument(; name = "arg", type = Int)
 
 macro test_show(mime, ex)
@@ -22,13 +19,6 @@ macro test_show(mime, ex)
         end
     end
     return esc(ret)
-end
-
-@testset "convert(Description, ...)" begin
-    @test Description(nothing) == Description()
-    @test convert(Description, nothing) == Description()
-    @test convert(Description, "nothing") == Description("nothing")
-    @test convert(Description, split("abcd. efdasdas.", '.')[1]) == Description("abcd")
 end
 
 @test_show MIME"text/plain" begin

@@ -61,21 +61,3 @@ function splitlines(s, width = 80)
     isempty(current_line) || push!(lines, strip(join(current_line)))
     return lines
 end
-
-"""
-    brief(text::String)
-
-Use the first sentence as the brief description.
-"""
-function brief(text::String)
-    index = findfirst(". ", text)
-    if index === nothing
-        index = findfirst(".", text)
-    end
-
-    if index === nothing
-        return text
-    else
-        return text[1:first(index)]
-    end
-end

@@ -3,18 +3,14 @@ const Maybe{T} = Union{Nothing,T}
 abstract type ComoniconExpr end
 
 Base.@kwdef struct Description <: ComoniconExpr
-    brief::Union{Nothing,String} = nothing
-    content::Union{Nothing,String} = nothing
+    brief::String = ""
+    content::String = ""
 end
 
+Base.convert(::Type{Description}, s::AbstractString) = Description(String(s))
 Base.convert(::Type{Description}, ::Nothing) = Description()
-Base.convert(::Type{Description}, x::String) = Description(x)
-Base.convert(::Type{Description}, x::AbstractString) = Description(String(x))
-
-Description(::Nothing) = Description(nothing, nothing)
-function Description(text::String)
-    return Description(brief(text), text)
-end
+Description(text::String) = Description(text, "")
+Description(::Nothing) = Description()
 
 Base.@kwdef struct Argument <: ComoniconExpr
     name::String
