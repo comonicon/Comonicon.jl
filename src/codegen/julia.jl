@@ -8,7 +8,7 @@ help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
 
 Base.@kwdef struct Configs
     color::Bool = true
-    static::Bool = false
+    static::Bool = true
 end
 
 function print_help_str(x, configs::Configs)

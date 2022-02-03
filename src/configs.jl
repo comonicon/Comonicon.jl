@@ -182,7 +182,7 @@ Configs for printing CLI help info.
 """
 @option struct Help
     color::Bool = true
-    static::Bool = false
+    static::Bool = true
 end
 
 """
