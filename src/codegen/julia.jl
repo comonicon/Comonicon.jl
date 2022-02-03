@@ -10,6 +10,7 @@ Base.@kwdef struct Configs
     color::Bool = true
     static::Bool = true
     dash::Bool = false
+    plugin::Bool = false
 end
 
 function print_help_str(x, configs::Configs)
@@ -73,6 +74,7 @@ function emit(cmd::Entry, configs::Configs=Configs(), ptr::Int = 1)
         args = [Expr(:kw, :(ARGS::Vector{String}), :ARGS)],
         body = quote
             $(emit_scan_version(cmd))
+            $(configs.plugin ? emit_plugin_lookup(cmd) : nothing)
             $(emit_body(cmd.root, configs, ptr))
         end,
     )
@@ -85,6 +87,19 @@ function emit_scan_version(cmd::Entry)
             print($(cmd.version))
             return 0
         end
+    end
+end
+
+function emit_plugin_lookup(cmd::Entry)
+    quote
+        if length(ARGS) ≥ 1
+            path = Sys.which(cmd.root.name * "-" * ARGS[1])
+            path === nothing && @goto no_plugin_found
+
+            p = run(ignorestatus(`$path $(ARGS[2:end])`))
+            return p.exitcode
+        end
+        @label no_plugin_found
     end
 end
 
