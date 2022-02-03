@@ -9,6 +9,7 @@ help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
 Base.@kwdef struct Configs
     color::Bool = true
     static::Bool = true
+    dash::Bool = false
 end
 
 function print_help_str(x, configs::Configs)
@@ -115,7 +116,8 @@ end
 
 function emit_body(cmd::LeafCommand, configs::Configs, ptr::Int = 1)
     @gensym idx
-    quote
+
+    configs.dash && return quote
         $(emit_help(cmd, configs, ptr))
 
         $idx = findnext(isequal("--"), ARGS, $ptr)
@@ -124,6 +126,12 @@ function emit_body(cmd::LeafCommand, configs::Configs, ptr::Int = 1)
         else # dash
             $(emit_dash_body(cmd, configs, idx, ptr))
         end
+    end
+
+    # no dash
+    return quote
+        $(emit_help(cmd, configs, ptr))
+        $(emit_norm_body(cmd, configs, ptr))
     end
 end
 

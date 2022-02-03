@@ -170,19 +170,21 @@ Application build configurations.
 end
 
 """
-    Help
+    Command
 
-Configs for printing CLI help info.
+Configs for Command execution.
 
 # Keywords
 
 - `color`: whether print with color in help page.
 - `static`: whether genrate help info at compile time
     (the format won't be adaptive to displaysize anymore)
+- `dash`: whether parse `--` seperator.
 """
-@option struct Help
+@option struct Command
     color::Bool = true
     static::Bool = true
+    dash::Bool = true
 end
 
 """
@@ -205,7 +207,7 @@ project directory and read in using [`read_configs`](@ref).
 @option struct Comonicon
     name::String
 
-    help::Help = Help()
+    command::Command = Command()
     install::Install = Install()
     sysimg::Maybe{SysImg} = nothing
     download::Union{Download,Nothing} = nothing
