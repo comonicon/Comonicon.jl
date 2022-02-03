@@ -394,6 +394,12 @@ function codegen_script_entry(m::Module, line, @nospecialize(ex))
 end
 
 function codegen_project_entry(m::Module, line, @nospecialize(ex))
+    include_deps_ex = if Configs.has_comonicon_toml(m)
+        :(include_dependency($(Configs.find_comonicon_toml(pkgdir(m)))))
+    else
+        nothing
+    end
+    
     quote
         $(codegen_create_entry(m, line, ex))
 
@@ -427,6 +433,8 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
         comonicon_install_path(; yes = false) = $Comonicon.Builder.install_env_path($m; yes)
 
         precompile(Tuple{typeof($m.command_main),Array{String,1}})
+
+        $include_deps_ex # make sure we recompile the package when Comonicon.toml changes
     end
 end
 
