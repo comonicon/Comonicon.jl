@@ -176,15 +176,18 @@ Configs for Command execution.
 
 # Keywords
 
-- `color`: whether print with color in help page.
-- `static`: whether genrate help info at compile time
-    (the format won't be adaptive to displaysize anymore)
-- `dash`: whether parse `--` seperator.
+- `color`: whether print with color in help page, default is `true`.
+- `static`: whether genrate help info at compile time,
+    the format won't be adaptive to displaysize anymore,
+    if `true`, default is `true`.
+- `dash`: whether parse `--` seperator, default is `true`.
+- `plugin`: parse `<main CLI name>-<plugin>` for CLI plugin, default is `false`.
 """
 @option struct Command
     color::Bool = true
     static::Bool = true
     dash::Bool = true
+    plugin::Bool = false
 end
 
 """

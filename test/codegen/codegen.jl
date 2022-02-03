@@ -8,6 +8,7 @@ using Test
     include("julia/options.jl")
     include("julia/vararg.jl")
     include("julia/exception.jl")
+    include("julia/plugin.jl")
 end
 
 @testset "ZSHCompletions.emit" begin
