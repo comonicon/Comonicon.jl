@@ -182,19 +182,19 @@ function print_body(io::IO, cmd::LeafCommand, t::Terminal)
 
     for each in cmd.args
         print_sig_brief(io, each, t)
-        println(io)
+        section(io)
     end
 
     if !isnothing(cmd.vararg)
         print_sig_brief(io, cmd.vararg, t)
-        println(io)
+        section(io)
     end
 
     if !isempty(cmd.options)
         section(io, "Options")
         for each in unique(values(cmd.options))
             print_sig_brief(io, each, t)
-            println(io)
+            section(io)
         end
     end
 
@@ -229,9 +229,10 @@ end
 
 function print_indent_content(io::IO, text::String, t::Terminal, firstline::Int)
     middle = t.width - t.left - t.right
-    lines = splitlines(text, t.width)
+    lines = splitlines(text, t.right)
     isempty(lines) && return
     print(io, tab(t.left - firstline + middle), lines[1])
+    length(lines) > 1 && println(io)
     for i in 2:length(lines)
         print(io, tab(t.width - t.right), lines[i])
         if i !== lastindex(lines)

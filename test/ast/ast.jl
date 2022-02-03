@@ -60,3 +60,8 @@ node = NodeCommand(; name = "foo", subcmds = Dict("leaf" => leaf))
     "Flags\n\n" in node
     "-h, --help" in node
 end
+
+text = "registry you want to register the package. If the package has not been registered, ion will try to register the package in the General registry. Or the user needs to specify the registry to register using this option."
+
+
+AST.print_indent_content(stdout, text, AST.Terminal(), 10)

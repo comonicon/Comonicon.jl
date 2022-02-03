@@ -4,11 +4,14 @@ using ..AST
 using ..Comonicon: CommandException, CommandExit
 using ExproniconLite
 
-help_str(x; color = true) = sprint(print_cmd, x; context = :color => color)
+function help_str(x; color = true, width::Int)
+    sprint(print_cmd, x; context = (:color => color, :displaysize=>(24, width)))
+end
 
 Base.@kwdef struct Configs
     color::Bool = true
     static::Bool = true
+    width::Int = 120
     dash::Bool = true
     plugin::Bool = false
 end
@@ -16,7 +19,7 @@ end
 function print_help_str(x, configs::Configs)
     color = configs.color
     if configs.static
-        :(print($(help_str(x; color))))
+        :(print($(help_str(x; color, configs.width))))
     else
         :($print_cmd(IOContext(stdout, :color=>$color), $x))
     end

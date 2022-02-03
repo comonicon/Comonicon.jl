@@ -180,12 +180,14 @@ Configs for Command execution.
 - `static`: whether genrate help info at compile time,
     the format won't be adaptive to displaysize anymore,
     if `true`, default is `true`.
+- `width`: if `static=true`, `width` is used to set the static size of expected terminal.
 - `dash`: whether parse `--` seperator, default is `true`.
 - `plugin`: parse `<main CLI name>-<plugin>` for CLI plugin, default is `false`.
 """
 @option struct Command
     color::Bool = true
     static::Bool = true
+    width::Int = 120
     dash::Bool = true
     plugin::Bool = false
 end
@@ -200,8 +202,7 @@ project directory and read in using [`read_configs`](@ref).
 ## Keywords
 
 - `name`: required, the name of CLI file to install.
-- `color`: whether print with color in help page.
-- `static_displaysize`: whether format the display at compile time to reduce latency, default is `false`
+- `command`: configs for command parsing.
 - `install`: installation options, see also [`Install`](@ref).
 - `sysimg`: system image build options, see also [`SysImg`](@ref).
 - `download`: download options, see also [`Download`](@ref).
