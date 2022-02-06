@@ -266,7 +266,7 @@ Read `Comonicon.toml` or `JuliaComonicon.toml` in given module's project path.
 """
 function read_toml(mod::Module)
     path = pkgdir(mod)
-    path === nothing && return Dict{String, Any}()
+    path === nothing && return Dict{String,Any}()
     return read_toml(path)
 end
 

@@ -369,11 +369,8 @@ end
 function codegen_create_entry(m::Module, line, @nospecialize(ex))
     @gensym cmd entry
     configs = Configs.read_options(m)
-    julia_expr_configs = JuliaExpr.Configs(;
-        configs.command.color,
-        configs.command.static,
-        configs.command.dash,
-    )
+    julia_expr_configs =
+        JuliaExpr.Configs(; configs.command.color, configs.command.static, configs.command.dash)
     quote
         $(codegen_entry_cmd(m::Module, line, cmd, configs, ex))
         $entry = $Comonicon.AST.Entry($cmd, $(get_version(m)), $line)
@@ -403,7 +400,7 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
     else
         nothing
     end
-    
+
     quote
         $(codegen_create_entry(m, line, ex))
 

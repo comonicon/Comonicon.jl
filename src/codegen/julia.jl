@@ -5,7 +5,7 @@ using ..Comonicon: CommandException, CommandExit
 using ExproniconLite
 
 function help_str(x; color = true, width::Int)
-    sprint(print_cmd, x; context = (:color => color, :displaysize=>(24, width)))
+    sprint(print_cmd, x; context = (:color => color, :displaysize => (24, width)))
 end
 
 Base.@kwdef struct Configs
@@ -21,7 +21,7 @@ function print_help_str(x, configs::Configs)
     if configs.static
         :(print($(help_str(x; color, configs.width))))
     else
-        :($print_cmd(IOContext(stdout, :color=>$color), $x))
+        :($print_cmd(IOContext(stdout, :color => $color), $x))
     end
 end
 
@@ -29,7 +29,7 @@ end
 emit_help(x, configs::Configs, ptr::Int = 1; color = true) = quote
     if !isnothing(findnext(isequal("-h"), ARGS, $ptr)) ||
        !isnothing(findnext(isequal("--help"), ARGS, $ptr))
-       $(print_help_str(x, configs))
+        $(print_help_str(x, configs))
         return 0
     end
 end
@@ -71,7 +71,7 @@ end
 
 Emit `Expr` from a `Entry`.
 """
-function emit(cmd::Entry, configs::Configs=Configs(), ptr::Int = 1)
+function emit(cmd::Entry, configs::Configs = Configs(), ptr::Int = 1)
     jlfn = JLFunction(;
         name = :command_main,
         args = [Expr(:kw, :(ARGS::Vector{String}), :ARGS)],
@@ -110,7 +110,8 @@ function emit_body(cmd::NodeCommand, configs::Configs, ptr::Int = 1)
     nargs_assert = quote
         if length(ARGS) < $ptr
             $(emit_error(
-                cmd, configs,
+                cmd,
+                configs,
                 "valid sub-commands for command $(cmd.name) are: $(join(keys(cmd.subcmds), ", "))",
             ))
         end
@@ -203,11 +204,14 @@ function emit_leaf_call(cmd::LeafCommand, configs::Configs, args::Symbol, kwargs
     end
 
     if cmd.nrequire > 0
-        push!(ret.args, quote
-            if $(cmd.nrequire) > $nargs
-                $(emit_error(cmd, configs, "expect $(cmd.nrequire) positional arguments"))
-            end
-        end)
+        push!(
+            ret.args,
+            quote
+                if $(cmd.nrequire) > $nargs
+                    $(emit_error(cmd, configs, "expect $(cmd.nrequire) positional arguments"))
+                end
+            end,
+        )
     end
 
     # check maximum number of arguments
@@ -216,7 +220,11 @@ function emit_leaf_call(cmd::LeafCommand, configs::Configs, args::Symbol, kwargs
             ret.args,
             quote
                 if $(length(cmd.args)) < $nargs
-                    $(emit_error(cmd, configs, "expect at most $(length(cmd.args)) positional arguments"))
+                    $(emit_error(
+                        cmd,
+                        configs,
+                        "expect at most $(length(cmd.args)) positional arguments",
+                    ))
                 end
             end,
         )
@@ -249,7 +257,8 @@ function emit_leaf_call(cmd::LeafCommand, configs::Configs, args::Symbol, kwargs
     end
 
     if isnothing(cmd.vararg)
-        ifelse.otherwise = emit_error(cmd, configs, "expect at most $(length(cmd.args)) positional arguments")
+        ifelse.otherwise =
+            emit_error(cmd, configs, "expect at most $(length(cmd.args)) positional arguments")
     else
         @gensym varargs
         call = copy(call)
@@ -332,7 +341,14 @@ function emit_kwarg(cmd::LeafCommand, configs::Configs, token::Symbol, kwargs::S
     end
 end
 
-function emit_short_flag(cmd::LeafCommand, configs::Configs, token::Symbol, sym::Symbol, key::Symbol, value::Symbol)
+function emit_short_flag(
+    cmd::LeafCommand,
+    configs::Configs,
+    token::Symbol,
+    sym::Symbol,
+    key::Symbol,
+    value::Symbol,
+)
     ifelse = JLIfElse()
     for (_, flag) in cmd.flags
         if flag.short
@@ -424,7 +440,13 @@ function emit_parse_value(cmd, configs::Configs, type, value)
     end
 end
 
-function emit_option(option::Option, configs::Configs, token::Symbol, value::Symbol, token_ptr::Symbol)
+function emit_option(
+    option::Option,
+    configs::Configs,
+    token::Symbol,
+    value::Symbol,
+    token_ptr::Symbol,
+)
     return quote
         if occursin('=', $token)
             _, $value = split($token, '=')

@@ -21,11 +21,11 @@ cmd = Entry(;
     ),
 )
 
-eval(emit(cmd, JuliaExpr.Configs(plugin=true)))
+eval(emit(cmd, JuliaExpr.Configs(plugin = true)))
 end
 
 using Comonicon
-withenv("PATH"=>"$(pkgdir(Comonicon, "test", "codegen", "julia")):$(ENV["PATH"])") do
+withenv("PATH" => "$(pkgdir(Comonicon, "test", "codegen", "julia")):$(ENV["PATH"])") do
     Sys.which("node-cmd3")
     @test TestPlugin.command_main(["cmd3"]) == 0
 end
