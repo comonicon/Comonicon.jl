@@ -68,9 +68,9 @@ function prompt(f, io::IO; yes::Bool = false, require::Bool = false)
 end
 
 function yes_or_no(io::IO)
-    run(`stty raw -F /dev/tty`)
+    run(`stty raw`)
     input = read(io, Char)
-    run(`stty cooked -F /dev/tty`)
+    run(`stty cooked`)
     return input
 end
 
