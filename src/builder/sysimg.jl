@@ -91,7 +91,8 @@ function create_command_env(m::Module, envpath::String = mktempdir(); test_deps:
     Pkg.activate(envpath)
     Pkg.develop(Pkg.PackageSpec(path = pkgdir(m)))
     Pkg.update()
-    Pkg.activate(current_project)
+    # NOTE: in global env, current_project is nothing
+    isnothing(current_project) || Pkg.activate(current_project)
     return envpath
 end
 
