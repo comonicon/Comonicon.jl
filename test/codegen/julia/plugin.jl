@@ -24,6 +24,7 @@ cmd = Entry(;
 eval(emit(cmd, JuliaExpr.Configs(plugin = true)))
 end
 
+using Test
 using Comonicon
 withenv("PATH" => "$(pkgdir(Comonicon, "test", "codegen", "julia")):$(ENV["PATH"])") do
     Sys.which("node-cmd3")
