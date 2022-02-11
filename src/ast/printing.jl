@@ -44,7 +44,7 @@ function Base.show(io::IO, ::MIME"text/plain", cmd::Description)
 end
 
 print_cmd(cmd) = print_cmd(stdout, cmd)
-print_cmd(io::IO, cmd) = print_cmd(io, cmd, Terminal())
+print_cmd(io::IO, cmd) = print_cmd(io, cmd, Terminal(width=get(io, :displaysize, displaysize(io))[2]))
 print_cmd(cmd, t::Terminal) = print_cmd(stdout, cmd, t)
 
 function print_cmd(io::IO, arg::Argument, t::Terminal)
@@ -219,11 +219,18 @@ function print_sig_brief(io::IO, cmd, t::Terminal)
     print_signature(buf, cmd, t)
     s = String(take!(buf))
 
+    middle = t.width - t.left - t.right
+    firstline = length(s) + 2
+    t.left - firstline + middle > 0 || error(
+        "signature of $(cmd.name) is too long, consider "*
+        "set `command.width` in `Comonicon.toml` to "*
+        "larger value, or truncate your argument and command name length " *
+        "current terminal width is $(t.width)")
+
     print(io, tab(2))
     print_signature(io, cmd, t)
     isnothing(cmd.description.brief) && return
-
-    print_indent_content(io, cmd.description.brief, t, length(s) + 2)
+    print_indent_content(io, cmd.description.brief, t, firstline)
     return
 end
 
