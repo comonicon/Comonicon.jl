@@ -41,4 +41,41 @@ eval(emit(cmd))
     @test command_main(["-o", "--option-b", "1.2", "-f", "--flag-b"]) == 1
 end
 
+
+cmd = Entry(;
+    version = v"1.1.0",
+    root = LeafCommand(;
+        fn = foo,
+        name = "leaf",
+        options = Dict(
+            "option-a" => Option(; sym = :option_a, hint = "str", type = String, short = true),
+            "option-b" => Option(; sym = :option_b, hint = "float64", type = Float64),
+        ),
+        flags = Dict(
+            "flag-a" => Flag(; sym = :flag_a, short = true),
+            "flag-b" => Flag(; sym = :flag_b),
+        ),
+    ),
+)
+
+eval(emit(cmd))
+
+end
+
+module TestStringType
+using Test
+using Comonicon
+
+@cast function build(name::String; target::String=nothing)
+    if target == "notebook"
+    elseif target == "markdown"
+    else
+    end
+end
+
+@main
+
+@testset "test String type" begin
+    @test command_main(["build", "test", "--target=aaaa"]) == 0
+end
 end

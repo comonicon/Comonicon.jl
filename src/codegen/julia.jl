@@ -435,8 +435,10 @@ function emit_long_option_or_flag(
 end
 
 function emit_parse_value(cmd, ctx::EmitContext, type, value)
-    if type === Any || type === String || type === AbstractString
+    if type === Any || type === AbstractString
         return value
+    elseif type === String # we need to convert SubString to String
+        return :(String($value))
     else
         @gensym ret
         return quote
