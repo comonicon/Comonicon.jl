@@ -66,7 +66,7 @@ module TestStringType
 using Test
 using Comonicon
 
-@cast function build(name::String; target::String=nothing)
+@cast function build(name::String; target::String = nothing)
     if target == "notebook"
     elseif target == "markdown"
     else
