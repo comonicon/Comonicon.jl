@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · Comonicon.jl</title><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><script src="../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>Comonicon.jl</a></span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Quick-Start"><span>Quick Start</span></a></li><li><a class="tocitem" href="#What&#39;s-under-the-hood?"><span>What&#39;s under the hood?</span></a></li><li><a class="tocitem" href="#Developer-Recommendations"><span>Developer Recommendations</span></a></li></ul></li><li><a class="tocitem" href="conventions/">Conventions</a></li><li><a class="tocitem" href="project/">Create a CLI project</a></li><li><a class="tocitem" href="types/">Command Types</a></li><li><a class="tocitem" href="parse/">Command Parsing</a></li><li><a class="tocitem" href="configurations/">Command Configuration</a></li><li><a class="tocitem" href="codegen/">Code Generation</a></li><li><a class="tocitem" href="build/">Build and Install CLI</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/comonicon/Comonicon.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Comonicon"><a class="docs-heading-anchor" href="#Comonicon">Comonicon</a><a id="Comonicon-1"></a><a class="docs-heading-anchor-permalink" href="#Comonicon" title="Permalink"></a></h1><p><em>gith averminaluk ayh juldas mausan urdan</em></p><p><a href="https://github.com/comonicon/Comonicon.jl/actions"><img src="https://github.com/comonicon/Comonicon.jl/workflows/CI/badge.svg" alt="Build Status"/></a> <a href="https://codecov.io/gh/comonicon/Comonicon.jl"><img src="https://codecov.io/gh/comonicon/Comonicon.jl/branch/master/graph/badge.svg?token=zZjCxCiFTY" alt="codecov"/></a></p><p>Roger&#39;s magic book for command line interfaces.</p><article class="docstring"><header><a class="docstring-binding" id="Comonicon" href="#Comonicon"><code>Comonicon</code></a> — <span class="docstring-category">Module</span></header><section><div><p>All the terminals are under my command. <code>Comonicon</code> is a CLI (Command Line Interface) generator that features light-weight dependency (optional to have zero dependency), fast start-up time and easy to use. See the <a href="https://comonicon.org">website</a> for more info.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/comonicon/Comonicon.jl">source</a></section></article><h2 id="Quick-Start"><a class="docs-heading-anchor" href="#Quick-Start">Quick Start</a><a id="Quick-Start-1"></a><a class="docs-heading-anchor-permalink" href="#Quick-Start" title="Permalink"></a></h2><p>The simplest and most common way to use <a href="#Comonicon"><code>Comonicon</code></a> is to use <code>@cast</code> and <code>@main</code>.</p><article class="docstring"><header><a class="docstring-binding" id="Comonicon.@main" href="#Comonicon.@main"><code>Comonicon.@main</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia hljs">@main
+@main &lt;function definition&gt;</code></pre><p>Main entry of the CLI application.</p><p><strong>Quick Example</strong></p><pre><code class="language-julia hljs"># in a script or module
+
+&quot;&quot;&quot;
+sum two numbers.
+
+# Args
+
+- `x`: first number
+- `y`: second number
+
+# Options
+
+- `-p, --precision=&lt;type&gt;`: precision of the calculation.
+
+# Flags
+
+- `-f, --fastmath`: enable fastmath.
+
+&quot;&quot;&quot;
+@main function sum(x, y; precision::String=&quot;float32&quot;, fastmath::Bool=false)
+    # implementation
+    return
+end</code></pre><p><strong>CLI Definitions and Julia Syntax Mapping</strong></p><p><strong>positional arguments</strong> normal inputs, these are mapped as Julia function arguments, e.g</p><pre><code class="language-shell hljs">sum 1 2</code></pre><p><code>sum</code> is the command, and <code>1</code>, <code>2</code> are positional arguments.</p><p><strong>options</strong> arguments with syntax <code>--&lt;name&gt;=&lt;value&gt;</code> or <code>--&lt;name&gt; &lt;value&gt;</code>, these are mapped as Julia keyword arguments, e.g</p><pre><code class="language-shell hljs">sum --precision=float32 1 2</code></pre><p><code>--precision</code> is the option of command <code>sum</code> and has value <code>float32</code>.</p><p><strong>short options</strong> arguments with syntax <code>-&lt;letter&gt;=&lt;value&gt;</code> or <code>-&lt;letter&gt;&lt;value&gt;</code> or <code>--&lt;letter&gt; &lt;value&gt;</code>, the letter is usually the first character of a normal option, e.g</p><pre><code class="language-shell hljs">sum -pfloat32 1 2</code></pre><p><code>-p</code> is the same as <code>--precision</code>, but in short hand, this is enabled by writing corresponding docstring (see the next section on docstring syntax).</p><p><strong>flags</strong> like options, but without any value, e.g <code>--&lt;name&gt;</code>, this is mapped to a special type of keyword argument that is of type <code>Bool</code> and has default value <code>false</code>, e.g</p><pre><code class="language-shell hljs">sum --fastmath</code></pre><p><strong>short flags</strong> flags with syntax <code>-&lt;letter&gt;</code>, the letter should be the first character of the corresponding normal flag, e.g</p><pre><code class="language-shell hljs">sum -f</code></pre><p><strong>Doc String Syntax</strong></p><p>Each different kind of inputs must have a different level-1 section (markdown syntax <code>#&lt;section name&gt;</code>).</p><p>The docstring must have section name:</p><ul><li><code>#Args</code> or <code>#Arguments</code> to declare the documentation   of positional arguments.</li><li><code>#Options</code> to declare the documentation of options.</li><li><code>#Flags</code> to declare the documentation of flags.</li></ul><p><strong>Examples</strong></p><p>The simplest usage is creating the following commands</p><pre><code class="language-julia hljs">&quot;&quot;&quot;
+an example command
+
+# Args
+
+- `x`: first argument
+- `y`: second argument
+- `z`: last argument
+
+# Flags
+
+- `-f, --flag`: a flag, optionally can be a short flag.
+
+# Options
+
+- `-o, --option=&lt;int&gt;`: an option, optionally can be short option.
+
+&quot;&quot;&quot;
+@cast function mycommand(x, y, z; flag::Bool=false, option::Int=2)
+    # some implementation
+    return
+end
+
+@cast function myothercommand(xs...)
+    # another command with variatic arguments
+    return
+end
+
+&quot;&quot;&quot;
+My main command.
+&quot;&quot;&quot;
+@main # declare the entry</code></pre><p>this can be used in command line as <code>mycommand 1 2 3 --flag</code>, you can also just type <code>-h</code> to check the detailed help info.</p><p>The command line documentation will be generated automatically from your Julia docstring.</p><p>If you have deeper hierachy of commands, you can also put <code>@cast</code> on a Julia module.</p><pre><code class="language-julia hljs">@cast module NodeCommand
+
+using Comonicon
+@cast foo(x) = nothing
+
+end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/comonicon/Comonicon.jl">source</a></section></article><p>Let&#39;s use a simple example to show how, the following example creates a command using <code>@main</code>.</p><pre><code class="language-julia hljs">using Comonicon
+@main function mycmd(arg; option=&quot;Sam&quot;, flag::Bool=false)
+    @show arg
+    @show option
+    @show flag
+end</code></pre><p>if you write this into a script file <code>myscript.jl</code> and execute it using</p><pre><code class="language-sh hljs">julia myscript.jl -h</code></pre><p>You will see the following in your terminal.</p><p><img src="assets/images/myscript.png" alt="myscript-help"/></p><p>If you want to add some description to your command, you can just write it as a Julia function doc string, e.g</p><pre><code class="language-julia hljs">using Comonicon
+
+&quot;&quot;&quot;
+my first Comonicon CLI.
+&quot;&quot;&quot;
+@main function mycmd(arg; option=&quot;Sam&quot;, flag::Bool=false)
+    @show arg
+    @show option
+    @show flag
+end</code></pre><p><img src="assets/images/myscript-doc.png" alt="myscript-help-docstring"/></p><p>but you might also want to have more detailed help message for your CLI arguments and options, you can specify them via doc string:</p><pre><code class="language-julia hljs">&quot;&quot;&quot;
+my command line interface.
+
+# Arguments
+
+- `arg`: an argument
+
+# Options
+
+- `-o, --option`: an option that has short option.
+
+# Flags
+
+- `-f, --flag`: a flag that has short flag.
+&quot;&quot;&quot;
+@main function mycmd(arg; option=&quot;Sam&quot;, flag::Bool=false)
+    @show arg
+    @show option
+    @show flag
+end</code></pre><p>This will give a help message looks like below after execute this in <code>myscript.jl</code> via <code>julia myscript.jl</code></p><p><img src="assets/images/mycmd-option-doc.png" alt="mycmd-option-doc"/></p><p>Now, you can directly use this script from command line in this way. But if you want to make it accessible in shell, should do the following:</p><ul><li>create a file without any extension called <code>mycmd</code></li><li>copy the script above</li><li>add the following line on the top of your script <code>mycmd</code> (this is called <a href="https://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</a>):</li></ul><pre><code class="language-sh hljs">#!&lt;path to your julia executable&gt;</code></pre><p>now your <code>mycmd</code> script should look like the following</p><pre><code class="language-julia hljs">#!&lt;path to your julia executable&gt;
+using Comonicon
+
+&quot;&quot;&quot;
+my first Comonicon CLI.
+&quot;&quot;&quot;
+@main function mycmd(arg; option=&quot;Sam&quot;, flag::Bool=false)
+    @show arg
+    @show option
+    @show flag
+end</code></pre><ul><li>now we need to give this file permission via <code>chmod</code>:</li></ul><pre><code class="language-sh hljs">chmod +x mycmd</code></pre><ul><li>you can now execute this file directly via <code>./mycmd</code>, if you want to be able to execute  this cmd directly from anywhere in your terminal, you can move this file to <code>.julia/bin</code>  folder, then add <code>.julia/bin</code> to your <code>PATH</code></li></ul><pre><code class="language-sh hljs">export PATH=&quot;$HOME/.julia/bin:$PATH&quot;</code></pre><h2 id="What&#39;s-under-the-hood?"><a class="docs-heading-anchor" href="#What&#39;s-under-the-hood?">What&#39;s under the hood?</a><a id="What&#39;s-under-the-hood?-1"></a><a class="docs-heading-anchor-permalink" href="#What&#39;s-under-the-hood?" title="Permalink"></a></h2><p>Now let me explain what <code>@main</code> does here. In short it does the following things:</p><ul><li>parse your expression and create a command line object</li><li>use this command line object to create an entry (See <a href="conventions/#Conventions">Conventions</a> section to read about its convention)</li><li>generate a Julia script to actually execute the command</li><li>cache the generated Julia script into a file so it won&#39;t need to recompile your code again</li></ul><h2 id="Developer-Recommendations"><a class="docs-heading-anchor" href="#Developer-Recommendations">Developer Recommendations</a><a id="Developer-Recommendations-1"></a><a class="docs-heading-anchor-permalink" href="#Developer-Recommendations" title="Permalink"></a></h2><p>For simple and small cases, a CLI script is sufficient.</p><p>However, for larger projects and more serious usage, one should <a href="project/#project">create a Comonicon CLI project</a> to use the full power of Comonicon. You will be able to gain the following features for free in a Comonicon project:</p><ul><li>much faster startup time</li><li>automatic CLI installation</li><li>much easier to deliver it to more users:<ul><li>can be registered and installed as a Julia package</li><li>distributable system image build in CI (powered by <a href="https://github.com/JuliaLang/PackageCompiler.jl">PackageCompiler</a>)</li><li>distributable standalone application build in CI (powered by <a href="https://github.com/JuliaLang/PackageCompiler.jl">PackageCompiler</a>)</li></ul></li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="conventions/">Conventions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Tuesday 22 February 2022 13:21">Tuesday 22 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
