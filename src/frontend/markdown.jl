@@ -173,7 +173,7 @@ function docstring(x)
 end
 
 function md_to_string(md::Markdown.MD) # don't print newlines for one paragraph
-    return sprint(md; context = (:color => true, :displaysize => (typemax(Int), 1000))) do io, x
+    return _sprint(md; color = true, displaysize = (typemax(Int), 1000)) do io, x
         show(io, MIME"text/plain"(), x)
     end
 end

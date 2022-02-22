@@ -1,11 +1,11 @@
 module JuliaExpr
 
 using ..AST
-using ..Comonicon: CommandException, CommandExit
+using ..Comonicon: CommandException, CommandExit, _sprint
 using ExproniconLite
 
 function help_str(x; color = true, width::Int)
-    sprint(print_cmd, x; context = (:color => color, :displaysize => (24, width)))
+    _sprint(print_cmd, x; color, displaysize = (24, width))
 end
 
 Base.@kwdef struct Configs
