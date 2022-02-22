@@ -2,6 +2,12 @@ using Pkg
 using TestEnv
 using Comonicon
 
+@static if VERSION < v"1.7"
+    pkgpath(pkg::Pkg.Types.PackageSpec) = pkg.repo.source
+else
+    pkgpath(pkg::Pkg.Types.PackageSpec) = pkg.path
+end
+
 function collect_lib()
     root = dirname(@__DIR__)
     lib_dir = joinpath(root, "lib")
@@ -38,7 +44,7 @@ function generate_example_manifest(pkgs)
     root = dirname(@__DIR__)
     comonicon_jl = PackageSpec(path = root)
     for pkg in pkgs
-        Pkg.activate(pkg.path)
+        Pkg.activate(pkgpath(pkg))
         Pkg.develop(comonicon_jl)
     end
     return
