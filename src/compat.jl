@@ -4,7 +4,7 @@
     end
 end
 
-function _sprint(f, args...; color::Bool, displaysize=(24, 80))
+function _sprint(f, args...; color::Bool, displaysize = (24, 80))
     buf = IOBuffer()
     io = IOContext(buf, :color => color, :displaysize => displaysize)
     f(io, args...)
