@@ -19,7 +19,7 @@ activate the environment at `path`.
 - `--shared`: whether activate the shared environment
 """
 @cast function activate(path; shared::Bool = false)
-    println("activating $s (shared=$shared)")
+    println("activating $path (shared=$shared)")
 end
 
 @main
