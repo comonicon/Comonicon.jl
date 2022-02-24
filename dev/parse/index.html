@@ -83,9 +83,17 @@ end
 &quot;&quot;&quot;
 My main command.
 &quot;&quot;&quot;
-@main # declare the entry</code></pre><p>this can be used in command line as <code>mycommand 1 2 3 --flag</code>, you can also just type <code>-h</code> to check the detailed help info.</p><p>The command line documentation will be generated automatically from your Julia docstring.</p><p>If you have deeper hierachy of commands, you can also put <code>@cast</code> on a Julia module.</p><pre><code class="language-julia hljs">@cast module NodeCommand
+@main # declare the entry</code></pre><p>this can be used in command line as <code>mycommand 1 2 3 --flag</code>, you can also just type <code>-h</code> to check the detailed help info.</p><p>The command line documentation will be generated automatically from your Julia docstring.</p><p>If you have deeper hierachy of commands, you can also put <code>@cast</code> on a Julia module.</p><pre><code class="language-julia hljs">using Comonicon
+@cast module NodeCommand
 
 using Comonicon
-@cast foo(x) = nothing
 
-end</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/comonicon/Comonicon.jl">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../types/">« Command Types</a><a class="docs-footer-nextpage" href="../configurations/">Command Configuration »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Thursday 24 February 2022 07:18">Thursday 24 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+@cast module NodeSubCommand
+using Comonicon
+@cast bar(x) = println(&quot;bar $x&quot;)
+end
+@cast foo(x) = println(&quot;foo $x&quot;)
+@main
+end
+
+NodeCommand.command_main()</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/comonicon/Comonicon.jl">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../types/">« Command Types</a><a class="docs-footer-nextpage" href="../configurations/">Command Configuration »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Thursday 24 February 2022 08:15">Thursday 24 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
