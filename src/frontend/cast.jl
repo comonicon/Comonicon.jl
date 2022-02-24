@@ -112,9 +112,9 @@ using Comonicon
 
 @cast module NodeSubCommand
 using Comonicon
-@cast bar(x) = println("bar $x")
+@cast bar(x) = println("bar \$x")
 end
-@cast foo(x) = println("foo $x")
+@cast foo(x) = println("foo \$x")
 @main
 end
 
