@@ -105,12 +105,20 @@ If you have deeper hierachy of commands, you can also put `@cast`
 on a Julia module.
 
 ```julia
+using Comonicon
 @cast module NodeCommand
 
 using Comonicon
-@cast foo(x) = nothing
 
+@cast module NodeSubCommand
+using Comonicon
+@cast bar(x) = println("bar $x")
 end
+@cast foo(x) = println("foo $x")
+@main
+end
+
+NodeCommand.command_main()
 ```
 
 """
