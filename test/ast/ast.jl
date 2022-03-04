@@ -56,7 +56,7 @@ node = NodeCommand(; name = "foo", subcmds = Dict("leaf" => leaf))
 @test_show MIME"text/plain" begin
     "  foo <command>" in node
     "Commands\n\n" in node
-    "  leaf <arg>" in node
+    "  leaf" in node
     "Flags\n\n" in node
     "-h, --help" in node
 end
