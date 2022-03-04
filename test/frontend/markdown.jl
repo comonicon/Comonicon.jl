@@ -48,9 +48,10 @@ using Comonicon:
     """)
 
     @test read_description(doc) == "description of the command."
-    @test read_intro(doc) == "asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa " *
-    "dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd " *
-    "dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw."
+    @test read_intro(doc) ==
+          "asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa " *
+          "dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd " *
+          "dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw."
 
     args = read_arguments(doc)
     @test args["arg1"] == "argument 1."

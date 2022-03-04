@@ -105,12 +105,20 @@ If you have deeper hierachy of commands, you can also put `@cast`
 on a Julia module.
 
 ```julia
+using Comonicon
 @cast module NodeCommand
 
 using Comonicon
-@cast foo(x) = nothing
 
+@cast module NodeSubCommand
+using Comonicon
+@cast bar(x) = println("bar \$x")
 end
+@cast foo(x) = println("foo \$x")
+@main
+end
+
+NodeCommand.command_main()
 ```
 
 """
@@ -370,6 +378,7 @@ function codegen_create_entry(m::Module, line, @nospecialize(ex))
     @gensym cmd entry
     configs = Configs.read_options(m)
     julia_expr_configs = JuliaExpr.Configs(;
+        configs.command.width,
         configs.command.color,
         configs.command.static,
         configs.command.dash,
@@ -403,7 +412,7 @@ function codegen_project_entry(m::Module, line, @nospecialize(ex))
     else
         nothing
     end
-    
+
     quote
         $(codegen_create_entry(m, line, ex))
 

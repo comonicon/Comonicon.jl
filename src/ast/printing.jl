@@ -44,7 +44,8 @@ function Base.show(io::IO, ::MIME"text/plain", cmd::Description)
 end
 
 print_cmd(cmd) = print_cmd(stdout, cmd)
-print_cmd(io::IO, cmd) = print_cmd(io, cmd, Terminal())
+print_cmd(io::IO, cmd) =
+    print_cmd(io, cmd, Terminal(width = get(io, :displaysize, displaysize(io))[2]))
 print_cmd(cmd, t::Terminal) = print_cmd(stdout, cmd, t)
 
 function print_cmd(io::IO, arg::Argument, t::Terminal)
@@ -160,7 +161,7 @@ function print_body(io::IO, cmd::Entry, t::Terminal)
     print_body(io, cmd.root, t)
     version_flag = "-V, --version"
     printstyled(io, tab(2), version_flag; color = t.color.dash)
-    print_indent_content(io, "print version information", t, length(version_flag) + 2)
+    print_indent_content(io, "Print version", t, length(version_flag) + 2)
     println(io)
 end
 
@@ -210,7 +211,7 @@ end
 function print_help(io::IO, t::Terminal)
     help_flag = "-h, --help"
     printstyled(io, tab(2), help_flag; color = t.color.dash)
-    print_indent_content(io, "print this help message", t, length(help_flag) + 2)
+    print_indent_content(io, "Print this help message", t, length(help_flag) + 2)
     println(io)
 end
 
@@ -227,10 +228,20 @@ function print_with_brief(f, io::IO, cmd, t::Terminal)
     f(buf, cmd, t)
     s = String(take!(buf))
 
+    middle = t.width - t.left - t.right
+    firstline = length(s) + 2
+    t.left - firstline + middle > 0 || error(
+        "signature of $(cmd.name) is too long, consider " *
+        "set `command.width` in `Comonicon.toml` to " *
+        "larger value, or truncate your argument and command name length " *
+        "current terminal width is $(t.width)",
+    )
+
     print(io, tab(2))
     f(io, cmd, t)
     isnothing(cmd.description.brief) && return
-    print_indent_content(io, cmd.description.brief, t, length(s) + 2)
+    print_indent_content(io, cmd.description.brief, t, firstline)
+    return
 end
 
 function print_indent_content(io::IO, text::String, t::Terminal, firstline::Int)
