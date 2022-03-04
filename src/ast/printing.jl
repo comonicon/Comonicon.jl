@@ -168,7 +168,7 @@ end
 function print_body(io::IO, cmd::NodeCommand, t::Terminal)
     section(io, "Commands")
     for each in values(cmd.subcmds)
-        print_sig_brief(io, each, t)
+        print_name_brief(io, each, t)
         println(io)
     end
     section(io, "Flags")
@@ -216,8 +216,16 @@ function print_help(io::IO, t::Terminal)
 end
 
 function print_sig_brief(io::IO, cmd, t::Terminal)
+    print_with_brief(print_signature, io, cmd, t)
+end
+
+function print_name_brief(io::IO, cmd, t::Terminal)
+    print_with_brief(print_name, io, cmd, t)
+end
+
+function print_with_brief(f, io::IO, cmd, t::Terminal)
     buf = IOBuffer()
-    print_signature(buf, cmd, t)
+    f(buf, cmd, t)
     s = String(take!(buf))
 
     middle = t.width - t.left - t.right
@@ -230,7 +238,7 @@ function print_sig_brief(io::IO, cmd, t::Terminal)
     )
 
     print(io, tab(2))
-    print_signature(io, cmd, t)
+    f(io, cmd, t)
     isnothing(cmd.description.brief) && return
     print_indent_content(io, cmd.description.brief, t, firstline)
     return
