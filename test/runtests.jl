@@ -10,6 +10,10 @@ end
     include("options.jl")
 end
 
+@testset "argtype" begin
+    include("argtype.jl")
+end
+
 @testset "ast" begin
     include("ast/ast.jl")
 end
