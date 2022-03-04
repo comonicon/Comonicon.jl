@@ -12,6 +12,7 @@ end
 
 @testset "ast" begin
     include("ast/ast.jl")
+    include("ast/argtype.jl")
 end
 
 @testset "frontend" begin

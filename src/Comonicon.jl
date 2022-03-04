@@ -15,6 +15,7 @@ export @cast, @main, cmd_error, cmd_exit
 include("compat.jl")
 include("configs.jl")
 include("exceptions.jl")
+include("argtypes.jl")
 include("ast/ast.jl")
 include("codegen/julia.jl")
 include("codegen/zsh.jl")
