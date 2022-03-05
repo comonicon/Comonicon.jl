@@ -63,8 +63,12 @@ end
 
 function install_completion(m::Module, options::Configs.Comonicon, shell::String)
     completions_dir = install_path(options, "completions")
-    completion_file = joinpath(completions_dir, "_" * options.name)
-    shell in ["zsh"] || return # only emit supported shell
+    shell in ["zsh", "bash"] || return
+    if shell == "zsh"
+        completion_file = joinpath(completions_dir, "_" * options.name)
+    elseif shell == "bash"
+        completion_file = joinpath(completions_dir, options.name * "-" * "completion.bash")
+    end
     open(completion_file, "w+") do io
         print(io, completion_script(m, options, shell))
     end
@@ -78,6 +82,8 @@ function completion_script(m::Module, options::Configs.Comonicon, shell::String)
 
     if shell == "zsh"
         return ZSHCompletions.emit(main)
+    else shell == "bash"
+        return BashCompletions.emit(main)
     else
         error(
             "$shell autocompletion is not supported, " *
