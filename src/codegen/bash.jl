@@ -176,6 +176,20 @@ function emit_compgen(::Type{Arg.DirName}, word::String)
     "COMPREPLY=(\$(compgen -d -- \"\$$(word)\"))"
 end
 
+function emit_compgen(::Type{Arg.FileName}, word::String)
+    "COMPREPLY=(\$(compgen -f -- \"\$$(word)\"))"
+end
+
+function emit_compgen(::Type{Arg.Prefix{name}}, word::String) where {name}
+    prefix = string(name)
+    "COMPREPLY=(\$(compgen -P \"$prefix\" -- \"\$$(word)\"))"
+end
+
+function emit_compgen(::Type{Arg.Suffix{name}}, word::String) where {name}
+    suffix = string(name)
+    "COMPREPLY=(\$(compgen -S \"$suffix\" -- \"\$$(word)\"))"
+end
+
 # if don't know how to complete, just go with default
 function emit_compgen(::Type, word::String)
     "COMPREPLY=(\$(compgen -o default -- \"\$$(word)\"))"
