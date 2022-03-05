@@ -18,7 +18,7 @@ function emit(cmd::Entry)
     name = cmd.root.name
     comp_func = bash_function_name([name])
     return """
-    $(emit(cmd.root))
+    $(emit(cmd.root, true))
 
     _$(name)_completion_entry() {
         $comp_func 1
@@ -28,7 +28,7 @@ function emit(cmd::Entry)
     """
 end
 
-function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
+function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String[])
     subcmd_cases = ["case \"\$curr_word\" in"]
     for name in keys(cmd.subcmds)
         subcmd_func = bash_function_name([prefix..., cmd.name, name])
@@ -38,7 +38,12 @@ function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
     push!(subcmd_cases, "esac")
 
     # NOTE: NodeCommand always complete based on the last word
-    available_cmds = join(keys(cmd.subcmds), " ")
+    words = collect(keys(cmd.subcmds))
+    push!(words, "-h", "--help")
+    if entry
+        push!(words, "-V", "--version")
+    end
+
     script = """
     $(bash_function_name([prefix..., cmd.name]))()
     {
@@ -46,7 +51,7 @@ function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
         local curr_word="\${COMP_WORDS[curr_word_idx]}"
         if [[ "\$curr_word_idx" -eq "\$COMP_CWORD" ]]
         then
-            COMPREPLY=(\$(compgen -W "$(available_cmds)" -- "\$curr_word"))
+            COMPREPLY=(\$(compgen -W "$(join(words, " "))" -- "\$curr_word"))
             return # return early if we're still completing the 'current' command
         fi
 
@@ -56,12 +61,12 @@ function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
 
     for subcmd in values(cmd.subcmds)
         script *= "\n\n"
-        script *= emit(subcmd, [prefix..., cmd.name])
+        script *= emit(subcmd, entry, [prefix..., cmd.name])
     end
     return script
 end
 
-function emit(cmd::LeafCommand, prefix::Vector{String}=String[])
+function emit(cmd::LeafCommand, entry::Bool=false, prefix::Vector{String}=String[])
     # last word doesn't match anything
     # specifically, but start with -
     # list all possible inputs
@@ -71,6 +76,9 @@ function emit(cmd::LeafCommand, prefix::Vector{String}=String[])
         flag.short && push!(dash_comp, string("-", flag.name))
     end
     push!(dash_comp, "-h", "--help")
+    if entry
+        push!(dash_comp, "-V", "--version")
+    end
 
     # last word matches an option
     # complete the option argument
@@ -174,6 +182,20 @@ end
 
 function emit_compgen(::Type{Arg.DirName}, word::String)
     "COMPREPLY=(\$(compgen -d -- \"\$$(word)\"))"
+end
+
+function emit_compgen(::Type{Arg.FileName}, word::String)
+    "COMPREPLY=(\$(compgen -f -- \"\$$(word)\"))"
+end
+
+function emit_compgen(::Type{Arg.Prefix{name}}, word::String) where {name}
+    prefix = string(name)
+    "COMPREPLY=(\$(compgen -P \"$prefix\" -- \"\$$(word)\"))"
+end
+
+function emit_compgen(::Type{Arg.Suffix{name}}, word::String) where {name}
+    suffix = string(name)
+    "COMPREPLY=(\$(compgen -S \"$suffix\" -- \"\$$(word)\"))"
 end
 
 # if don't know how to complete, just go with default
