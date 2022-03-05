@@ -1,8 +1,6 @@
 module Arg
 
-export FileName, DirName,
-    UserName, Path, Prefix, Suffix,
-    @Prefix_str, @Suffix_str
+export FileName, DirName, UserName, Path, Prefix, Suffix, @Prefix_str, @Suffix_str
 
 abstract type ArgType end
 
@@ -38,8 +36,8 @@ macro Suffix_str(s::String)
     return Suffix{Symbol(s)}
 end
 
-Base.show(io::IO, x::Prefix{name}) where name = print(io, "Prefix\"", name, "\"")
-Base.show(io::IO, x::Suffix{name}) where name = print(io, "Suffix\"", name, "\"")
+Base.show(io::IO, x::Prefix{name}) where {name} = print(io, "Prefix\"", name, "\"")
+Base.show(io::IO, x::Suffix{name}) where {name} = print(io, "Suffix\"", name, "\"")
 
 # use rust-like enum instead?
 # @renum ArgType begin
@@ -51,7 +49,7 @@ Base.show(io::IO, x::Suffix{name}) where name = print(io, "Suffix\"", name, "\""
 #     AnyType(name::String)
 # end
 
-function Base.tryparse(::Type{T}, s::AbstractString) where {T <: ArgType}
+function Base.tryparse(::Type{T}, s::AbstractString) where {T<:ArgType}
     return T(s)
 end
 
