@@ -38,11 +38,12 @@ function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String
     push!(subcmd_cases, "esac")
 
     # NOTE: NodeCommand always complete based on the last word
-    available_cmds = join(keys(cmd.subcmds), " ")
-    push!(available_cmds, "-h", "--help")
+    words = collect(keys(cmd.subcmds))
+    push!(words, "-h", "--help")
     if entry
-        push!(available_cmds, "-V", "--version")
+        push!(words, "-V", "--version")
     end
+
     script = """
     $(bash_function_name([prefix..., cmd.name]))()
     {
@@ -50,7 +51,7 @@ function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String
         local curr_word="\${COMP_WORDS[curr_word_idx]}"
         if [[ "\$curr_word_idx" -eq "\$COMP_CWORD" ]]
         then
-            COMPREPLY=(\$(compgen -W "$(available_cmds)" -- "\$curr_word"))
+            COMPREPLY=(\$(compgen -W "$(join(words, " "))" -- "\$curr_word"))
             return # return early if we're still completing the 'current' command
         fi
 
@@ -60,7 +61,7 @@ function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String
 
     for subcmd in values(cmd.subcmds)
         script *= "\n\n"
-        script *= emit(subcmd, [prefix..., cmd.name])
+        script *= emit(subcmd, entry, [prefix..., cmd.name])
     end
     return script
 end
