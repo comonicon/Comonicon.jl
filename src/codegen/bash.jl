@@ -18,7 +18,7 @@ function emit(cmd::Entry)
     name = cmd.root.name
     comp_func = bash_function_name([name])
     return """
-    $(emit(cmd.root))
+    $(emit(cmd.root, true))
 
     _$(name)_completion_entry() {
         $comp_func 1
@@ -28,7 +28,7 @@ function emit(cmd::Entry)
     """
 end
 
-function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
+function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String[])
     subcmd_cases = ["case \"\$curr_word\" in"]
     for name in keys(cmd.subcmds)
         subcmd_func = bash_function_name([prefix..., cmd.name, name])
@@ -39,6 +39,10 @@ function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
 
     # NOTE: NodeCommand always complete based on the last word
     available_cmds = join(keys(cmd.subcmds), " ")
+    push!(available_cmds, "-h", "--help")
+    if entry
+        push!(available_cmds, "-V", "--version")
+    end
     script = """
     $(bash_function_name([prefix..., cmd.name]))()
     {
@@ -61,7 +65,7 @@ function emit(cmd::NodeCommand, prefix::Vector{String}=String[])
     return script
 end
 
-function emit(cmd::LeafCommand, prefix::Vector{String}=String[])
+function emit(cmd::LeafCommand, entry::Bool=false, prefix::Vector{String}=String[])
     # last word doesn't match anything
     # specifically, but start with -
     # list all possible inputs
@@ -71,6 +75,9 @@ function emit(cmd::LeafCommand, prefix::Vector{String}=String[])
         flag.short && push!(dash_comp, string("-", flag.name))
     end
     push!(dash_comp, "-h", "--help")
+    if entry
+        push!(dash_comp, "-V", "--version")
+    end
 
     # last word matches an option
     # complete the option argument

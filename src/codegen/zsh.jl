@@ -1,6 +1,7 @@
 module ZSHCompletions
 
 using ..AST
+using ..Arg
 
 const tab = " "
 
@@ -77,7 +78,33 @@ function emit(prefix::String, cmd::LeafCommand, entry::Bool)
         if option.short
             token = "{-$(name[1]),--$name}"
         end
+        msg = something(option.hint, lowercase(string(option.type)))
+        push!(args, "$token='[$doc]:$msg:$(emit_action(option.type))'")
+    end
+
+    for flag in values(cmd.flags)
+        name = flag.name
+        doc = flag.description.brief
+        token = "--$name"
+        if flag.short
+            token = "{-$(name[1]),$token}"
+        end
+
         push!(args, "$token'[$doc]'")
+    end
+
+    for (k, arg) in enumerate(cmd.args)
+        msg = isempty(arg.description.brief) ? arg.name : arg.description.brief
+        if arg.require
+            push!(args, "\"$k:$msg:$(emit_action(arg.type))\"")
+        else
+            push!(args, "\"$k::$msg:$(emit_action(arg.type))\"")
+        end
+    end
+
+    if !isnothing(cmd.vararg)
+        msg = isempty(cmd.vararg.description.brief) ? cmd.vararg.name : cmd.vararg.description.brief
+        push!(args, "\"*::$(msg):$(emit_action(cmd.vararg.type))\"")
     end
 
     append!(lines, map(x -> tab * x * " \\", args))
@@ -107,5 +134,10 @@ function actions(args)
 
     return "((" * join(hints, " ") * "))"
 end
+
+emit_action(::Type{Arg.Path}) = "_path_files"
+emit_action(::Type{Arg.FileName}) = "_files"
+emit_action(::Type{Arg.DirName}) = "_dir_list"
+emit_action(::Type) = "_path_files"
 
 end
