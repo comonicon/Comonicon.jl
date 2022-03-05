@@ -82,7 +82,7 @@ function completion_script(m::Module, options::Configs.Comonicon, shell::String)
 
     if shell == "zsh"
         return ZSHCompletions.emit(main)
-    else shell == "bash"
+    elseif shell == "bash"
         return BashCompletions.emit(main)
     else
         error(
