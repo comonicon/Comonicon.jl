@@ -14,9 +14,28 @@ function install_env_path(
         write_path(rcfile, install_path)
     end
 
-    msg = "cannot detect $(options.install.path)/completions in FPATH, do you want to add it in FPATH?"
-    if !contains_fpath(rcfile, install_path, env) && Tools.prompt(msg, yes)
-        write_fpath(rcfile, install_path)
+    if shell == "bash"
+        completions_script = install_path(options, "completions",
+                     options.name * "-" * "completion.bash")
+        println("please add the following line in your $rcfile to enable shell autocompletion")
+        println(" source $completions_script")
+        println()
+        # msg = "cannot detect bash completions, do you want to add it in $rcfile?"
+        # if Tools.prompt(msg, yes)
+        #     open(rcfile, "a") do io
+        #         completions_script = install_path(options, "completions",
+        #             options.name * "-" * "completion.bash")
+        #         script = "source $completions_script"
+        #         write(io, "\n" * script * "\n")
+        #     end
+        # end
+    end
+
+    if shell == "zsh"
+        msg = "cannot detect $(options.install.path)/completions in FPATH, do you want to add it in FPATH?"
+        if !contains_fpath(rcfile, install_path, env) && Tools.prompt(msg, yes)
+            write_fpath(rcfile, install_path)
+        end
     end
 
     @info "open a new terminal, or source $rcfile to enable the new PATH."

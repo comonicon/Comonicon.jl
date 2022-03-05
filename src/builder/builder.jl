@@ -2,6 +2,7 @@ module Builder
 
 using ..Configs: Configs
 using ..ZSHCompletions
+using ..BashCompletions
 using ..Comonicon: get_version, Tools
 using PackageCompiler
 using Logging
