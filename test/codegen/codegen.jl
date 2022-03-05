@@ -14,3 +14,7 @@ end
 @testset "ZSHCompletions.emit" begin
     include("zsh/zsh.jl")
 end
+
+@testset "BashCompletions.emit" begin
+    include("bash.jl")
+end

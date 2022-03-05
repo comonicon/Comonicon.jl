@@ -19,6 +19,7 @@ include("argtypes.jl")
 include("ast/ast.jl")
 include("codegen/julia.jl")
 include("codegen/zsh.jl")
+include("codegen/bash.jl")
 include("tools.jl")
 
 include("frontend/frontend.jl")
