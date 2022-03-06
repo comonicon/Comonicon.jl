@@ -15,8 +15,8 @@ function install_env_path(
     end
 
     if shell == "bash"
-        completions_script = install_path(options, "completions",
-                     options.name * "-" * "completion.bash")
+        completions_script =
+            install_path(options, "completions", options.name * "-" * "completion.bash")
         println("please add the following line in your $rcfile to enable shell autocompletion")
         println(" source $completions_script")
         println()

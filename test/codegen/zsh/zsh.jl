@@ -25,16 +25,14 @@ cmd = Entry(;
         subcmds = Dict(
             "cmd1" => NodeCommand(;
                 name = "cmd1",
-                    subcmds = Dict(
-                        "cmd11" => LeafCommand(; fn = identity, name = "cmd11")
-                    )
+                subcmds = Dict("cmd11" => LeafCommand(; fn = identity, name = "cmd11")),
             ),
             "cmd2" => LeafCommand(; fn = identity, name = "cmd2"),
         ),
     ),
 )
 
-ZSHCompletions.emit(cmd)|>print
+ZSHCompletions.emit(cmd) |> print
 
 cmd = Entry(;
     version = v"1.1.0",
@@ -47,7 +45,13 @@ cmd = Entry(;
         ],
         vararg = Argument(; name = "c", type = Int, vararg = true),
         options = Dict(
-            "option-a" => Option(; sym = :option_a, hint = "int", type = Int, short = true, description="test"),
+            "option-a" => Option(;
+                sym = :option_a,
+                hint = "int",
+                type = Int,
+                short = true,
+                description = "test",
+            ),
             "option-b" => Option(; sym = :option_b, hint = "float64", type = Float64),
         ),
         flags = Dict(
@@ -57,4 +61,4 @@ cmd = Entry(;
     ),
 )
 
-ZSHCompletions.emit(cmd)|>print
+ZSHCompletions.emit(cmd) |> print

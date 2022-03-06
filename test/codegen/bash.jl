@@ -19,7 +19,7 @@ cmd = Entry(;
     ),
 )
 
-BashCompletions.emit(cmd)|>print
+BashCompletions.emit(cmd) |> print
 
 cmd = Entry(;
     version = v"1.2.0",
@@ -28,16 +28,14 @@ cmd = Entry(;
         subcmds = Dict(
             "cmd1" => NodeCommand(;
                 name = "cmd1",
-                    subcmds = Dict(
-                        "cmd11" => LeafCommand(; fn = called, name = "cmd11")
-                    )
+                subcmds = Dict("cmd11" => LeafCommand(; fn = called, name = "cmd11")),
             ),
             "cmd2" => LeafCommand(; fn = called, name = "cmd2"),
         ),
     ),
 )
 
-BashCompletions.emit(cmd)|>print
+BashCompletions.emit(cmd) |> print
 
 foo(x) = x
 
@@ -62,4 +60,4 @@ cmd = Entry(;
     ),
 )
 
-BashCompletions.emit(cmd)|>print
+BashCompletions.emit(cmd) |> print

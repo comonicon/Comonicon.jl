@@ -5,8 +5,8 @@ using ..Arg
 
 tab(n::Int) = " "^n
 
-indent(s::String, n::Int=1) = tab(4n) * s
-function indent(lines::Vector, n::Int=1)
+indent(s::String, n::Int = 1) = tab(4n) * s
+function indent(lines::Vector, n::Int = 1)
     indent.(lines, n)
 end
 
@@ -28,7 +28,7 @@ function emit(cmd::Entry)
     """
 end
 
-function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String[])
+function emit(cmd::NodeCommand, entry::Bool = false, prefix::Vector{String} = String[])
     subcmd_cases = ["case \"\$curr_word\" in"]
     for name in keys(cmd.subcmds)
         subcmd_func = bash_function_name([prefix..., cmd.name, name])
@@ -66,7 +66,7 @@ function emit(cmd::NodeCommand, entry::Bool=false, prefix::Vector{String}=String
     return script
 end
 
-function emit(cmd::LeafCommand, entry::Bool=false, prefix::Vector{String}=String[])
+function emit(cmd::LeafCommand, entry::Bool = false, prefix::Vector{String} = String[])
     # last word doesn't match anything
     # specifically, but start with -
     # list all possible inputs
