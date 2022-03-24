@@ -10,7 +10,7 @@ function install_env_path(
     rcfile = detect_rcfile(shell, home_dir)
     install_path = expanduser(options.install.path)
     msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
-    if !contains_path(rcfile, install_path, env) && Tools.prompt(msg, yes)
+    if !contains_path(rcfile, install_path, env) && Tools.prompt(msg; yes)
         write_path(rcfile, install_path)
     end
 
@@ -33,7 +33,7 @@ function install_env_path(
 
     if shell == "zsh"
         msg = "cannot detect $(options.install.path)/completions in FPATH, do you want to add it in FPATH?"
-        if !contains_fpath(rcfile, install_path, env) && Tools.prompt(msg, yes)
+        if !contains_fpath(rcfile, install_path, env) && Tools.prompt(msg; yes)
             write_fpath(rcfile, install_path)
         end
     end
