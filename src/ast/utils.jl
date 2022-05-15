@@ -67,8 +67,11 @@ function content_brief(s; max_width = 80)
     brief = String[]
     char_count = 0
     for word in words
-        char_count += length(word)
-        char_count > max_width-3 && break
+        char_count += length(word) + 1
+        # length should be max_width-3
+        # but we overcount a space for
+        # the last word.
+        char_count > max_width-2 && break
         push!(brief, word)
     end
     return join(brief, ' ') * "..."

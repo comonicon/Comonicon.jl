@@ -16,6 +16,7 @@ end
 
 @testset "ast" begin
     include("ast/ast.jl")
+    include("ast/utils.jl")
 end
 
 @testset "frontend" begin
