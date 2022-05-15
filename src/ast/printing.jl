@@ -80,6 +80,8 @@ end
 
 function print_content(io::IO, desc::Description, t::Terminal)
     isnothing(desc.content) || print_within(io, desc.content, t.width, 0)
+    # if Intro section is empty, use brief description
+    isnothing(desc.brief) || print_within(io, desc.brief, t.width, 0)
     return
 end
 
@@ -169,7 +171,7 @@ function print_body(io::IO, cmd::NodeCommand, t::Terminal)
     section(io, "Commands")
     for each in values(cmd.subcmds)
         print_name_brief(io, each, t)
-        println(io)
+        section(io)
     end
     section(io, "Flags")
     print_help(io, t)
@@ -239,8 +241,14 @@ function print_with_brief(f, io::IO, cmd, t::Terminal)
 
     print(io, tab(2))
     f(io, cmd, t)
-    isnothing(cmd.description.brief) && return
-    print_indent_content(io, cmd.description.brief, t, firstline)
+
+    if isnothing(cmd.description.brief)
+        isnothing(cmd.description.content) && return
+        brief = content_brief(cmd.description.content; max_width=t.right)
+    else
+        brief = cmd.description.brief
+    end
+    print_indent_content(io, brief, t, firstline)
     return
 end
 
