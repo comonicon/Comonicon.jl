@@ -34,6 +34,7 @@ Base.@kwdef struct Option <: ComoniconExpr
     sym::Symbol
     name::String = replace(string(sym), '_' => '-')
     hint::Maybe{String} = nothing
+    require::Bool = false # unless option doesn't have a default keyword
     type = Any
     short::Bool = false
     description::Description = Description()
