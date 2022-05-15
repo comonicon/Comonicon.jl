@@ -61,3 +61,15 @@ function splitlines(s, width = 80)
     isempty(current_line) || push!(lines, strip(join(current_line)))
     return lines
 end
+
+function content_brief(s; max_width = 80)
+    words = splittext(s)
+    brief = String[]
+    char_count = 0
+    for word in words
+        char_count += length(word)
+        char_count > max_width-3 && break
+        push!(brief, word)
+    end
+    return join(brief, ' ') * "..."
+end
