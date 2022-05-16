@@ -244,7 +244,7 @@ function print_with_brief(f, io::IO, cmd, t::Terminal)
 
     if isnothing(cmd.description.brief)
         isnothing(cmd.description.content) && return
-        brief = content_brief(cmd.description.content; max_width=t.right)
+        brief = content_brief(cmd.description.content; max_width = t.right)
     else
         brief = cmd.description.brief
     end
