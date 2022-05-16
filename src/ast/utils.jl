@@ -71,7 +71,7 @@ function content_brief(s; max_width = 80)
         # length should be max_width-3
         # but we overcount a space for
         # the last word.
-        char_count > max_width-2 && break
+        char_count > max_width - 2 && break
         push!(brief, word)
     end
     return join(brief, ' ') * "..."
