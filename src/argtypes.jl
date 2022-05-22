@@ -2,36 +2,96 @@ module Arg
 
 export FileName, DirName, UserName, Path, Prefix, Suffix, @Prefix_str, @Suffix_str
 
+"""
+    abstract type ArgType
+
+Abstract type for special CLI arguments. These
+types are useful for generating shell autocompletions
+and argument checks. All the `ArgType` should implement
+a corresponding `Base.tryparse` method, otherwise
+it will fallback to passing the raw string as the `content`
+field.
+"""
 abstract type ArgType end
 
+"""
+    struct Path <: ArgType
+    Path(content)
+
+A `Path` object denotes a path as CLI input.
+"""
 struct Path <: ArgType
     content::String
 end
 
+"""
+    struct DirName <: ArgType
+    DirName(content)
+
+A `DirName` object denotes a directory name as CLI input.
+"""
 struct DirName <: ArgType
     content::String
 end
 
+"""
+    struct FileName <: ArgType
+    FileName(content)
+
+A `FileName` object denotes a file name as CLI input.
+"""
 struct FileName <: ArgType
     content::String
 end
 
+"""
+    struct UserName <: ArgType
+    UserName(content)
+
+A `UserName` object denotes a Linux/MacOS user name as CLI input.
+"""
 struct UserName <: ArgType
     content::String
 end
 
+"""
+    struct Prefix{name} <: ArgType
+    Prefix{name}(content)
+
+Denotes strings with prefix `name` as CLI input, e.g `data-xxx`
+"""
 struct Prefix{name} <: ArgType
     content::String
 end
 
+"""
+    struct Suffix{name} <: ArgType
+    Suffix{name}(content)
+
+Denotes strings with suffix `name` as CLI input, e.g `xxxxx.jl`.
+"""
 struct Suffix{name} <: ArgType
     content::String
 end
 
+"""
+    macro Prefix_str
+    Prefix"<name>"
+
+Syntax sugar for creating a prefix type, e.g `Predix"data"`
+is the same as `Prefix{:data}`.
+"""
 macro Prefix_str(s::String)
     return Prefix{Symbol(s)}
 end
 
+"""
+    macro Suffix_str
+    Suffix"<name>"
+
+Syntax sugar for creating a suffix type, e.g `Suffix"data"`
+is the same as `Suffix{:data}`.
+"""
 macro Suffix_str(s::String)
     return Suffix{Symbol(s)}
 end
