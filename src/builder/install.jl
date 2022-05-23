@@ -102,7 +102,7 @@ function entryfile_script(m::Module, options::Configs.Comonicon)
         push!(cmds, "--sysimage=" * dylib)
     end
 
-    if options.install.nthreads > 1
+    if options.install.nthreads > 1 || options.install.nthreads == "auto"
         push!(cmds, string("--threads=", options.install.nthreads))
     end
 
