@@ -7,7 +7,7 @@ using Comonicon.Configs
     display(options)
     @test options == Configs.Comonicon(;
         name = "foo",
-        install = Configs.Install(; compile = "min"),
+        install = Configs.Install(; compile = "min", nthreads="auto"),
         sysimg = Configs.SysImg(;
             cpu_target = "native",
             precompile = Configs.Precompile(; execution_file = ["deps/precopmile.jl"]),
