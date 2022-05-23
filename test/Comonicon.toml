@@ -5,6 +5,7 @@ completion=true
 quiet=false
 compile="min"
 optimize=2
+nthreads="auto"
 
 [sysimg]
 path="deps"

@@ -60,6 +60,7 @@ Installation configurations.
 - `quiet`: print logs or not, default is `false`.
 - `compile`: julia compiler option for CLIs if not built as standalone application, default is "min".
 - `optimize`: julia compiler option for CLIs if not built as standalone application, default is `2`.
+- `nthreads`: julia compiler option for CLIs if not built as standalone application, default is `1`.
 """
 @option struct Install
     path::String = "~/.julia"
@@ -67,7 +68,7 @@ Installation configurations.
     quiet::Bool = false
     compile::String = "yes"
     optimize::Int = 2
-    nthreads::Int = 1
+    nthreads::Union{Int, String} = 1
 end
 
 """
