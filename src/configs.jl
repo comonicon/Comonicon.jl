@@ -68,7 +68,7 @@ Installation configurations.
     quiet::Bool = false
     compile::String = "yes"
     optimize::Int = 2
-    nthreads::Union{Int, String} = 1
+    nthreads::Union{Int,String} = 1
 end
 
 """
