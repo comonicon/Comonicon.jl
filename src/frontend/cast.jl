@@ -254,8 +254,18 @@ function is_optional_argument_with_type(ex)
 end
 
 function split_leaf_command(fn::JLFunction)
+    args = parse_arguments(fn)
+    flags, options = parse_kwargs(fn)
+
+    args = Expr(:ref, :($Comonicon.JLArgument), args...)
+    options = Expr(:ref, :($Comonicon.JLOption), options...)
+    flags = Expr(:ref, :($Comonicon.JLFlag), flags...)
+    return args, options, flags
+end
+
+function parse_arguments(fn::JLFunction)
     # use ::<type> as hint if there is no docstring
-    args = map(fn.args) do each
+    return map(fn.args) do each
         if each isa Symbol
             xcall(Comonicon, :JLArgument; name = QuoteNode(each))
         elseif is_argument_with_type(each) # :($name::$type)
@@ -302,45 +312,78 @@ function split_leaf_command(fn::JLFunction)
             throw(Meta.ParseError("invalid syntax: $each"))
         end
     end
+end
 
+"""
+    parse_kwargs(fn::JLFunction) -> flags, options
+
+Parse the keyword arguments of function expression `fn` into
+intermediate Julia CLI objects `JLFlag` and `JLOption`.
+"""
+function parse_kwargs(fn::JLFunction)
     flags, options = [], []
-    if !isnothing(fn.kwargs)
-        for each in fn.kwargs
-            Meta.isexpr(each, :kw) ||
-                error("options should have default values or make it a positional argument")
-            expr = each.args[1]
-            value = each.args[2]
-            if expr isa Symbol # Expr(:kw, name::Symbol, value)
-                push!(options, xcall(Comonicon, :JLOption, QuoteNode(expr), Any, string(value)))
-            elseif Meta.isexpr(expr, :(::))
-                name = expr.args[1]
-                type = expr.args[2]
-
-                if type === :Bool || type === Bool
-                    value == false || error(
-                        "Boolean options must use false as " *
-                        "default value, and will be parsed as flags. got $name",
-                    )
-                    push!(flags, xcall(Comonicon, :JLFlag, QuoteNode(name)))
-                else
-                    push!(
-                        options,
-                        xcall(
-                            Comonicon,
-                            :JLOption,
-                            QuoteNode(name),
-                            type,
-                            string(value) * "::" * string(type),
-                        ),
-                    )
-                end
-            end
+    isnothing(fn.kwargs) && return flags, options
+    for each_expr in fn.kwargs
+        if Meta.isexpr(each_expr, :kw)
+            parse_optional_kwargs!(flags, options, each_expr)
+        else
+            parse_required_kwargs!(flags, options, each_expr)
         end
     end
-    args = Expr(:ref, :($Comonicon.JLArgument), args...)
-    options = Expr(:ref, :($Comonicon.JLOption), options...)
-    flags = Expr(:ref, :($Comonicon.JLFlag), flags...)
-    return args, options, flags
+    return flags, options
+end
+
+function parse_required_kwargs!(flags, options, @nospecialize(expr))::Nothing
+    if expr isa Symbol # name::Any
+        name = expr
+        type = Any
+    elseif Meta.isexpr(expr, :(::)) # name::type
+        name = expr.args[1]
+        type = expr.args[2]
+    else
+        throw(ArgumentError("unexpected expression $expr"))
+    end
+
+    push!(options, xcall(
+        Comonicon, :JLOption, QuoteNode(name), true, type, string(type),
+    ))
+    return
+end
+
+function parse_optional_kwargs!(flags, options, kw_expr::Expr)::Nothing
+    # expr == Expr(:kw, expr, value)
+    expr = kw_expr.args[1]
+    value = kw_expr.args[2]
+    if expr isa Symbol # Expr(:kw, name::Symbol, value)
+        push!(options, xcall(Comonicon, :JLOption, QuoteNode(expr), false, Any, string(value)))
+    elseif Meta.isexpr(expr, :(::)) # Expr(:kw, ($name::$type), value)
+        name = expr.args[1]
+        type = expr.args[2]
+
+        if type === :Bool || type === Bool
+            value == false || error(
+                "Boolean options must use false as " *
+                "default value, and will be parsed as flags. got $name" *
+                "for non-standard usage please use the AST interface directly"
+            )
+            push!(flags, xcall(Comonicon, :JLFlag, QuoteNode(name)))
+        else
+            push!(
+                options,
+                xcall(
+                    Comonicon,
+                    :JLOption,
+                    QuoteNode(name),
+                    false,
+                    type,
+                    string(value) * "::" * string(type),
+                ),
+            )
+        end
+    else
+        throw(ArgumentError("unexpected expression: $kw_expr"))
+    end
+    return
 end
 
 function wrap_type(def::JLFunction, type)
@@ -586,6 +629,7 @@ function cast_options(doc::JLMD, options::Vector{JLOption}, line)
                     sym = each.name,
                     name = name,
                     hint = option.hint, # use user defined hint
+                    require = each.require,
                     type = each.type,
                     short = option.short,
                     description = option.desc,
@@ -600,6 +644,7 @@ function cast_options(doc::JLMD, options::Vector{JLOption}, line)
                 sym = each.name,
                 name = name,
                 hint = each.hint,
+                require = each.require,
                 type = each.type,
                 line = line,
             )

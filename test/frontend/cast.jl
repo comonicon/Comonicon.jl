@@ -35,9 +35,9 @@ flags = [JLFlag(:flag1), JLFlag(:flag2)]
 
 options = [
     # name, type, hint
-    JLOption(:option1, Any, "nothing"),
-    JLOption(:option2, Int, "1::Int"),
-    JLOption(:option3, String, "abc::String"),
+    JLOption(:option1, false, Any, "nothing"),
+    JLOption(:option2, false, Int, "1::Int"),
+    JLOption(:option3, false, String, "abc::String"),
 ]
 
 """
@@ -99,33 +99,56 @@ function foo(
 end
 
 @testset "split_leaf_command" begin
-    def = @expr JLFunction function foo(
-        arg1,
-        arg2::Int = 1,
-        arg3::String = "abc";
-        option1 = nothing,
-        option2::Int = 1,
-        option3::String = "abc",
-        flag1::Bool = false,
-        flag2::Bool = false,
-    ) end
 
-    args′, options′, flags′ = split_leaf_command(def)
-    args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
+    @testset "basic" begin
+        def = @expr JLFunction function foo(
+            arg1,
+            arg2::Int = 1,
+            arg3::String = "abc";
+            option1 = nothing,
+            option2::Int = 1,
+            option3::String = "abc",
+            flag1::Bool = false,
+            flag2::Bool = false,
+        ) end
 
-    @test args′ == args
-    @test options == options′
-    @test flags == flags′
+        args′, options′, flags′ = split_leaf_command(def)
+        args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
 
-    def = @expr JLFunction function foo(; option1::Bool = true) end
-    @test_throws ErrorException split_leaf_command(def)
+        @test args′ == args
+        @test options == options′
+        @test flags == flags′
 
-    def = @expr JLFunction function foo(; option1::Bool) end
-    @test_throws ErrorException split_leaf_command(def)
+        def = @expr JLFunction function foo(; option1::Bool = true) end
+        @test_throws ErrorException split_leaf_command(def)
+    end
 
-    def = @expr JLFunction function foo(; option1) end
-    @test_throws ErrorException split_leaf_command(def)
+    @testset "required kwargs" begin
+        def = @expr JLFunction function foo(
+            arg1,
+            arg2::Int = 1,
+            arg3::String = "abc";
+            option1,
+            option2::Int,
+            option3::String,
+            flag1::Bool,
+            flag2::Bool = false,
+        ) end
+
+        args′, options′, flags′ = split_leaf_command(def)
+        args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
+
+        @test options′ == [
+            JLOption(:option1, true, Any, "<Any>"),
+            JLOption(:option2, true, Int64, "<Int>"),
+            JLOption(:option3, true, String, "<String>"),
+            JLOption(:flag1, true, Bool, "<Bool>"),
+        ]
+
+        @test flags′ == [JLFlag(:flag2)]
+    end
 end
+
 
 @test_throws ErrorException eval(:(module TestA
 using Comonicon

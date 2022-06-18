@@ -79,3 +79,25 @@ end
     @test command_main(["build", "test", "--target=aaaa"]) == 0
 end
 end
+
+module TestRequireOptions
+
+using Test
+using Comonicon
+
+"""
+# Options
+
+- `--name=<string>`: name
+"""
+@main function run(;name::String, shots::Int)
+    @test name == "test"
+    @test shots == 2
+end
+
+@testset "TestRequireOptions" begin
+    @test TestRequireOptions.command_main(["--name=test"]) == 1
+    @test TestRequireOptions.command_main(["--name=test", "--shots=2"]) == 0
+end
+
+end
