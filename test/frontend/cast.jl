@@ -139,10 +139,10 @@ end
         args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
 
         @test options′ == [
-            JLOption(:option1, true, Any, "<Any>"),
-            JLOption(:option2, true, Int64, "<Int>"),
-            JLOption(:option3, true, String, "<String>"),
-            JLOption(:flag1, true, Bool, "<Bool>"),
+            JLOption(:option1, true, Any, "Any"),
+            JLOption(:option2, true, Int64, "Int"),
+            JLOption(:option3, true, String, "String"),
+            JLOption(:flag1, true, Bool, "Bool"),
         ]
 
         @test flags′ == [JLFlag(:flag2)]
