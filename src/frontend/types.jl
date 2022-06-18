@@ -8,6 +8,7 @@ end
 
 struct JLOption
     name::Symbol
+    require::Bool
     type::Any
     hint::String
 end

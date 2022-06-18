@@ -239,6 +239,30 @@ function emit_leaf_call(cmd::LeafCommand, ctx::EmitContext, args::Symbol, kwargs
         )
     end
 
+    # check if all required options are filled
+    if !isempty(cmd.options)
+        for each in values(cmd.options)
+            each.require || continue
+            err_hint = "--" * each.name
+            
+            if each.short
+                err_hint *= ",-" * each.name[1:1]
+            end
+
+            err_hint = "expect option $err_hint"
+
+            @gensym idx
+            push!(ret.args,
+                quote
+                    $idx = findfirst(x->x.first===$(QuoteNode(each.sym)), $kwargs)
+                    if $idx === nothing
+                        $(emit_error(cmd, ctx, err_hint))
+                    end
+                end
+            )
+        end
+    end
+
     call = Expr(:call, cmd.fn)
     if !isempty(cmd.flags) || !isempty(cmd.options)
         push!(call.args, Expr(:parameters, :($kwargs...)))
@@ -301,9 +325,9 @@ function emit_exception_handle(cmd::LeafCommand, ctx::EmitContext, call, color::
         catch e
             # NOTE:
             # terminate should return 0
-            # other exception will return 1
+            # other exception will return exitcode
             if e isa $CommandExit
-                print("command exit")
+                println("command exit with 0")
                 return 0
             elseif e isa $CommandException
                 showerror(stdout, e)
