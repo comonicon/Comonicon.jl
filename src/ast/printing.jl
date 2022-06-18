@@ -17,12 +17,37 @@ Base.@kwdef mutable struct Indent
     desc::Int = 0
 end
 
+"""
+    mutable struct Color
+
+Color configuration.
+
+# Fields
+
+- `name::Symbol`: command name color.
+- `args::Symbol`: command args color.
+- `dash::Symbol`: command flag/option color.
+"""
 Base.@kwdef mutable struct Color
     name::Symbol = :light_blue
     args::Symbol = :light_magenta
     dash::Symbol = :light_cyan
 end
 
+"""
+    mutable struct Terminal
+
+Configurations for terminal printing.
+
+# Fields
+
+- `width::Int`: width of the terminal.
+- `left::Int`: left column max width.
+- `right::Int`: right column max width.
+- `color:Color`: color configurations, see [`Color`](@ref).
+- `indent::Indent`: indent configuration, see [`Indent`](@ref).
+- `brief::Bool`: print the brief intro or not.
+"""
 Base.@kwdef mutable struct Terminal
     width::Int = max(displaysize(stdout)[2], 80) # always have a minimum size
     left::Int = floor(Int, 0.4 * width) # left column max width
@@ -42,6 +67,20 @@ function Base.show(io::IO, ::MIME"text/plain", cmd::Description)
     printstyled(io, "content:\n"; color = :light_black)
     print(io, cmd.content)
 end
+
+"""
+    print_cmd([io::IO], cmd, [terminal::Terminal])
+
+Print the command object in terminal.
+
+# Arguments
+
+- `io::IO`: an IO object, default is `stdout`.
+- `cmd`: a command object, can be `Entry`, `NodeCommand`, `LeafCommand`.
+- `terminal::Terminal`: a `Terminal` object, contains
+    the printing and terminal configuration. See also [`Terminal`](@ref).
+"""
+function print_cmd end
 
 print_cmd(cmd) = print_cmd(stdout, cmd)
 print_cmd(io::IO, cmd) =
