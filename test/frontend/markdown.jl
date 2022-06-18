@@ -237,6 +237,7 @@ end
 end # TestMarkdown
 
 module TestLazyLoad
+using Test
 @testset "lazyload" begin
     generated = macroexpand(Main, :(@lazyload using Pkg @cast function f() end))
     ex1 = generated.args[1]
