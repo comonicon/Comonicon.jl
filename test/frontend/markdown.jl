@@ -235,3 +235,45 @@ end
 end
 
 end # TestMarkdown
+
+module TestLazyLoad
+
+using Test
+using Comonicon
+using ExproniconLite
+
+@testset "lazyload" begin
+    ex = @expr @cast function f()
+    end
+    generated = Comonicon.lazyload_m(Main, nothing, :(using Pkg), ex)
+
+    @test_expr generated == quote
+        if !(isempty(ARGS)) && ARGS[1] == "f"
+            using Pkg
+        end
+
+        Core.@__doc__ @cast function f()
+        end
+    end
+
+    ex = @expr @cast module nodecmd
+        using Comonicon
+        @cast function f()
+        end
+    end
+
+    generated = Comonicon.lazyload_m(Main, nothing, :(using Pkg), ex)
+    @test_expr generated == quote
+        if !(isempty(ARGS)) && ARGS[1] == "nodecmd"
+            using Pkg
+        end
+
+        Core.@__doc__ @cast module nodecmd
+            using Comonicon
+            @cast function f()
+            end
+        end
+    end
+end
+
+end
