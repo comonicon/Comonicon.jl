@@ -652,3 +652,22 @@ function cast_options(doc::JLMD, options::Vector{JLOption}, line)
     end
     return cmd_options
 end
+
+"""
+    @lazyload expr @cast function f(args...) ... end
+
+Run `expr` if current top level command `f` is executed.
+Mainly designed for lazy loading packages that associated to a command.
+"""
+macro lazyload(expr, fdef)
+    if (__module__) != Main
+        error("Top level module of `@lazyload` must be `Main`, got `$(__module__)`")
+    end
+    if !(fdef isa Expr && fdef.head == :macrocall && fdef.args[1] == Symbol("@cast"))
+        error("`@lazyload` must take a `@cast function ... end` expression as the second argument.")
+    end
+    fname = string(fdef.args[3].args[1].args[1])
+    esc(Expr(:block, :(if ARGS[1] == $fname
+                           $(expr)
+                       end), fdef))
+end

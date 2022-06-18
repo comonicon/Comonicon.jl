@@ -10,7 +10,7 @@ using Pkg
 using Markdown
 using ExproniconLite
 
-export @cast, @main, cmd_error, cmd_exit
+export @cast, @main, cmd_error, cmd_exit, @lazyload
 
 include("compat.jl")
 include("configs.jl")
