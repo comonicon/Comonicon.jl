@@ -237,12 +237,24 @@ end
 end # TestMarkdown
 
 module TestLazyLoad
-using Test, Comonicon
+
+using Test
+using Comonicon
+using ExproniconLite
+
 @testset "lazyload" begin
-    generated = macroexpand(Main, :(@lazyload using Pkg @cast function f() end))
-    ex1 = generated.args[1]
-    @test ex1.head == :if
-    @test ex1.args[1] == :(ARGS[1] == "f")
-    @test ex1.args[2].args[2] == :(using Pkg)
+    ex = @expr @cast function f()
+    end
+    generated = Comonicon.lazyload_m(Main, nothing, :(using Pkg), ex)
+
+    @test_expr generated == quote
+        if !(isempty(ARGS)) && ARGS[1] == "f"
+            using Pkg
+        end
+
+        Core.@__doc__ @cast function f()
+        end
+    end
 end
+
 end

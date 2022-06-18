@@ -37,6 +37,10 @@ end
     include("scripts.jl")
 end
 
+@testset "example scripts" begin
+    include("examples.jl")
+end
+
 # the script workaround doesn't work on MacOS
 # https://github.com/actions/runner/issues/241
 # @testset "tools" begin

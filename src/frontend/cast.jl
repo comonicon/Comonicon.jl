@@ -654,20 +654,42 @@ function cast_options(doc::JLMD, options::Vector{JLOption}, line)
 end
 
 """
-    @lazyload expr @cast function f(args...) ... end
+    @lazyload expr @cast <valid castable expr>
 
-Run `expr` if current top level command `f` is executed.
-Mainly designed for lazy loading packages that associated to a command.
+Evaluate `expr` if command `f` is called. This is useful
+for reducing the latency of scripts that has subcmds depend
+on plotting, serialization etc.
+
+Please see [`@cast`](@ref) for valid expression specifications.
+
+!!! warning
+
+    This macro only works at top-level command and thus can only be
+    used in `Main` and only works in scripts. Using this macro in any
+    other module or a project module will not work.
 """
-macro lazyload(expr, fdef)
-    if (__module__) != Main
-        error("Top level module of `@lazyload` must be `Main`, got `$(__module__)`")
+macro lazyload(load_expr, casted_expr)
+    return esc(lazyload_m(__module__, __source__, load_expr, casted_expr))
+end
+
+function lazyload_m(m::Module, line, load_expr, casted_expr::Expr)
+    m === Main || throw(ArgumentError("`@lazyload` can only be used in `Main`, got $m"))
+    Meta.isexpr(casted_expr, :macrocall) && casted_expr.args[1] === Symbol("@cast") ||
+        throw(ArgumentError("`@lazyload` only accept `@cast`ed objects in `Main`"))
+
+    if is_function(casted_expr.args[3])
+        fname = JLFunction(casted_expr.args[3]).name
+        cmd_name = default_name(fname)
+    elseif Meta.isexpr(casted_expr.args[3], :module)
+        cmd_name = default_name(casted_expr.args[3].args[2])
     end
-    if !(fdef isa Expr && fdef.head == :macrocall && fdef.args[1] == Symbol("@cast"))
-        error("`@lazyload` must take a `@cast function ... end` expression as the second argument.")
+
+    return quote
+        if !isempty(ARGS) && ARGS[1] == $cmd_name
+            $load_expr
+        end
+
+        $line
+        Core.@__doc__ $casted_expr
     end
-    fname = string(fdef.args[3].args[1].args[1])
-    esc(Expr(:block, :(if ARGS[1] == $fname
-                           $(expr)
-                       end), fdef))
 end
