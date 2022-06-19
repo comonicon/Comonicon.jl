@@ -244,7 +244,7 @@ function emit_leaf_call(cmd::LeafCommand, ctx::EmitContext, args::Symbol, kwargs
         for each in values(cmd.options)
             each.require || continue
             err_hint = "--" * each.name
-            
+
             if each.short
                 err_hint *= ",-" * each.name[1:1]
             end
@@ -252,14 +252,12 @@ function emit_leaf_call(cmd::LeafCommand, ctx::EmitContext, args::Symbol, kwargs
             err_hint = "expect option $err_hint"
 
             @gensym idx
-            push!(ret.args,
-                quote
-                    $idx = findfirst(x->x.first===$(QuoteNode(each.sym)), $kwargs)
-                    if $idx === nothing
-                        $(emit_error(cmd, ctx, err_hint))
-                    end
+            push!(ret.args, quote
+                $idx = findfirst(x -> x.first === $(QuoteNode(each.sym)), $kwargs)
+                if $idx === nothing
+                    $(emit_error(cmd, ctx, err_hint))
                 end
-            )
+            end)
         end
     end
 

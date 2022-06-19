@@ -90,7 +90,7 @@ using Comonicon
 
 - `--name=<string>`: name
 """
-@main function run(;name::String, shots::Int)
+@main function run(; name::String, shots::Int)
     @test name == "test"
     @test shots == 2
 end

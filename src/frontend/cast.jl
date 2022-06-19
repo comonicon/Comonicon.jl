@@ -299,7 +299,13 @@ function parse_arguments(fn::JLFunction)
                 default = string(value),
             )
         elseif Meta.isexpr(each, :...) # :($name...)
-            xcall(Comonicon, :JLArgument; name = QuoteNode(each.args[1]), require = false, vararg = true)
+            xcall(
+                Comonicon,
+                :JLArgument;
+                name = QuoteNode(each.args[1]),
+                require = false,
+                vararg = true,
+            )
         elseif Meta.isexpr(each, :kw) && each.args[1] isa Symbol # Expr(:kw, name::Symbol, value)
             xcall(
                 Comonicon,
@@ -344,9 +350,7 @@ function parse_required_kwargs!(flags, options, @nospecialize(expr))::Nothing
         throw(ArgumentError("unexpected expression $expr"))
     end
 
-    push!(options, xcall(
-        Comonicon, :JLOption, QuoteNode(name), true, type, string(type),
-    ))
+    push!(options, xcall(Comonicon, :JLOption, QuoteNode(name), true, type, string(type)))
     return
 end
 
@@ -364,7 +368,7 @@ function parse_optional_kwargs!(flags, options, kw_expr::Expr)::Nothing
             value == false || error(
                 "Boolean options must use false as " *
                 "default value, and will be parsed as flags. got $name" *
-                "for non-standard usage please use the AST interface directly"
+                "for non-standard usage please use the AST interface directly",
             )
             push!(flags, xcall(Comonicon, :JLFlag, QuoteNode(name)))
         else
