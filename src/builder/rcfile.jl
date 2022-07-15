@@ -7,11 +7,12 @@ function install_env_path(
     yes::Bool = false,
 )
 
-    rcfile = detect_rcfile(shell, home_dir)
-    install_path = expanduser(options.install.path)
-    msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
-    if !contains_path(rcfile, install_path, env) && Tools.prompt(msg; yes)
-        write_path(rcfile, install_path)
+    let install_path = expanduser(options.install.path)
+        rcfile = detect_rcfile(shell, home_dir)
+        msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
+        if !contains_path(rcfile, install_path, env) && Tools.prompt(msg; yes)
+            write_path(rcfile, install_path)
+        end
     end
 
     if shell == "bash"
