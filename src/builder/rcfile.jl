@@ -6,9 +6,8 @@ function install_env_path(
     env = ENV,
     yes::Bool = false,
 )
-
+    rcfile = detect_rcfile(shell, home_dir)
     let install_path = expanduser(options.install.path)
-        rcfile = detect_rcfile(shell, home_dir)
         msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
         if !contains_path(rcfile, install_path, env) && Tools.prompt(msg; yes)
             write_path(rcfile, install_path)
