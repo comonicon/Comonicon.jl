@@ -271,12 +271,7 @@ function print_with_brief(f, io::IO, cmd, t::Terminal)
 
     middle = t.width - t.left - t.right
     firstline = length(s) + 2
-    t.left - firstline + middle > 0 || error(
-        "signature of $(cmd.name) is too long, consider " *
-        "set `command.width` in `Comonicon.toml` to " *
-        "larger value, or truncate your argument and command name length " *
-        "current terminal width is $(t.width)",
-    )
+    t.left - firstline + middle > 0 || print_with_brief_error(cmd, t)
 
     print(io, tab(2))
     f(io, cmd, t)
@@ -289,6 +284,26 @@ function print_with_brief(f, io::IO, cmd, t::Terminal)
     end
     print_indent_content(io, brief, t, firstline)
     return
+end
+
+function print_with_brief_error(cmd::Option, t::Terminal)
+    error(
+        "signature of $(cmd.name) is too long, consider " *
+        "this might due to default hint of this option is too long " *
+        "override the hint with --option=<your own hint> or " *
+        "set `command.width` in `Comonicon.toml` to " *
+        "larger value, or truncate your argument and command name length " *
+        "current terminal width is $(t.width)",
+    )
+end
+
+function print_with_brief_error(cmd, t::Terminal)
+    error(
+        "signature of $(cmd.name) is too long, consider " *
+        "set `command.width` in `Comonicon.toml` to " *
+        "larger value, or truncate your argument and command name length " *
+        "current terminal width is $(t.width)",
+    )
 end
 
 function print_indent_content(io::IO, text::String, t::Terminal, firstline::Int)
