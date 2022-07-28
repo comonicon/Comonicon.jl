@@ -368,7 +368,10 @@ function parse_optional_kwargs!(flags, options, kw_expr::Expr)::Nothing
     expr = kw_expr.args[1]
     value = kw_expr.args[2]
     if expr isa Symbol # Expr(:kw, name::Symbol, value)
-        push!(options, xcall(Comonicon, :JLOption, QuoteNode(expr), false, Any, emit_default_hint(value)))
+        push!(
+            options,
+            xcall(Comonicon, :JLOption, QuoteNode(expr), false, Any, emit_default_hint(value)),
+        )
     elseif Meta.isexpr(expr, :(::)) # Expr(:kw, ($name::$type), value)
         name = expr.args[1]
         type = expr.args[2]
