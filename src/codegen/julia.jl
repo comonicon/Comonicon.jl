@@ -96,7 +96,7 @@ end
 function emit_scan_version(cmd::Entry)
     quote
         if "-V" in ARGS || "--version" in ARGS
-            print($(cmd.version))
+            println($(cmd.version))
             return 0
         end
     end
