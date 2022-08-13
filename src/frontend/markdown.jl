@@ -29,7 +29,9 @@ function split_docstring(doc::Markdown.MD)
 end
 
 function has_docstring(doc::Markdown.MD)
-    paragraph = first(read_content(doc))
+    content = read_content(doc)
+    isempty(content) && return false
+    paragraph = first(content)
     flag = paragraph isa Markdown.Paragraph && paragraph.content == Any["No documentation found."]
     return !flag
 end
@@ -132,7 +134,7 @@ end
 
 read_content(x) = x
 function read_content(md::Markdown.MD)
-    if md.content[1] isa Markdown.MD
+    if !isempty(md.content) && md.content[1] isa Markdown.MD
         return read_content(md.content[1])
     else
         return md.content
