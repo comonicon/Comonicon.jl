@@ -234,6 +234,22 @@ end
     @test options["registry"].hint == "registry name"
 end
 
+module TestEmptyDocString
+using Test
+using Comonicon
+
+@cast test() = @test true
+
+"""
+"""
+@main
+
+end # TestEmptyDocString
+
+@testset "empty docstring" begin
+    TestEmptyDocString.command_main(["test"])
+end
+
 end # TestMarkdown
 
 module TestLazyLoad

@@ -521,6 +521,8 @@ end
 function codegen_multiple_main_entry(m::Module, line, cmd, configs)
     name = configs.name
 
+    isdefined(m, :CASTED_COMMANDS) ||
+        throw(ArgumentError("expect @cast in module $m for multi-command CLI"))
     @gensym doc
     return quote
         Core.@__doc__ const COMMAND_ENTRY_DOC_STUB = nothing
