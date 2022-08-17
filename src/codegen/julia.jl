@@ -28,7 +28,7 @@ function print_help_str(x, ctx::EmitContext)
     end
 
     if ctx.configs.static
-        :(print($(help_str(x; color, ctx.configs.width))))
+        :($Base.print($(help_str(x; color, ctx.configs.width))))
     else
         :($print_cmd(IOContext(stdout, :color => $color), $x))
     end
