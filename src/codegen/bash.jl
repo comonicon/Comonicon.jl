@@ -41,7 +41,7 @@ function emit(cmd::NodeCommand, entry::Bool = false, prefix::Vector{String} = St
     words = collect(keys(cmd.subcmds))
     push!(words, "-h", "--help")
     if entry
-        push!(words, "-V", "--version")
+        push!(words, "--version")
     end
 
     script = """
@@ -77,7 +77,7 @@ function emit(cmd::LeafCommand, entry::Bool = false, prefix::Vector{String} = St
     end
     push!(dash_comp, "-h", "--help")
     if entry
-        push!(dash_comp, "-V", "--version")
+        push!(dash_comp, "--version")
     end
 
     # last word matches an option

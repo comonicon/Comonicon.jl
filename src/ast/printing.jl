@@ -200,7 +200,7 @@ end
 
 function print_body(io::IO, cmd::Entry, t::Terminal)
     print_body(io, cmd.root, t)
-    version_flag = "-V, --version"
+    version_flag = "--version"
     printstyled(io, tab(2), version_flag; color = t.color.dash)
     print_indent_content(io, "Print version.", t, length(version_flag) + 2)
     println(io)

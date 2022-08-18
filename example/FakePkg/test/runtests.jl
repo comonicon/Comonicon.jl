@@ -8,7 +8,6 @@ using Comonicon.Builder
 
     @test FakePkg.command_main(["-h"]) == 0
     @test FakePkg.command_main(["--help"]) == 0
-    @test FakePkg.command_main(["-V"]) == 0
     @test FakePkg.command_main(["--version"]) == 0
 
     @test FakePkg.command_main(["add", "-h"]) == 0
