@@ -34,12 +34,18 @@ convert your expressions to commands, these are
 !!! note
     to be compatible with shell options, variable names with underscore `_` will be automatically replaced with dash `-`.   As a result, the corresponding doc string should use dash `-` instead of `_` as well, e.g kwargs name `dash_dash` will be converted to `--dash-dash` option/flag in terminal, and its corresponding doc string should be ``` - `--dash-dash`: <arg>```.
 
-# Doc String Syntax
+## Help and Version
+
+There are two flags are always generated and always have highest priority, they are `-h,--help`
+and `--version`. The version is automatically read from the corresponding project's `Project.toml`
+if it's not found then it's set to `0.0.0`.
+
+## Doc String Syntax
 
 the docstring of each `@cast` or `@main` annotated object have a few special section.
 The function or module signature is ignored for generating CLI help page, 
 
-## Description
+### Description
 
 The description of the command is seperated as brief and detailed description.
 The special sections are organized as following:
@@ -64,7 +70,7 @@ dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw.
 """
 ```
 
-## Arguments
+### Arguments
 
 The argument description can be specified using `#Args` or `#Arguments` section.
 The syntax must be
@@ -97,7 +103,7 @@ dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw.
 """
 ```
 
-## Options
+### Options
 
 the options can be specified in `#Options` section, the option
 must have a prefix `--`, and optionally have `-<first letter>`
@@ -119,12 +125,12 @@ or the default hint will be the default value's Julia expression.
 - `--short_underscore, -s <value>`: short option with underscore.
 ```
 
-## Flags
+### Flags
 
 the flags can be specified using `#Flags` section, the rest are similar to
 `#Options` except there are no value hints.
 
-# Special Arugment/Options Types
+## Special Arugment/Options Types
 
 there are a few special argument/option types defined to generate special shell completions.
 
@@ -132,7 +138,7 @@ there are a few special argument/option types defined to generate special shell 
 Modules = [Comonicon.Arg]
 ```
 
-# Dash Seperator
+## Dash Seperator
 
 Dash seperator `--` is useful when the CLI program contains scripts that accepts command line inputs, e.g a custom command `run` that execute Julia script
 
@@ -142,7 +148,7 @@ run --flag -- script.jl a b c
 
 one will need to seperate the input of `run` and `script.jl` for disambiguity sometimes,then the dash seperator comes useful for this case.
 
-# Plugins
+## Plugins
 
 Most complicated CLIs support plugins, this is acheived by checking
 if there is a command line executable with the following name pattern
@@ -160,4 +166,3 @@ in `(Julia)Comonicon.toml`
 [command]
 plugin=true
 ```
-

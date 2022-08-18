@@ -13,7 +13,7 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Conventions" => "conventions.md",
+        "Syntax & Conventions" => "conventions.md",
         "Create a CLI project" => "project.md",
         "Command Types" => "types.md",
         "Command Parsing" => "parse.md",
