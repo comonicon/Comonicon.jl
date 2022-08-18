@@ -1,4 +1,4 @@
-# Conventions
+# Syntax & Conventions
 
 ## Basics
 
@@ -34,6 +34,104 @@ convert your expressions to commands, these are
 !!! note
     to be compatible with shell options, variable names with underscore `_` will be automatically replaced with dash `-`.   As a result, the corresponding doc string should use dash `-` instead of `_` as well, e.g kwargs name `dash_dash` will be converted to `--dash-dash` option/flag in terminal, and its corresponding doc string should be ``` - `--dash-dash`: <arg>```.
 
+# Doc String Syntax
+
+the docstring of each `@cast` or `@main` annotated object have a few special section.
+The function or module signature is ignored for generating CLI help page, 
+
+## Description
+
+The description of the command is seperated as brief and detailed description.
+The special sections are organized as following:
+
+- The brief description is the first paragraph of the docstring.
+- The long detailed description can be specified using `#Intro` or `#Introduction` section.
+
+for example
+
+```julia
+"""
+    command(args1, args2, args3, args4)
+
+the brief description of the command.
+
+# Intro
+
+the long description of the command,
+asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa
+dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd
+dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw.
+"""
+```
+
+## Arguments
+
+The argument description can be specified using `#Args` or `#Arguments` section.
+The syntax must be
+
+```md
+- `<arg name>`: <description of the argument>
+```
+
+for example
+
+```julia
+"""
+    command(args1, args2, args3, args4)
+
+the brief description of the command.
+
+# Intro
+
+the long description of the command,
+asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa
+dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd
+dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw.
+
+# Args
+
+- `arg1`: argument 1.
+- `arg2`: argument 2.
+- `arg3`: argument 3.
+- `arg4`: argument 4.
+"""
+```
+
+## Options
+
+the options can be specified in `#Options` section, the option
+must have a prefix `--`, and optionally have `-<first letter>`
+to specify its short option. All underscore `_` in the option name
+will be converted to a dash `-` for option names, for example.
+
+The value string after `=` (e.g `-s=<value>`) can give user specified hint
+or the default hint will be the default value's Julia expression.
+
+```md
+# Options
+
+- `--short, -s`: short option using default hint.
+- `--short-space, -s <value>`: short option using given hint.
+- `--short-assign, -s=<value>`: short option using given hint.
+- `--long`: long option using default hint.
+- `--long-space <value>`: long option using given hint.
+- `--long-assign=<value>`: long option using given hint.
+- `--short_underscore, -s <value>`: short option with underscore.
+```
+
+## Flags
+
+the flags can be specified using `#Flags` section, the rest are similar to
+`#Options` except there are no value hints.
+
+# Special Arugment/Options Types
+
+there are a few special argument/option types defined to generate special shell completions.
+
+```@autodocs
+Modules = [Comonicon.Arg]
+```
+
 # Dash Seperator
 
 Dash seperator `--` is useful when the CLI program contains scripts that accepts command line inputs, e.g a custom command `run` that execute Julia script
@@ -62,3 +160,4 @@ in `(Julia)Comonicon.toml`
 [command]
 plugin=true
 ```
+
