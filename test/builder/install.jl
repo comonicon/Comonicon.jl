@@ -55,8 +55,9 @@ end
 end
 
 @testset "detect_rcfile" begin
+    answer = joinpath((haskey(ENV, "ZDOTDIR") ? ENV["ZDOTDIR"] : homedir()), ".zshrc")
     withenv("SHELL" => "zsh") do
-        @test detect_rcfile("zsh") == joinpath(homedir(), ".zshrc")
+        @test detect_rcfile("zsh") == answer
     end
 
     withenv("SHELL" => "zsh", "ZDOTDIR" => "zsh_dir") do
