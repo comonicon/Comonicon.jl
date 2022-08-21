@@ -101,3 +101,23 @@ end
 end
 
 end
+
+module TestShortOptions
+
+using Test
+using Comonicon
+
+"""
+# Options
+
+- `-e, --example <value>`: short option.
+"""
+@main function run(;example::String)
+    @test example == "demo"
+end
+
+@testset "TestShortOptions" begin
+    @test TestShortOptions.command_main(["-e", "demo"]) == 0
+end
+
+end

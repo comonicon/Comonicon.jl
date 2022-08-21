@@ -163,6 +163,9 @@ function emit_body(cmd::LeafCommand, ctx::EmitContext, ptr::Int = 1)
     end
 end
 
+"""
+emit dash parsing code (contains `--`).
+"""
 function emit_dash_body(cmd::LeafCommand, ctx::EmitContext, idx::Symbol, ptr::Int = 1)
     @gensym token token_ptr args kwargs
 
@@ -184,6 +187,9 @@ function emit_dash_body(cmd::LeafCommand, ctx::EmitContext, idx::Symbol, ptr::In
     end
 end
 
+"""
+emit the normal parsing code (do not contain dash `--`)
+"""
 function emit_norm_body(cmd::LeafCommand, ctx::EmitContext, ptr::Int = 1)
     @gensym token_ptr args kwargs token
 
@@ -348,12 +354,6 @@ function emit_kwarg(cmd::LeafCommand, ctx::EmitContext, token::Symbol, kwargs::S
     @gensym sym key value
 
     ifelse = JLIfElse()
-    # short flag
-    ifelse[:(length($token) == 2)] = quote
-        $key = $token[2:2]
-        $(emit_short_flag(cmd, ctx, token, sym, key, value))
-    end
-
     # long option/flag
     ifelse[:(startswith($token, "--"))] = quote
         $key = lstrip(split($token, '=')[1], '-')
@@ -363,7 +363,7 @@ function emit_kwarg(cmd::LeafCommand, ctx::EmitContext, token::Symbol, kwargs::S
     # short option
     ifelse.otherwise = quote
         $key = $token[2:2]
-        $(emit_short_option(cmd, ctx, token, sym, key, value, token_ptr))
+        $(emit_short_flag_or_option(cmd, ctx, token, sym, key, value, token_ptr))
     end
 
     return quote
@@ -372,13 +372,14 @@ function emit_kwarg(cmd::LeafCommand, ctx::EmitContext, token::Symbol, kwargs::S
     end
 end
 
-function emit_short_flag(
+function emit_short_flag_or_option(
     cmd::LeafCommand,
     ctx::EmitContext,
     token::Symbol,
     sym::Symbol,
     key::Symbol,
     value::Symbol,
+    token_ptr,
 )
     ifelse = JLIfElse()
     for (_, flag) in cmd.flags
@@ -390,7 +391,7 @@ function emit_short_flag(
             end
         end
     end
-    ifelse.otherwise = emit_error(cmd, ctx, :("cannot find flag: $($token)"))
+    ifelse.otherwise = emit_short_option(cmd, ctx, token, sym, key, value, token_ptr)
     return codegen_ast(ifelse)
 end
 
@@ -424,7 +425,9 @@ function emit_short_option(
             end
         end
     end
-    ifelse.otherwise = emit_error(cmd, ctx, :("cannot find $($token)"))
+    ifelse.otherwise = emit_error(
+        cmd, ctx, :("cannot find short flag or option: $($token)")
+    )
     return codegen_ast(ifelse)
 end
 
@@ -464,7 +467,7 @@ function emit_parse_value(cmd, ctx::EmitContext, type, value)
     else
         @gensym ret
         return quote
-            $ret = tryparse($type, $value)
+            $ret = tryparse($type, $value) # this may calls the runtime in Comonicon.Arg
             if isnothing($ret)
                 $(emit_error(cmd, ctx, "expect value of type: $(type)"))
             end
