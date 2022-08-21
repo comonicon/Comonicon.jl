@@ -13,6 +13,7 @@ Manifest.toml
 
 /node_modules/
 package-lock.json
+config.toml
 
 *.cmd
 /bin/

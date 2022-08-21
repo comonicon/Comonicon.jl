@@ -479,6 +479,10 @@ function emit_parse_value(cmd, ctx::EmitContext, type, value)
         return value
     elseif type === String # we need to convert SubString to String
         return :(String($value))
+    elseif Configurations.is_option(type)
+        return quote
+            $Configurations.from_toml($type, $value)
+        end
     else
         @gensym ret
         return quote
@@ -558,7 +562,7 @@ function emit_option_with_option_type(
         end
 
         if isnothing($fields) # path to the config file
-            $value = $Configurations.from_toml($(option.type), $field_value)
+            $value = $(emit_parse_value(option, ctx, option.type, field_value))
         else
             $value = get(Dict{String, Any}, $kwargs, $(QuoteNode(option.sym)))
             $(codegen_ast(assign_field_to_dict))

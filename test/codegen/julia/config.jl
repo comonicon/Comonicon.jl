@@ -14,6 +14,11 @@ end
     c::Int
 end
 
+"""
+# Options
+
+- `-c, --config <path/to/option/or/specific field>`: config.
+"""
 @main function run(;config::OptionB)
     @test config == OptionB(OptionA(1, 1), 1)
 end
@@ -24,6 +29,7 @@ end
     opt = TestConfigOption.OptionB(TestConfigOption.OptionA(1, 1), 1)
     to_toml("config.toml", opt)
     TestConfigOption.command_main(["--config", "config.toml"])
+    TestConfigOption.command_main(["-c", "config.toml"])
 end
 
 end
