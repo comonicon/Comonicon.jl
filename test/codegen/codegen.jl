@@ -10,6 +10,7 @@ using Test
     include("julia/exception.jl")
     include("julia/plugin.jl")
     include("julia/print.jl")
+    include("julia/config.jl")
 end
 
 @testset "ZSHCompletions.emit" begin

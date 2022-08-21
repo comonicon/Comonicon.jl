@@ -18,6 +18,7 @@ package-lock.json
 /bin/
 /test/bin/
 /test/completions/
+/test/config.toml
 
 build
 *.tar.gz
