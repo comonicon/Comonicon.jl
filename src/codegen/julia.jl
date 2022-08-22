@@ -3,6 +3,7 @@ module JuliaExpr
 using ..AST
 using ..Comonicon: CommandException, CommandExit, _sprint
 using ExproniconLite
+using TOML: TOML
 using Configurations: Configurations
 
 function help_str(x; color = true, width::Int)
