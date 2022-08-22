@@ -1,5 +1,6 @@
 [deps]
 ComoniconTestUtils = "53b67e40-53a7-4335-973f-e3e901fe4865"
+Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
 ExproniconLite = "55351af7-c7e9-48d6-89ff-24e801d99491"
 Faker = "0efc519c-db33-5916-ab87-703215c3906f"
 FromFile = "ff7dd447-1dcb-4ce3-b8ac-22a812192de7"

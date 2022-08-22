@@ -13,11 +13,13 @@ Manifest.toml
 
 /node_modules/
 package-lock.json
+config.toml
 
 *.cmd
 /bin/
 /test/bin/
 /test/completions/
+/test/config.toml
 
 build
 *.tar.gz
