@@ -1,7 +1,7 @@
 name = "ComoniconTestUtils"
 uuid = "53b67e40-53a7-4335-973f-e3e901fe4865"
 authors = ["Roger-Luo <rogerluo.rl18@gmail.com> and contributors"]
-version = "0.3.0"
+version = "1.0.0"
 
 [deps]
 Comonicon = "863f3e99-da2a-4334-8734-de3dacbe5542"
@@ -10,7 +10,7 @@ Faker = "0efc519c-db33-5916-ab87-703215c3906f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
-Comonicon = "0.12"
+Comonicon = "1"
 Configurations = "0.17"
 Faker = "0.3"
 julia = "1.6"
