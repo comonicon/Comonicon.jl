@@ -188,4 +188,4 @@ statements_file = ["deps/statements.jl"]
 
 ## Further Reference
 The CLI we just used to create this project serves as the best practice for
-Comonicon, you can take it as a reference: [IonCLI.jl](https://github.com/Roger-luo/IonCLI.jl).
+Comonicon, you can take it as a reference: [Ion.jl](https://github.com/Roger-luo/Ion.jl).
