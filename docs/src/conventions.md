@@ -138,6 +138,45 @@ there are a few special argument/option types defined to generate special shell 
 Modules = [Comonicon.Arg]
 ```
 
+## Working with option types from Configurations
+
+If the option type is defined using `@option` then Comonicon can provide the following syntax
+to read a configuration file.
+
+```julia
+using Test
+using Comonicon
+using Configurations
+
+@option struct OptionA
+    a::Int
+    b::Int
+end
+
+@option struct OptionB
+    option::OptionA
+    c::Int
+end
+
+"""
+# Options
+
+- `-c, --config <path/to/option/or/specific field>`: config.
+"""
+@main function run(;config::OptionB)
+    @test config == OptionB(OptionA(1, 1), 1)
+end
+```
+
+can be used with the following syntax
+
+```sh
+command --config.c=1 --config.option.a=1 --config.option.b=1
+command --config=config.toml
+command -c config.toml
+command -c config.toml --config.option.b=2 # change a field of config.toml
+```
+
 ## Dash Seperator
 
 Dash seperator `--` is useful when the CLI program contains scripts that accepts command line inputs, e.g a custom command `run` that execute Julia script
