@@ -3,6 +3,7 @@ module JuliaExpr
 using ..AST
 using ..Comonicon: CommandException, CommandExit, _sprint
 using ExproniconLite
+using TOML: TOML
 using Configurations: Configurations
 
 function help_str(x; color = true, width::Int)
@@ -480,9 +481,7 @@ function emit_parse_value(cmd, ctx::EmitContext, type, value)
     elseif type === String # we need to convert SubString to String
         return :(String($value))
     elseif Configurations.is_option(type)
-        return quote
-            $Configurations.from_toml($type, $value)
-        end
+        return :($TOML.parsefile($value))
     else
         @gensym ret
         return quote

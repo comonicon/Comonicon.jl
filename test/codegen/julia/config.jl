@@ -30,6 +30,10 @@ end
     to_toml("config.toml", opt)
     TestConfigOption.command_main(["--config", "config.toml"])
     TestConfigOption.command_main(["-c", "config.toml"])
+
+    opt = TestConfigOption.OptionB(TestConfigOption.OptionA(1, 1), 2)
+    to_toml("config.toml", opt)
+    TestConfigOption.command_main(["--config", "config.toml", "--config.c=1"])
 end
 
 end
