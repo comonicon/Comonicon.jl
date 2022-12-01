@@ -274,8 +274,10 @@ function emit_leaf_call(cmd::LeafCommand, ctx::EmitContext, args::Symbol, kwargs
         for option in values(cmd.options)
             Configurations.is_option(option.type) || continue
             push!(ret.args, quote
-                $kwargs[$(QuoteNode(option.sym))] =
-                    $Configurations.from_dict($(option.type), $kwargs[$(QuoteNode(option.sym))])
+                if $(QuoteNode(option.sym)) in Base.keys($kwargs)
+                    $kwargs[$(QuoteNode(option.sym))] =
+                        $Configurations.from_dict($(option.type), $kwargs[$(QuoteNode(option.sym))])
+                end
             end)
         end
     end
@@ -533,7 +535,7 @@ function emit_option_with_option_type(
     assign_field_to_dict = foreach_leaf_field(option.type, value, fields) do dict_ex, type
         quote
             $field_value = $(emit_parse_value(option, ctx, type, field_value))
-            $dict_ex = $field_value 
+            $dict_ex = $field_value
         end
     end
     assign_field_to_dict.otherwise = emit_error(option, ctx, :("cannot find field $($fields)"))
