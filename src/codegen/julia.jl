@@ -123,7 +123,7 @@ function emit_body(cmd::NodeCommand, ctx::EmitContext, ptr::Int = 1)
             $(emit_error(
                 cmd,
                 ctx,
-                "valid sub-commands for command $(cmd.name) are: $(join(keys(cmd.subcmds), ", "))",
+                "valid sub-commands for command $(cmd.name) are: $(join(sort(collect(keys(cmd.subcmds))), ", "))",
             ))
         end
     end

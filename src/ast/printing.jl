@@ -208,8 +208,8 @@ end
 
 function print_body(io::IO, cmd::NodeCommand, t::Terminal)
     section(io, "Commands")
-    for each in values(cmd.subcmds)
-        print_name_brief(io, each, t)
+    for k in sort(collect(keys(cmd.subcmds)))
+        print_name_brief(io, cmd.subcmds[k], t)
         section(io)
     end
     section(io, "Flags")
