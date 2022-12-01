@@ -533,7 +533,7 @@ function emit_option_with_option_type(
     assign_field_to_dict = foreach_leaf_field(option.type, value, fields) do dict_ex, type
         quote
             $field_value = $(emit_parse_value(option, ctx, type, field_value))
-            $dict_ex = $field_value 
+            $dict_ex = $field_value
         end
     end
     assign_field_to_dict.otherwise = emit_error(option, ctx, :("cannot find field $($fields)"))

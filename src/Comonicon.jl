@@ -9,6 +9,7 @@ module Comonicon
 using Pkg
 using Markdown
 using ExproniconLite
+import OrderedCollections: OrderedDict
 
 export @cast, @main, cmd_error, cmd_exit, @lazyload
 

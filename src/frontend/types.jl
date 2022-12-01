@@ -31,7 +31,7 @@ end
 Base.@kwdef struct JLMD
     desc::String = ""
     intro::String = ""
-    arguments::Dict{String,String} = Dict{String,String}()
-    options::Dict{String,JLMDOption} = Dict{String,JLMDOption}()
-    flags::Dict{String,JLMDFlag} = Dict{String,JLMDFlag}()
+    arguments::OrderedDict{String,String} = OrderedDict{String,String}()
+    options::OrderedDict{String,JLMDOption} = OrderedDict{String,JLMDOption}()
+    flags::OrderedDict{String,JLMDFlag} = OrderedDict{String,JLMDFlag}()
 end
