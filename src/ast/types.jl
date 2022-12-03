@@ -162,13 +162,13 @@ NodeCommand(;fields_above...)
 """
 Base.@kwdef struct NodeCommand <: ComoniconExpr
     name::String
-    subcmds::Dict{String,Any}
+    subcmds::OrderedDict{String,Any}
     description::Description = Description()
     line::Maybe{LineNumberNode} = nothing
 
     function NodeCommand(name, subcmds, description, line)
         !isempty(subcmds) || error("list of subcommands should not be empty")
-        new(name, subcmds, description, line)
+        new(name, sort!(OrderedDict(subcmds)), description, line)
     end
 end
 
