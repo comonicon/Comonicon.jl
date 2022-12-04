@@ -44,7 +44,7 @@ function read_intro(md::Markdown.MD)
 end
 
 function read_arguments(md::Markdown.MD)
-    args = Dict{String,String}()
+    args = OrderedDict{String,String}()
     sec = read_section(md, ["Arguments", "Args"])
     isempty(sec) && return args
     length(sec) == 1 || error("section Arguments/Args can only have one paragraph")
@@ -58,7 +58,7 @@ function read_arguments(md::Markdown.MD)
 end
 
 function read_flags(md::Markdown.MD)
-    flags = Dict{String,JLMDFlag}()
+    flags = OrderedDict{String,JLMDFlag}()
     sec = read_section(md, "Flags")
     isempty(sec) && return flags
     length(sec) == 1 || error("section Flags can only have one paragraph")
@@ -74,7 +74,7 @@ function read_flags(md::Markdown.MD)
 end
 
 function read_options(md::Markdown.MD)
-    options = Dict{String,JLMDOption}()
+    options = OrderedDict{String,JLMDOption}()
     sec = read_section(md, "Options")
     isempty(sec) && return options
     length(sec) == 1 || error("section Options can only have one paragraph")

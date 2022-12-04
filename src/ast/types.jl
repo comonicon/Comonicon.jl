@@ -162,13 +162,13 @@ NodeCommand(;fields_above...)
 """
 Base.@kwdef struct NodeCommand <: ComoniconExpr
     name::String
-    subcmds::Dict{String,Any}
+    subcmds::OrderedDict{String,Any}
     description::Description = Description()
     line::Maybe{LineNumberNode} = nothing
 
     function NodeCommand(name, subcmds, description, line)
         !isempty(subcmds) || error("list of subcommands should not be empty")
-        new(name, subcmds, description, line)
+        new(name, sort!(OrderedDict(subcmds)), description, line)
     end
 end
 
@@ -190,8 +190,8 @@ main-cmd node-cmd leaf-cmd 1 2 3
 - `args::Vector{Argument}`: list of CLI arguments, see [`Argument`](@ref), default is `Argument[]`.
 - `nrequire::Int`: number of required arguments, default is the number of `require==true` arugments in `args`.
 - `vararg::Maybe{Argument}`: variant argument, default is `nothing`.
-- `flags::Dict{String, Flag}`: map between flag name and flag object, see [`Flag`](@ref), default is the empty collection.
-- `options::Dict{String, Option}`: map between option name and option object, see [`Option`](@ref), default is the empty collection.
+- `flags::OrderedDict{String, Flag}`: map between flag name and flag object, see [`Flag`](@ref), default is the empty collection.
+- `options::OrderedDict{String, Option}`: map between option name and option object, see [`Option`](@ref), default is the empty collection.
 - `description::Description`: description of the leaf command, default is `Description()`.
 - `line::Maybe{LineNumberNode}`: line number of the leaf command in original Julia program.
 
@@ -208,8 +208,8 @@ Base.@kwdef struct LeafCommand <: ComoniconExpr
     args::Vector{Argument} = Argument[]
     nrequire::Int = count(x -> x.require, args)
     vararg::Maybe{Argument} = nothing
-    flags::Dict{String,Flag} = Dict{String,Flag}()
-    options::Dict{String,Option} = Dict{String,Option}()
+    flags::OrderedDict{String,Flag} = OrderedDict{String,Flag}()
+    options::OrderedDict{String,Option} = OrderedDict{String,Option}()
     description::Description = Description()
     line::Maybe{LineNumberNode} = nothing
 

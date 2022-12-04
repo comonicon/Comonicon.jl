@@ -96,6 +96,12 @@ function foo(
     @test cmd.options["option2"].type === Int
     @test cmd.description == Description("a test function.")
     @test cmd.line == LineNumberNode(0)
+
+    @show cmd.options
+    @test all(keys(cmd.options) .== ["option1", "o", "option2", "option3"])
+
+    @show cmd.flags
+    @test all(keys(cmd.flags) .== ["flag1", "f", "flag2"])
 end
 
 @testset "split_leaf_command" begin

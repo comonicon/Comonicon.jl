@@ -612,7 +612,7 @@ function cast_args(doc::JLMD, args::Vector{JLArgument}, line)
 end
 
 function cast_flags(doc::JLMD, flags::Vector{JLFlag}, line)
-    cmd_flags = Dict{String,Flag}()
+    cmd_flags = OrderedDict{String,Flag}()
     for each in flags
         name = replace(string(each.name), '_' => '-')
         if haskey(doc.flags, name)
@@ -637,7 +637,7 @@ function cast_flags(doc::JLMD, flags::Vector{JLFlag}, line)
 end
 
 function cast_options(doc::JLMD, options::Vector{JLOption}, line)
-    cmd_options = Dict{String,Option}()
+    cmd_options = OrderedDict{String,Option}()
     for each in options
         name = replace(string(each.name), '_' => '-')
         if haskey(doc.options, name)
