@@ -261,7 +261,7 @@ function emit_leaf_call(cmd::LeafCommand, ctx::EmitContext, args::Symbol, kwargs
 
             @gensym idx
             push!(ret.args, quote
-                if !($(QuoteNode(each.sym)) in Base.keys($kwargs))
+                if !($(QuoteNode(each.sym)) in $Base.keys($kwargs))
                     $(emit_error(cmd, ctx, err_hint))
                 end
             end)
@@ -578,7 +578,7 @@ function foreach_leaf_field!(f, jl::JLIfElse, ::Type{T}, dict, fields::Symbol, p
         if Configurations.is_option(type)
             foreach_leaf_field!(jl, type, dict_ex, fields, key) do dict_ex, type
                 quote
-                    Base.get!(Dict{String, Any}, $dict, $(string(name)))
+                    $Base.get!(Dict{String, Any}, $dict, $(string(name)))
                     $(f(dict_ex, type))
                 end
             end
