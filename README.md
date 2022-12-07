@@ -31,7 +31,7 @@ pkg> add Comonicon
 For current master
 
 ```julia
-pkg> add Comonicon#master
+pkg> add Comonicon#main
 ```
 
 ## Usage
