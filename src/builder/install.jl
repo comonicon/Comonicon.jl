@@ -62,6 +62,7 @@ function install_sysimg(m::Module, options::Configs.Comonicon)
 end
 
 function install_completion(m::Module, options::Configs.Comonicon, shell::String)
+    options.install.completion || return
     completions_dir = install_path(options, "completions")
     shell in ["zsh", "bash"] || return
     if shell == "zsh"
