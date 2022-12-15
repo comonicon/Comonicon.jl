@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Create a CLI project · Comonicon.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Comonicon.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../conventions/">Syntax &amp; Conventions</a></li><li class="is-active"><a class="tocitem" href>Create a CLI project</a><ul class="internal"><li><a class="tocitem" href="#Create-a-Julia-Comonicon-project"><span>Create a Julia Comonicon project</span></a></li><li><a class="tocitem" href="#Use-@cast-to-define-multiple-commands"><span>Use <code>@cast</code> to define multiple commands</span></a></li><li><a class="tocitem" href="#Setup-the-build.jl"><span>Setup the <code>build.jl</code></span></a></li><li><a class="tocitem" href="#Install-the-CLI"><span>Install the CLI</span></a></li><li><a class="tocitem" href="#Enable-System-Image"><span>Enable System Image</span></a></li><li><a class="tocitem" href="#Enable-Application-Build"><span>Enable Application Build</span></a></li><li><a class="tocitem" href="#Further-Reference"><span>Further Reference</span></a></li></ul></li><li><a class="tocitem" href="../types/">Command Types</a></li><li><a class="tocitem" href="../parse/">Command Parsing</a></li><li><a class="tocitem" href="../configurations/">Command Configuration</a></li><li><a class="tocitem" href="../codegen/">Code Generation</a></li><li><a class="tocitem" href="../build/">Build and Install CLI</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Create a CLI project</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Create a CLI project</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/comonicon/Comonicon.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="project"><a class="docs-heading-anchor" href="#project">CLI Project</a><a id="project-1"></a><a class="docs-heading-anchor-permalink" href="#project" title="Permalink"></a></h1><p>To build better, faster and more complicated CLI, you will want to build your CLI in a Julia package and deliver it to your users. I will introduce how to create a Comonicon CLI project in this chapter.</p><h2 id="Create-a-Julia-Comonicon-project"><a class="docs-heading-anchor" href="#Create-a-Julia-Comonicon-project">Create a Julia Comonicon project</a><a id="Create-a-Julia-Comonicon-project-1"></a><a class="docs-heading-anchor-permalink" href="#Create-a-Julia-Comonicon-project" title="Permalink"></a></h2><p>A Comonicon CLI project is first a Julia project, thus you should first create a Julia project. If you don&#39;t know what is a Julia project, please read about the Pkg section of <a href="https://julialang.github.io/Pkg.jl/v1/creating-packages/">creating packages</a>. The minimal requirement of a Julia Comonicon project is the following structure</p><pre><code class="language-sh hljs">Demo
+├── LICENSE
+├── Manifest.toml
+├── Project.toml
+├── README.md
+├── src
+│   └── Demo.jl
+└── test
+    └── runtests.jl</code></pre><p>usually it&#39;s more convenient to create a Julia project via <a href="https://github.com/Roger-luo/IonCLI.jl">IonCLI</a>, after you install IonCLI, you can type the following command in your terminal</p><pre><code class="language-sh hljs">ion create Demo --template=comonicon</code></pre><h2 id="Use-@cast-to-define-multiple-commands"><a class="docs-heading-anchor" href="#Use-@cast-to-define-multiple-commands">Use <code>@cast</code> to define multiple commands</a><a id="Use-@cast-to-define-multiple-commands-1"></a><a class="docs-heading-anchor-permalink" href="#Use-@cast-to-define-multiple-commands" title="Permalink"></a></h2><p>In a large project, one might need to define multiple commands. This can be done via <code>@cast</code>.</p><article class="docstring"><header><a class="docstring-binding" id="Comonicon.@cast" href="#Comonicon.@cast"><code>Comonicon.@cast</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia hljs">@cast &lt;function definition&gt;
+@cast &lt;module definition&gt;</code></pre><p>Denote a Julia expression is a command. If the expression is a function definition, it will be parsed as a leaf command, if the expression is a module definition or module name, it will be parsed as a node command. This macro must be used with <a href="../#Comonicon.@main"><code>@main</code></a> to create a multi-command CLI.</p><p><strong>Quick Example</strong></p><pre><code class="language-julia hljs"># in a script or module
+
+&quot;&quot;&quot;
+sum two numbers.
+
+# Args
+
+- `x`: first number
+- `y`: second number
+
+# Options
+
+- `-p, --precision=&lt;type&gt;`: precision of the calculation.
+
+# Flags
+
+- `-f, --fastmath`: enable fastmath.
+
+&quot;&quot;&quot;
+@cast function sum(x, y; precision::String=&quot;float32&quot;, fastmath::Bool=false)
+    # implementation
+    return
+end
+
+&quot;product two numbers&quot;
+@cast function prod(x, y)
+    return
+end
+
+@main</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/comonicon/Comonicon.jl">source</a></section></article><p><code>@cast</code> is similar to <code>@main</code> before functions, but it won&#39;t execute anything, but only create the command and register the command to a global variable <code>CASTED_COMMANDS</code> in the current module. And it will create <code>NodeCommand</code>s before modules, and the sub-commands of the <code>NodeCommand</code> can be created via <code>@cast</code> inside the module.</p><p>After you create the commands via <code>@cast</code>, you can declare an entry at the bottom of your module via <code>@main</code>. A simple example looks like the following</p><pre><code class="language-julia hljs">module Demo
+
+using Comonicon
+
+@cast mycmd1(arg; option=&quot;Sam&quot;) = println(&quot;cmd1: arg=&quot;, arg, &quot;option=&quot;, option)
+@cast mycmd2(arg; option=&quot;Sam&quot;) = println(&quot;cmd2: arg=&quot;, arg, &quot;option=&quot;, option)
+
+&quot;&quot;&quot;
+a module
+&quot;&quot;&quot;
+module Cmd3
+
+using Comonicon
+
+@cast mycmd4(arg) = println(&quot;cmd4: arg=&quot;, arg)
+
+end # module
+
+@cast Cmd3
+
+&quot;&quot;&quot;
+my demo Comonicon CLI project.
+&quot;&quot;&quot;
+@main
+
+end # module</code></pre><p>You can find all created commands via following</p><pre><code class="language-julia hljs">julia&gt; Demo.CASTED_COMMANDS
+Dict{String,Any} with 4 entries:
+  &quot;mycmd2&quot; =&gt; mycmd2 [options] &lt;arg&gt;
+  &quot;cmd3&quot;   =&gt; cmd3 &lt;command&gt;
+  &quot;main&quot;   =&gt; demo v0.1.0
+  &quot;mycmd1&quot; =&gt; mycmd1 [options] &lt;arg&gt;</code></pre><p>and you can execute the command via <code>Demo.command_main</code> created by <code>@main</code>:</p><p><img src="../assets/images/project-demo.png" alt="project-demo"/></p><h2 id="Setup-the-build.jl"><a class="docs-heading-anchor" href="#Setup-the-build.jl">Setup the <code>build.jl</code></a><a id="Setup-the-build.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Setup-the-build.jl" title="Permalink"></a></h2><p>Then you can create a <code>build.jl</code> file in your package <code>deps</code> folder to install this command to <code>~/.julia/bin</code> when your user install your package. This will only need one line:</p><pre><code class="language-julia hljs"># build.jl
+using Demo; Demo.comonicon_install()</code></pre><p>To learn about how to use it, you can type</p><pre><code class="language-sh hljs">julia --project deps/build.jl -h</code></pre><p>which will print the following help message:</p><p><img src="../assets/images/build-help.png" alt="build-help"/></p><h2 id="Install-the-CLI"><a class="docs-heading-anchor" href="#Install-the-CLI">Install the CLI</a><a id="Install-the-CLI-1"></a><a class="docs-heading-anchor-permalink" href="#Install-the-CLI" title="Permalink"></a></h2><p>You can now install the CLI by building the package either in REPL via <code>]build</code> or use IonCLI in terminal via</p><pre><code class="language-sh hljs">ion build # in Demo folder</code></pre><p>This will install this command to <code>~/.julia/bin</code> directory by default, if you have put this directory in your <code>PATH</code> then you will be able to use the command <code>demo</code> directory in your terminal, e.g</p><pre><code class="language-sh hljs">demo -h</code></pre><h2 id="Enable-System-Image"><a class="docs-heading-anchor" href="#Enable-System-Image">Enable System Image</a><a id="Enable-System-Image-1"></a><a class="docs-heading-anchor-permalink" href="#Enable-System-Image" title="Permalink"></a></h2><p>Some CLI projects are quite complicated thus the startup latency is still quite huge even the package module is precompiled. In this case, one will want to use a system image to reduce the startup latency.</p><p>You can enable to the system image build by specifying <code>[sysimg]</code> field in your Comonicon configuration file <code>Comonicon.toml</code> (or <code>JuliaComonicon.toml</code>).</p><pre><code class="language-toml hljs">name = &quot;demo&quot;
+
+[install]
+completion = true
+quiet = false
+optimize = 2
+
+[sysimg]</code></pre><p>You can also specify more detailed system image compilation options, e.g</p><pre><code class="language-toml hljs">[sysimg]
+incremental=false
+filter_stdlibs=true</code></pre><p>You can find more references for these options in <a href="https://julialang.github.io/PackageCompiler.jl/dev/refs/#PackageCompiler.create_sysimage">PackageCompiler#create_sysimage</a>.</p><p>However, you may still find it being slow, you can further reduce the latency by adding an execution file to record precompilation statements.</p><pre><code class="language-toml hljs">[sysimg.precompile]
+execution_file = [&quot;deps/precompile.jl&quot;]</code></pre><p>or you can manually specify these precompile statements via</p><pre><code class="language-toml hljs">[sysimg.precompile]
+statements_file = [&quot;deps/statements.jl&quot;]</code></pre><p>you can learn more about how to create precompilation statements via <a href="https://timholy.github.io/SnoopCompile.jl/stable/">SnoopCompile</a> and <a href="https://timholy.github.io/SnoopCompile.jl/stable/userimg/">create a <code>userimg.jl</code></a> as the precompilation statements.</p><h2 id="Enable-Application-Build"><a class="docs-heading-anchor" href="#Enable-Application-Build">Enable Application Build</a><a id="Enable-Application-Build-1"></a><a class="docs-heading-anchor-permalink" href="#Enable-Application-Build" title="Permalink"></a></h2><p>You can build a standalone application similar to building a system image as well, e.g</p><pre><code class="language-toml hljs">[application]
+incremental=true
+filter_stdlibs=false
+
+[application.precompile]
+statements_file = [&quot;deps/statements.jl&quot;]</code></pre><h2 id="Further-Reference"><a class="docs-heading-anchor" href="#Further-Reference">Further Reference</a><a id="Further-Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Further-Reference" title="Permalink"></a></h2><p>The CLI we just used to create this project serves as the best practice for Comonicon, you can take it as a reference: <a href="https://github.com/Roger-luo/Ion.jl">Ion.jl</a>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../conventions/">« Syntax &amp; Conventions</a><a class="docs-footer-nextpage" href="../types/">Command Types »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 15 December 2022 06:46">Thursday 15 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
