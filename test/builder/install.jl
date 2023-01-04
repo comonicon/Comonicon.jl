@@ -37,7 +37,7 @@ end
     @test occursin("--optimize=2 \\\n", script)
     @test occursin("-- \"\${BASH_SOURCE[0]}\"", script)
     @test occursin(
-        "using Main.TestBuilderInstall.TestInstall\nexit(Main.TestBuilderInstall.TestInstall.command_main())",
+        "using Main.TestBuilderInstall.TestInstall\nexit(TestInstall.command_main())",
         script,
     )
 end
