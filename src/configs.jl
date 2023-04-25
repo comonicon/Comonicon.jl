@@ -63,7 +63,7 @@ Installation configurations.
 - `nthreads`: julia compiler option for CLIs if not built as standalone application, default is `1`.
 """
 @option struct Install
-    path::String = "~/.julia"
+    path::String = get(ENV, "JULIA_DEPOT_PATH", "~/.julia")
     completion::Bool = true
     quiet::Bool = false
     compile::String = "yes"
