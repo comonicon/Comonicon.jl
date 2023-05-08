@@ -26,7 +26,11 @@ end
 
 using Test
 using Comonicon
-withenv("PATH" => "$(pkgdir(Comonicon, "test", "codegen", "julia")):$(ENV["PATH"])") do
-    Sys.which("node-cmd3")
-    @test TestPlugin.command_main(["cmd3"]) == 0
+if Sys.iswindows()
+    @test_broken false
+else
+    withenv("PATH" => "$(pkgdir(Comonicon, "test", "codegen", "julia")):$(ENV["PATH"])") do
+        Sys.which("node-cmd3")
+        @test TestPlugin.command_main(["cmd3"]) == 0
+    end
 end
