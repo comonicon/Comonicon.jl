@@ -1,4 +1,4 @@
-function print_builder_help(io::IO = stdout)
+function print_builder_help(options::Configs.Comonicon, io::IO = stdout)
     println(io, "Comonicon - Builder CLI.")
     println(io)
     print(io, "Builder CLI for Comonicon Applications. If not sepcified, run the command")
@@ -12,12 +12,19 @@ function print_builder_help(io::IO = stdout)
 
     printstyled(io, " "^4, "install"; color = :light_blue, bold = true)
     println(io, " "^21, "install the CLI locally.\n")
-
-    printstyled(io, " "^4, "app"; color = :light_blue, bold = true)
+    if isnothing(options.application)
+        printstyled(io, " "^4, "app (disabled, add [application] section in Comonicon.toml to enable) "; color = :light_yellow, bold = true)  
+    else
+        printstyled(io, " "^4, "app"; color = :light_blue, bold = true)
+    end
     printstyled(io, " [tarball]"; color = :blue)
     println(io, " "^15, "build the application, optionally make a tarball.\n")
-
-    printstyled(io, " "^4, "sysimg"; color = :light_blue, bold = true)
+    
+    if isnothing(options.sysimg)
+        printstyled(io, " "^4, "sysimg (disabled, add [sysimg] section in Comonicon.toml to enable) "; color = :light_yellow, bold = true)
+    else
+        printstyled(io, " "^4, "sysimg"; color = :light_blue, bold = true)
+    end
     printstyled(io, " [tarball]"; color = :blue)
     println(io, " "^12, "build the system image, optionally make a tarball.\n")
 
@@ -51,7 +58,7 @@ end
 
 function command_main(m::Module, options::Configs.Comonicon)
     if "-h" in ARGS || "--help" in ARGS || "help" in ARGS
-        print_builder_help()
+        print_builder_help(options)
         return 0
     elseif isempty(ARGS) || (first(ARGS) == "install" && length(ARGS) == 1)
         if options.install.quiet
@@ -91,6 +98,6 @@ function command_main(m::Module, options::Configs.Comonicon)
     printstyled(join(ARGS, " "); color = :red)
     println()
     println()
-    print_builder_help()
+    print_builder_help(options)
     return 1
 end
