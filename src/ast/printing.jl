@@ -167,7 +167,7 @@ function print_head(io::IO, cmd::LeafCommand, t::Terminal)
         printstyled(io, tab(1), "<args>"; color = t.color.args)
     end
 
-    isempty(cmd.args) || printstyled(io, tab(1), "[options]"; color = t.color.dash)
+    isempty(cmd.options) || printstyled(io, tab(1), "[options]"; color = t.color.dash)
     isempty(cmd.flags) || printstyled(io, tab(1), "[flags]"; color = t.color.dash)
     return
 end
