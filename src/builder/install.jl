@@ -163,9 +163,7 @@ function _entryfile_script_bat(m::Module, options::Configs.Comonicon)
     setlocal
     set JULIA_PROJECT=$(get_scratch!(m, "env"))
     $(join(cmds, " ^\n    "))
-    IF %ERRORLEVEL% NEQ 0 (
-        exit /b %ERRORLEVEL%
-    )
+    if %ERRORLEVEL% NEQ 0 exit /b %ERRORLEVEL%
     endlocal
     """
 end
