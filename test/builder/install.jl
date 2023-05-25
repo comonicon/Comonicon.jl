@@ -26,20 +26,34 @@ end
 @testset "entryfile_script" begin
     options = Configs.Comonicon(name = "test")
     script = entryfile_script(TestInstall, options)
-
-    @test occursin("#!/usr/bin/env bash", script)
-    @test occursin("JULIA_PROJECT=$(get_scratch!(TestInstall, "env"))", script)
-    julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())
-    @test occursin("exec $julia_exe \\\n", script)
-    @test occursin("--startup-file=no \\\n", script)
-    @test occursin("--color=yes \\\n", script)
-    @test occursin("--compile=yes \\\n", script)
-    @test occursin("--optimize=2 \\\n", script)
-    @test occursin("-- \"\${BASH_SOURCE[0]}\"", script)
-    @test occursin(
-        "using Main.TestBuilderInstall.TestInstall\nexit(TestInstall.command_main())",
-        script,
-    )
+    if Sys.iswindows()
+        @test occursin("@echo off", script)
+        @test occursin("set JULIA_PROJECT=$(get_scratch!(TestInstall, "env"))", script)
+        julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())
+        @test occursin("$julia_exe ^\n", script)
+        @test occursin("--startup-file=no ^\n", script)
+        @test occursin("--color=yes ^\n", script)
+        @test occursin("--compile=yes ^\n", script)
+        @test occursin("--optimize=2 ^\n", script)
+        @test occursin(
+            "using Main.TestBuilderInstall.TestInstall; exit(TestInstall.command_main())",
+            script,
+        )
+    else
+        @test occursin("#!/usr/bin/env bash", script)
+        @test occursin("JULIA_PROJECT=$(get_scratch!(TestInstall, "env"))", script)
+        julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())
+        @test occursin("exec $julia_exe \\\n", script)
+        @test occursin("--startup-file=no \\\n", script)
+        @test occursin("--color=yes \\\n", script)
+        @test occursin("--compile=yes \\\n", script)
+        @test occursin("--optimize=2 \\\n", script)
+        @test occursin("-- \"\${BASH_SOURCE[0]}\"", script)
+        @test occursin(
+            "using Main.TestBuilderInstall.TestInstall\nexit(TestInstall.command_main())",
+            script,
+        )
+    end
 end
 
 @testset "test completion script" begin
