@@ -56,6 +56,7 @@ a test function.
 - `--option1, -o`: test option.
 - `--option2 <int>`: test option.
 - `--option3=<name>`: test option.
+- `--option4`: test option.
 
 # Flags
 - `--flag1, -f`: test flag.
@@ -68,6 +69,7 @@ function foo(
     option1 = nothing,
     option2::Int = 1,
     option3::String = "abc",
+    option4::Int = 1,
     flag1::Bool = false,
     flag2::Bool = false,
 ) end
@@ -96,6 +98,9 @@ function foo(
     @test cmd.options["option2"].type === Int
     @test cmd.description == Description("a test function.")
     @test cmd.line == LineNumberNode(0)
+
+    # for PR #251: the default hint should be used in the absence of the user-defined one
+    @test cmd.options["option4"].hint == "1::Int"
 
     @show cmd.options
     @test all(keys(cmd.options) .== ["option1", "o", "option2", "option3"])
