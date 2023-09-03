@@ -118,10 +118,9 @@ function _print_dash(io::IO, cmd::Union{Option,Flag}, t::Terminal)
 end
 
 function print_content(io::IO, desc::Description, t::Terminal)
-    isnothing(desc.content) || print_within(io, desc.content, t.width, 0)
+    isnothing(desc.content) || (print_within(io, desc.content, t.width, 0); return)
     # if Intro section is empty, use brief description
     isnothing(desc.brief) || print_within(io, desc.brief, t.width, 0)
-    return
 end
 
 function print_cmd(io::IO, cmd::Entry, t::Terminal)
