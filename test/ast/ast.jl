@@ -42,7 +42,7 @@ leaf = LeafCommand(;
 )
 
 @test_show MIME"text/plain" begin
-    "  leaf <args> [options] [flags]" in leaf
+    "  leaf <args> [flags]" in leaf
     "Args\n\n" in leaf
     "  <arg>" in leaf
     "Flags\n\n" in leaf
