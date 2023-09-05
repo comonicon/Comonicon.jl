@@ -38,6 +38,7 @@ options = [
     JLOption(:option1, false, Any, "nothing"),
     JLOption(:option2, false, Int, "1::Int"),
     JLOption(:option3, false, String, "abc::String"),
+    JLOption(:option4, false, Int, "1::Int"),
 ]
 
 """
@@ -91,7 +92,7 @@ function foo(
     @test cmd.options["option1"].name == "option1"
     @test cmd.options["option2"].name == "option2"
     @test cmd.options["o"].short == true
-    @test cmd.options["o"].hint === nothing
+    @test cmd.options["o"].hint === "nothing"
 
     @test cmd.options["option2"].short == false
     @test cmd.options["option2"].hint == "int"
@@ -103,7 +104,7 @@ function foo(
     @test cmd.options["option4"].hint == "1::Int"
 
     @show cmd.options
-    @test all(keys(cmd.options) .== ["option1", "o", "option2", "option3"])
+    @test all(keys(cmd.options) .== ["option1", "o", "option2", "option3", "option4"])
 
     @show cmd.flags
     @test all(keys(cmd.flags) .== ["flag1", "f", "flag2"])
@@ -119,6 +120,7 @@ end
             option1 = nothing,
             option2::Int = 1,
             option3::String = "abc",
+            option4::Int = 1,
             flag1::Bool = false,
             flag2::Bool = false,
         ) end
