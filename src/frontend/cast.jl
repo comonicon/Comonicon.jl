@@ -646,7 +646,8 @@ function cast_options(doc::JLMD, options::Vector{JLOption}, line)
                 opt = Option(;
                     sym = each.name,
                     name = name,
-                    hint = option.hint, # use user defined hint
+                    hint = isnothing(option.hint) ? each.hint : # fallback to default hint
+                        option.hint, # use user defined hint if provided
                     require = each.require,
                     type = each.type,
                     short = option.short,
