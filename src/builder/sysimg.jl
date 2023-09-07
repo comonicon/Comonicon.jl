@@ -43,6 +43,9 @@ function create_command_env(m::Module, envpath::String = mktempdir(); test_deps:
     cmd_project = Pkg.Types.Project()
     merge!(cmd_project.deps, ctx.env.project.deps)
     merge!(cmd_project.compat, ctx.env.project.compat)
+    if hasproperty(ctx.env.project, :extras)
+        merge!(cmd_project.extras, ctx.env.project.extras)
+    end
     if hasproperty(ctx.env.project, :weakdeps)
         merge!(cmd_project.weakdeps, ctx.env.project.weakdeps)
     end
