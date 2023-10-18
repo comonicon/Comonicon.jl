@@ -1,6 +1,8 @@
 using Comonicon
 
 """
+# Intro
+
 ArgParse example implemented in Comonicon.
 
 # Arguments
