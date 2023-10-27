@@ -5,7 +5,7 @@ using Test
 @testset "scripts" begin
     empty!(ARGS)
     push!(ARGS, "arg", "--opt1=2", "--opt2", "3", "-f")
-    @test Base.include(Main, "scripts/hello.jl") == 0
+    @test Base.include(Main, "scripts/hello.jl") === nothing
 
     empty!(ARGS)
     push!(ARGS, "activate", "-h")
@@ -17,7 +17,7 @@ using Test
 
     empty!(ARGS)
     push!(ARGS, "Author - Year.pdf")
-    @test Base.include(Main, "scripts/searchpdf.jl") == 0
+    @test Base.include(Main, "scripts/searchpdf.jl") == nothing
 end
 
 end
