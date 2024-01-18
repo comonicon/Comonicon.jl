@@ -28,7 +28,7 @@ For stable release
 pkg> add Comonicon
 ```
 
-For current master
+For current main branch
 
 ```julia
 pkg> add Comonicon#main
@@ -42,7 +42,7 @@ Although you can use `Comonicon` in your script, but the recommended way to buil
 Julia compiler.
 
 Moreover, if you wish to create multiple commands. You can use `@cast` macro to annotate a function or module
-to create more complicated command line interfaces. You can check the example `Ion` [here](https://github.com/Roger-luo/IonCLI.jl).
+to create more complicated command line interfaces.
 
 ## Features
 ### Zero Duplication
