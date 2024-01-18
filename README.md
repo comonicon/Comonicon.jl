@@ -36,20 +36,7 @@ pkg> add Comonicon#main
 
 ## Usage
 
-The simplest way to use it is via `@main` macro, please refer to the demo in [Zero Duplication](#zero-duplication).
-
-Although you can use `Comonicon` in your script, but the recommended way to build CLI with Comonicon is to use `@main` in a Julia project module, so the command line interface entry will get compiled by the
-Julia compiler.
-
-Moreover, if you wish to create multiple commands. You can use `@cast` macro to annotate a function or module
-to create more complicated command line interfaces.
-
-## Features
-### Zero Duplication
-The frontend `@main` and `@cast` will try to **parse everything you typed** and turn them into
-part of your command line. This includes your function or module docstrings, your argument and keyword
-argument names, types and default values.
-
+The simplest way to use it is via `@main` macro,
 
 ```julia
 """
@@ -77,21 +64,50 @@ ArgParse example implemented in Comonicon.
 end
 ```
 
-We don't want to compromise on writing DRY code. If you have mentioned it in the documentation or somewhere in your script, you shouldn't write about it again in your code. 
+Now if you save this in a `mail.jl` file, you can run the following in your terminal
+
+```sh
+julia main.jl 123 --opt1 3 -o 2 -f
+```
+
+or use
+
+```sh
+julia main.jl --help
+```
+
+to print out a help message.
+
+Although you can use `Comonicon` in your script, but the recommended way to build CLI with Comonicon is to use `@main` in a Julia project module, so the command line interface entry will get compiled by the
+Julia compiler.
+
+Moreover, if you wish to create multiple commands. You can use `@cast` macro to annotate a function or module
+to create more complicated command line interfaces.
+
+## Features
+
+### Zero Duplication
+
+The frontend `@main` and `@cast` will try to **parse everything you typed** and turn them into
+part of your command line. This includes your function or module docstrings, your argument and keyword
+argument names, types and default values.
+
+We don't want to compromise on writing DRY code. If you have mentioned it in the documentation or somewhere in your script, you shouldn't write about it again in your code.
 
 This is like Python [docopt](https://github.com/docopt/docopt) but with [Fire](https://github.com/google/python-fire) and in Julia.
 
 ### Zero Overhead
+
 The backend code generator will generate Julia ASTs directly to parse your command line inputs all in one
 function `main` with one method `main(::Vector{String})`, which can be precompiled easily during module compilation.
 
 ### Zero Dependency
+
 You can get rid of `Comonicon` entirely after you generate the command line parsing script
 via `write_cmd(filename, command_object)`. It means if you copy this file into your script, you
 will get a standalone Julia script (unless the script depends on something else). However,
 this is usually not necessary since `Comonicon` itself is quite fast to load, the main latency
 of a CLI application usually comes from other dependencies or the application itself.
-
 
 ## License
 
