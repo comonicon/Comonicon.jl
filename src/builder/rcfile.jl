@@ -7,16 +7,15 @@ function install_env_path(
     yes::Bool = false,
 )
     rcfile = detect_rcfile(shell, home_dir)
-    let install_path = expanduser(options.install.path)
-        msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
-        if !contains_path(rcfile, install_path, env) && Tools.prompt(msg; yes)
-            write_path(rcfile, install_path)
-        end
+    completions_dir(xs...) = install_path(options, "completions", xs...)
+
+    msg = "cannot detect $(options.install.path)/bin in PATH, do you want to add it in PATH?"
+    if !contains_path(rcfile, install_path(options), env) && Tools.prompt(msg; yes)
+        write_path(rcfile, install_path(options))
     end
 
     if shell == "bash"
-        completions_script =
-            install_path(options, "completions", options.name * "-" * "completion.bash")
+        completions_script = completions_dir(options.name * "-" * "completion.bash")
         println("please add the following line in your $rcfile to enable shell autocompletion")
         println(" source $completions_script")
         println()
@@ -33,8 +32,8 @@ function install_env_path(
 
     if shell == "zsh"
         msg = "cannot detect $(options.install.path)/completions in FPATH, do you want to add it in FPATH?"
-        if !contains_fpath(rcfile, install_path, env) && Tools.prompt(msg; yes)
-            write_fpath(rcfile, install_path)
+        if !contains_fpath(rcfile, completions_dir(), env) && Tools.prompt(msg; yes)
+            write_fpath(rcfile, completions_dir())
         end
     end
 
