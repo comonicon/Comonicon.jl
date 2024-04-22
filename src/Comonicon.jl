@@ -11,6 +11,9 @@ using Markdown
 using ExproniconLite
 using OrderedCollections: OrderedDict
 
+# We only load repl in order to get Base.Docs methods defined, see issue #272
+using REPL: REPL
+
 export @cast, @main, cmd_error, cmd_exit, @lazyload
 
 include("compat.jl")
