@@ -22,7 +22,7 @@ Demo
     └── runtests.jl
 ```
 
-usually it's more convenient to create a Julia project via [IonCLI](https://github.com/Roger-luo/IonCLI.jl), after you install IonCLI, you can type the following command in your terminal
+usually it's more convenient to create a Julia project via [Ion](https://github.com/Roger-luo/ion), after you install Ion, you can type the following command in your terminal
 
 ```sh
 ion create Demo --template=comonicon
