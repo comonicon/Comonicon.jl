@@ -22,12 +22,6 @@ Demo
     └── runtests.jl
 ```
 
-usually it's more convenient to create a Julia project via [Ion](https://github.com/Roger-luo/ion), after you install Ion, you can type the following command in your terminal
-
-```sh
-ion create Demo --template=comonicon
-```
-
 ## Use `@cast` to define multiple commands
 
 In a large project, one might need to define multiple
