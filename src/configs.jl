@@ -58,8 +58,8 @@ Installation configurations.
 - `path`: installation path.
 - `completion`: set to `true` to install shell auto-completion scripts.
 - `quiet`: print logs or not, default is `false`.
-- `compile`: julia compiler option for CLIs if not built as standalone application, default is "min".
-- `optimize`: julia compiler option for CLIs if not built as standalone application, default is `2`.
+- `compile`: julia compiler option for CLIs if not built as standalone application, default is "min". See help section of `julia --compile` for more details.
+- `optimize`: julia compiler option for CLIs if not built as standalone application, default is `2`. See help section of `julia --optimize` for more details.
 - `nthreads`: julia compiler option for CLIs if not built as standalone application, default is `1`.
 """
 @option struct Install
