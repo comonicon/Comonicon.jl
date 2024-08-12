@@ -147,7 +147,7 @@ incremental=false
 filter_stdlibs=true
 ```
 
-You can find more references for these options in [PackageCompiler#create_sysimage](https://julialang.github.io/PackageCompiler.jl/dev/refs/#PackageCompiler.create_sysimage).
+You can find more references for these options in [PackageCompiler#create_sysimage](https://julialang.github.io/PackageCompiler.jl/dev/refs.html#PackageCompiler.create_sysimage).
 
 However, you may still find it being slow, you can further reduce the latency
 by adding an execution file to record precompilation statements.
