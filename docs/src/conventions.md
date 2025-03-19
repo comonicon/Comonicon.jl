@@ -1,4 +1,4 @@
-# Syntax & Conventions
+# [Syntax & Conventions](@id Conventions)
 
 ## Basics
 
