@@ -116,17 +116,17 @@ end
 
 - now we need to give this file permission via `chmod`:
 
-```sh
-chmod +x mycmd
-```
+  ```sh
+  chmod +x mycmd
+  ```
 
 - you can now execute this file directly via `./mycmd`, if you want to be able to execute
-   this cmd directly from anywhere in your terminal, you can move this file to `.julia/bin`
-   folder, then add `.julia/bin` to your `PATH`
+  this cmd directly from anywhere in your terminal, you can move this file to `.julia/bin`
+  folder, then add `.julia/bin` to your `PATH`
 
-```sh
-export PATH="$HOME/.julia/bin:$PATH"
-```
+  ```sh
+  export PATH="$HOME/.julia/bin:$PATH"
+  ```
 
 ## What's under the hood?
 
