@@ -16,7 +16,7 @@ Comonicon
 The simplest and most common way to use [`Comonicon`](@ref) is to use `@cast` and `@main`.
 
 ```@docs
-@main
+Comonicon.@main
 ```
 
 Let's use a simple example to show how, the following example creates a command using `@main`.
