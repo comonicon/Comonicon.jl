@@ -198,7 +198,7 @@ end
 
 Build configurations for Comonicon. One can set this option
 via `Comonicon.toml` under the root path of a Julia
-project directory and read in using [`read_configs`](@ref).
+project directory and read in using `read_configs`.
 
 ## Keywords
 
