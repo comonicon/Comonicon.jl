@@ -45,7 +45,7 @@ Configurations for terminal printing.
 - `left::Int`: left column max width.
 - `right::Int`: right column max width.
 - `color:Color`: color configurations, see [`Color`](@ref).
-- `indent::Indent`: indent configuration, see [`Indent`](@ref).
+- `indent::Indent`: indent configuration, see `Indent`.
 - `brief::Bool`: print the brief intro or not.
 """
 Base.@kwdef mutable struct Terminal

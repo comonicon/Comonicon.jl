@@ -1,6 +1,7 @@
 using Documenter
 using Comonicon
 using DocThemeIndigo
+using Documenter.Remotes: GitHub
 
 indigo = DocThemeIndigo.install(Comonicon)
 
@@ -21,8 +22,9 @@ makedocs(;
         "Code Generation" => "codegen.md",
         "Build and Install CLI" => "build.md",
     ],
-    repo = "https://github.com/comonicon/Comonicon.jl",
+    repo = GitHub("comonicon/Comonicon.jl"),
     sitename = "Comonicon.jl",
+    checkdocs = :export,
 )
 
 deploydocs(; repo = "github.com/comonicon/Comonicon.jl")

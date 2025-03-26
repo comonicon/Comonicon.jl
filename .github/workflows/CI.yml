@@ -36,31 +36,23 @@ jobs:
           #   arch: x64
           #   package: 'example'
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v1
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+      - uses: julia-actions/cache@v2
       - name: "add TestEnv"
         shell: julia --color=yes {0}
         run: |
           import Pkg; Pkg.add("TestEnv");
       - uses: julia-actions/julia-buildpkg@v1
         with:
-            directories: src, lib/ComoniconTestUtils/src
+          directories: src, lib/ComoniconTestUtils/src
       - name: "run test"
         run: julia --project .ci/test.jl runtest ${{ matrix.package }} --coverage
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v5
         with:
-          file: lcov.info
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
