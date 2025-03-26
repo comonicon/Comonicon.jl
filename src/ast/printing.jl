@@ -1,5 +1,14 @@
 tab(n::Int) = " "^n
-ignore_type(type) = type in [Any, String] || type <: AbstractString
+
+function is_vararg(T)
+    @static if VERSION < v"1.7"
+        T <: Vararg
+    else
+        typeof(T) == Core.TypeofVararg
+    end
+end		
+
+ignore_type(type) = !is_vararg(type) && (type in [Any, String] || type <: AbstractString)
 
 function has_args(cmd::LeafCommand)
     !isempty(cmd.args) || !isnothing(cmd.vararg)
