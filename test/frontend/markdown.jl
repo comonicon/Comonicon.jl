@@ -185,7 +185,15 @@ end
     args_sorted = ["arg1", "arg2", "arg3", "arg4"]
     @test all(keys(doc.arguments) .== args_sorted)
 
-    opts_sorted = ["short", "short-space", "short-assign", "long", "long-space", "long-assign", "short-underscore"]
+    opts_sorted = [
+        "short",
+        "short-space",
+        "short-assign",
+        "long",
+        "long-space",
+        "long-assign",
+        "short-underscore",
+    ]
     @test all(keys(doc.options) .== opts_sorted)
 
     flags_sorted = ["short", "short-space", "long", "long-space"]

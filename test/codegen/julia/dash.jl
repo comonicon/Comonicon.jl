@@ -6,11 +6,11 @@ using Comonicon.JuliaExpr: emit, emit_body, emit_norm_body, emit_dash_body
 using Test
 
 const test_args = Ref{Vector{Any}}()
-const test_kwargs = Ref{Dict{Symbol, Any}}()
+const test_kwargs = Ref{Dict{Symbol,Any}}()
 
 function foo(a, b = 2, c...; kwargs...)
     test_args[] = [a, b, c...]
-    test_kwargs[] = Dict{Symbol, Any}(kwargs)
+    test_kwargs[] = Dict{Symbol,Any}(kwargs)
 end
 
 cmd = Entry(;
@@ -39,11 +39,11 @@ eval(emit(cmd))
 @testset "test leaf optional argument" begin
     @test command_main(["3", "2", "5", "6", "7", "--option-a=2", "--option-b", "2.3"]) == 0
     @test test_args[] == Any[3, 2, 5, 6, 7]
-    @test test_kwargs[] == Dict{Symbol, Any}(:option_a => 2, :option_b => 2.3)
+    @test test_kwargs[] == Dict{Symbol,Any}(:option_a => 2, :option_b => 2.3)
 
     @test command_main(["--option-a=2", "--option-b=2.3", "--", "3", "2"]) == 0
     @test test_args[] == Any[3, 2]
-    @test test_kwargs[] == Dict{Symbol, Any}(:option_a => 2, :option_b => 2.3)
+    @test test_kwargs[] == Dict{Symbol,Any}(:option_a => 2, :option_b => 2.3)
 
     @test command_main(["3", "2"]) == 0
     @test test_args[] == Any[3, 2]
