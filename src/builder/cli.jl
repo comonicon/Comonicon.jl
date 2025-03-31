@@ -13,15 +13,27 @@ function print_builder_help(options::Configs.Comonicon, io::IO = stdout)
     printstyled(io, " "^4, "install"; color = :light_blue, bold = true)
     println(io, " "^21, "install the CLI locally.\n")
     if isnothing(options.application)
-        printstyled(io, " "^4, "app (disabled, add [application] section in Comonicon.toml to enable) "; color = :light_yellow, bold = true)  
+        printstyled(
+            io,
+            " "^4,
+            "app (disabled, add [application] section in Comonicon.toml to enable) ";
+            color = :light_yellow,
+            bold = true,
+        )
     else
         printstyled(io, " "^4, "app"; color = :light_blue, bold = true)
     end
     printstyled(io, " [tarball]"; color = :blue)
     println(io, " "^15, "build the application, optionally make a tarball.\n")
-    
+
     if isnothing(options.sysimg)
-        printstyled(io, " "^4, "sysimg (disabled, add [sysimg] section in Comonicon.toml to enable) "; color = :light_yellow, bold = true)
+        printstyled(
+            io,
+            " "^4,
+            "sysimg (disabled, add [sysimg] section in Comonicon.toml to enable) ";
+            color = :light_yellow,
+            bold = true,
+        )
     else
         printstyled(io, " "^4, "sysimg"; color = :light_blue, bold = true)
     end

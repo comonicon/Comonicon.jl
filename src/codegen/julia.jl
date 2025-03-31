@@ -172,7 +172,7 @@ function emit_dash_body(cmd::LeafCommand, ctx::EmitContext, idx::Symbol, ptr::In
     @gensym token token_ptr args kwargs
 
     quote # parse option/flag
-        $kwargs = Dict{Symbol, Any}()
+        $kwargs = Dict{Symbol,Any}()
         $token_ptr = $ptr
         while $token_ptr ≤ $idx - 1
             $token = ARGS[$token_ptr]
@@ -197,7 +197,7 @@ function emit_norm_body(cmd::LeafCommand, ctx::EmitContext, ptr::Int = 1)
 
     quote
         $args = []
-        $kwargs = Dict{Symbol, Any}()
+        $kwargs = Dict{Symbol,Any}()
         sizehint!($args, $(cmd.nrequire))
         $token_ptr = $ptr
         while $token_ptr ≤ length(ARGS)
@@ -273,12 +273,17 @@ function emit_leaf_call(cmd::LeafCommand, ctx::EmitContext, args::Symbol, kwargs
         # already, we are safe to depend on it in the generated code
         for option in values(cmd.options)
             Configurations.is_option(option.type) || continue
-            push!(ret.args, quote
-                if $(QuoteNode(option.sym)) in Base.keys($kwargs)
-                    $kwargs[$(QuoteNode(option.sym))] =
-                        $Configurations.from_dict($(option.type), $kwargs[$(QuoteNode(option.sym))])
-                end
-            end)
+            push!(
+                ret.args,
+                quote
+                    if $(QuoteNode(option.sym)) in Base.keys($kwargs)
+                        $kwargs[$(QuoteNode(option.sym))] = $Configurations.from_dict(
+                            $(option.type),
+                            $kwargs[$(QuoteNode(option.sym))],
+                        )
+                    end
+                end,
+            )
         end
     end
 
@@ -371,8 +376,8 @@ function emit_kwarg(cmd::LeafCommand, ctx::EmitContext, token::Symbol, kwargs::S
     ifelse = JLIfElse()
     # long option/flag
     ifelse[:(startswith($token, "--"))] = quote
-        $key = lstrip(split($token, '='; limit=2)[1], '-')
-        $key = split($key, '.'; limit=2)[1]
+        $key = lstrip(split($token, '='; limit = 2)[1], '-')
+        $key = split($key, '.'; limit = 2)[1]
         $(emit_long_option_or_flag(cmd, ctx, token, kwargs, sym, key, value, token_ptr))
     end
 
@@ -426,7 +431,7 @@ function emit_short_option(
             name = option.name[1:1]
             ifelse[:($key == $name)] = quote
                 if occursin('=', $token)
-                    _, $value = split($token, '='; limit=2)
+                    _, $value = split($token, '='; limit = 2)
                 elseif length($token) == 2 # read next
                     $token_ptr += 1
                     if $token_ptr > length(ARGS)
@@ -441,9 +446,7 @@ function emit_short_option(
             end
         end
     end
-    ifelse.otherwise = emit_error(
-        cmd, ctx, :("cannot find short flag or option: $($token)")
-    )
+    ifelse.otherwise = emit_error(cmd, ctx, :("cannot find short flag or option: $($token)"))
     return codegen_ast(ifelse)
 end
 
@@ -510,7 +513,7 @@ function emit_option(
 
     return quote
         if occursin('=', $token)
-            _, $value = split($token, '='; limit=2)
+            _, $value = split($token, '='; limit = 2)
         else # read next token
             $token_ptr += 1
             if $token_ptr > length(ARGS)
@@ -542,15 +545,15 @@ function emit_option_with_option_type(
 
     return quote
         if occursin('=', $token)
-            $key, $field_value = split($token, '='; limit=2)
+            $key, $field_value = split($token, '='; limit = 2)
             if occursin('.', $key)
-                _, $fields = split($key, '.'; limit=2)
+                _, $fields = split($key, '.'; limit = 2)
             else
                 $fields = nothing
             end
         else # read next token
             if occursin('.', $token)
-                _, $fields = split($token, '.'; limit=2)
+                _, $fields = split($token, '.'; limit = 2)
             else
                 $fields = nothing
             end
@@ -565,20 +568,27 @@ function emit_option_with_option_type(
         if isnothing($fields) # path to the config file
             $value = $(emit_parse_value(option, ctx, option.type, field_value))
         else
-            $value = get(Dict{String, Any}, $kwargs, $(QuoteNode(option.sym)))
+            $value = get(Dict{String,Any}, $kwargs, $(QuoteNode(option.sym)))
             $(codegen_ast(assign_field_to_dict))
         end
     end
 end
 
-function foreach_leaf_field!(f, jl::JLIfElse, ::Type{T}, dict, fields::Symbol, prefix::String="") where T
+function foreach_leaf_field!(
+    f,
+    jl::JLIfElse,
+    ::Type{T},
+    dict,
+    fields::Symbol,
+    prefix::String = "",
+) where {T}
     Configurations.foreach_keywords(T) do name, type
         key = isempty(prefix) ? string(name) : join((prefix, name), '.')
         dict_ex = :($dict[$(string(name))])
         if Configurations.is_option(type)
             foreach_leaf_field!(jl, type, dict_ex, fields, key) do dict_ex, type
                 quote
-                    $Base.get!(Dict{String, Any}, $dict, $(string(name)))
+                    $Base.get!(Dict{String,Any}, $dict, $(string(name)))
                     $(f(dict_ex, type))
                 end
             end
@@ -591,7 +601,7 @@ function foreach_leaf_field!(f, jl::JLIfElse, ::Type{T}, dict, fields::Symbol, p
     return jl
 end
 
-function foreach_leaf_field(f, ::Type{T}, dict::Symbol, fields::Symbol) where T
+function foreach_leaf_field(f, ::Type{T}, dict::Symbol, fields::Symbol) where {T}
     return foreach_leaf_field!(f, JLIfElse(), T, dict, fields)
 end
 
