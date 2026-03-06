@@ -461,7 +461,7 @@ end
 function codegen_script_entry(m::Module, line, @nospecialize(ex))
     quote
         $(codegen_create_entry(m, line, ex))
-        command_main()
+        Base.invokelatest(command_main)
     end
 end
 
