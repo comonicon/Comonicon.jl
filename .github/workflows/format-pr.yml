@@ -16,7 +16,7 @@ jobs:
         with:
           version: ${{ matrix.julia-version }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install JuliaFormatter and format
         run: |
           julia  -e 'import Pkg; Pkg.add("JuliaFormatter")'
