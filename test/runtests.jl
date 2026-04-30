@@ -23,6 +23,7 @@ end
     include("frontend/cast.jl")
     include("frontend/markdown.jl")
     include("long_print.jl")
+    include("vararg.jl")
 end
 
 @testset "codegen" begin
