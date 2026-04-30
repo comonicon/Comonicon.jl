@@ -1,82 +1,82 @@
-Comonicon.moduleComonicon. Comonicon.TestBuilderInstallComonicon.
+module TestBuilderInstall
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ScratchComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..ConfigsComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..BuilderComonicon.: Comonicon.ensure_pathComonicon., Comonicon.entryfile_scriptComonicon., Comonicon.completion_scriptComonicon., Comonicon.detect_rcfileComonicon.
+using Test
+using Scratch
+using Comonicon.Configs
+using Comonicon.Builder: ensure_path, entryfile_script, completion_script, detect_rcfile
 
-@Comonicon.testsetComonicon. "Comonicon.ensure_pathComonicon." Comonicon.beginComonicon.
-    Comonicon.pathComonicon. = Comonicon.tempnameComonicon.()
-    @Comonicon.testComonicon. Comonicon.ispathComonicon.(Comonicon.pathComonicon.) == Comonicon.falseComonicon.
-    Comonicon.ensure_pathComonicon.(Comonicon.pathComonicon.)
-    @Comonicon.testComonicon. Comonicon.ispathComonicon.(Comonicon.pathComonicon.) == Comonicon.trueComonicon.
-Comonicon.endComonicon.
+@testset "ensure_path" begin
+    path = tempname()
+    @test ispath(path) == false
+    ensure_path(path)
+    @test ispath(path) == true
+end
 
-Comonicon.moduleComonicon. Comonicon.TestInstallComonicon.
+module TestInstall
 
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Comonicon
 
-@Comonicon.castComonicon. Comonicon.fooComonicon.(Comonicon.xComonicon.) = Comonicon.0Comonicon.
-@Comonicon.castComonicon. Comonicon.gooComonicon.(Comonicon.xComonicon.) = Comonicon.1Comonicon.
+@cast foo(x) = 0
+@cast goo(x) = 1
 
-@Comonicon.mainComonicon.
+Comonicon.@main
 
-Comonicon.endComonicon.
+end
 
-@Comonicon.testsetComonicon. "Comonicon.entryfile_scriptComonicon." Comonicon.beginComonicon.
-    Comonicon.optionsComonicon. = Comonicon.ConfigsComonicon..Comonicon.ComoniconComonicon.(Comonicon.nameComonicon. = "Comonicon.testComonicon.")
-    Comonicon.scriptComonicon. = Comonicon.entryfile_scriptComonicon.(Comonicon.TestInstallComonicon., Comonicon.optionsComonicon.)
-    Comonicon.ifComonicon. Comonicon.SysComonicon..Comonicon.iswindowsComonicon.()
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("@Comonicon.echoComonicon. Comonicon.offComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("Comonicon.setComonicon. Comonicon.JULIA_PROJECTComonicon.=$(Comonicon.get_scratchComonicon.!(Comonicon.TestInstallComonicon., "Comonicon.envComonicon."))", Comonicon.scriptComonicon.)
-        Comonicon.julia_exeComonicon. = Comonicon.joinpathComonicon.(Comonicon.SysComonicon..Comonicon.BINDIRComonicon., Comonicon.BaseComonicon..Comonicon.julia_exenameComonicon.())
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("$Comonicon.julia_exeComonicon. ^\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.startupComonicon.-Comonicon.fileComonicon.=Comonicon.noComonicon. ^\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.colorComonicon.=Comonicon.yesComonicon. ^\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.compileComonicon.=Comonicon.yesComonicon. ^\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.optimizeComonicon.=Comonicon.2Comonicon. ^\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.(
-            "Comonicon.usingComonicon. Comonicon.MainComonicon..Comonicon.TestBuilderInstallComonicon..Comonicon.TestInstallComonicon.; Comonicon.exitComonicon.(Comonicon.TestInstallComonicon..Comonicon.command_mainComonicon.())",
-            Comonicon.scriptComonicon.,
+@testset "entryfile_script" begin
+    options = Configs.Comonicon(name = "test")
+    script = entryfile_script(TestInstall, options)
+    if Sys.iswindows()
+        @test occursin("@echo off", script)
+        @test occursin("set JULIA_PROJECT=$(get_scratch!(TestInstall, "env"))", script)
+        julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())
+        @test occursin("$julia_exe ^\n", script)
+        @test occursin("--startup-file=no ^\n", script)
+        @test occursin("--color=yes ^\n", script)
+        @test occursin("--compile=yes ^\n", script)
+        @test occursin("--optimize=2 ^\n", script)
+        @test occursin(
+            "using Main.TestBuilderInstall.TestInstall; exit(TestInstall.command_main())",
+            script,
         )
-    Comonicon.elseComonicon.
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("#!/Comonicon.usrComonicon./Comonicon.binComonicon./Comonicon.envComonicon. Comonicon.bashComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("Comonicon.JULIA_PROJECTComonicon.=$(Comonicon.get_scratchComonicon.!(Comonicon.TestInstallComonicon., "Comonicon.envComonicon."))", Comonicon.scriptComonicon.)
-        Comonicon.julia_exeComonicon. = Comonicon.joinpathComonicon.(Comonicon.SysComonicon..Comonicon.BINDIRComonicon., Comonicon.BaseComonicon..Comonicon.julia_exenameComonicon.())
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("Comonicon.execComonicon. $Comonicon.julia_exeComonicon. \\\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.startupComonicon.-Comonicon.fileComonicon.=Comonicon.noComonicon. \\\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.colorComonicon.=Comonicon.yesComonicon. \\\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.compileComonicon.=Comonicon.yesComonicon. \\\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("--Comonicon.optimizeComonicon.=Comonicon.2Comonicon. \\\Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("-- \"\${Comonicon.BASH_SOURCEComonicon.[Comonicon.0Comonicon.]}\"", Comonicon.scriptComonicon.)
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.(
-            "Comonicon.usingComonicon. Comonicon.MainComonicon..Comonicon.TestBuilderInstallComonicon..Comonicon.TestInstallComonicon.\Comonicon.nexitComonicon.(Comonicon.TestInstallComonicon..Comonicon.command_mainComonicon.())",
-            Comonicon.scriptComonicon.,
+    else
+        @test occursin("#!/usr/bin/env bash", script)
+        @test occursin("JULIA_PROJECT=$(get_scratch!(TestInstall, "env"))", script)
+        julia_exe = joinpath(Sys.BINDIR, Base.julia_exename())
+        @test occursin("exec $julia_exe \\\n", script)
+        @test occursin("--startup-file=no \\\n", script)
+        @test occursin("--color=yes \\\n", script)
+        @test occursin("--compile=yes \\\n", script)
+        @test occursin("--optimize=2 \\\n", script)
+        @test occursin("-- \"\${BASH_SOURCE[0]}\"", script)
+        @test occursin(
+            "using Main.TestBuilderInstall.TestInstall\nexit(TestInstall.command_main())",
+            script,
         )
-    Comonicon.endComonicon.
-Comonicon.endComonicon.
+    end
+end
 
-@Comonicon.testsetComonicon. "Comonicon.testComonicon. Comonicon.completionComonicon. Comonicon.scriptComonicon." Comonicon.beginComonicon.
-    Comonicon.optionsComonicon. = Comonicon.ConfigsComonicon..Comonicon.ComoniconComonicon.(Comonicon.nameComonicon. = "Comonicon.testComonicon.")
-    Comonicon.withenvComonicon.("Comonicon.SHELLComonicon." => "/Comonicon.binComonicon./Comonicon.zshComonicon.") Comonicon.doComonicon.
-        Comonicon.scriptComonicon. = Comonicon.completion_scriptComonicon.(Comonicon.TestInstallComonicon., Comonicon.optionsComonicon., "Comonicon.zshComonicon.")
-        @Comonicon.testComonicon. Comonicon.occursinComonicon.("#Comonicon.compdefComonicon. Comonicon._testinstallComonicon. Comonicon.testinstallComonicon. \Comonicon.nComonicon.", Comonicon.scriptComonicon.)
-    Comonicon.endComonicon.
+@testset "test completion script" begin
+    options = Configs.Comonicon(name = "test")
+    withenv("SHELL" => "/bin/zsh") do
+        script = completion_script(TestInstall, options, "zsh")
+        @test occursin("#compdef _testinstall testinstall \n", script)
+    end
 
-    Comonicon.withenvComonicon.("Comonicon.SHELLComonicon." => "/Comonicon.binComonicon./Comonicon.fakeshComonicon.") Comonicon.doComonicon.
-        @Comonicon.test_throwsComonicon. Comonicon.ErrorExceptionComonicon. Comonicon.completion_scriptComonicon.(Comonicon.TestInstallComonicon., Comonicon.optionsComonicon., "/Comonicon.binComonicon./Comonicon.fakeshComonicon.")
-    Comonicon.endComonicon.
-Comonicon.endComonicon.
+    withenv("SHELL" => "/bin/fakesh") do
+        @test_throws ErrorException completion_script(TestInstall, options, "/bin/fakesh")
+    end
+end
 
-@Comonicon.testsetComonicon. "Comonicon.detect_rcfileComonicon." Comonicon.beginComonicon.
-    Comonicon.answerComonicon. = Comonicon.joinpathComonicon.((Comonicon.haskeyComonicon.(Comonicon.ENVComonicon., "Comonicon.ZDOTDIRComonicon.") ? Comonicon.ENVComonicon.["Comonicon.ZDOTDIRComonicon."] : Comonicon.homedirComonicon.()), ".Comonicon.zshrcComonicon.")
-    Comonicon.withenvComonicon.("Comonicon.SHELLComonicon." => "Comonicon.zshComonicon.") Comonicon.doComonicon.
-        @Comonicon.testComonicon. Comonicon.detect_rcfileComonicon.("Comonicon.zshComonicon.") == Comonicon.answerComonicon.
-    Comonicon.endComonicon.
+@testset "detect_rcfile" begin
+    answer = joinpath((haskey(ENV, "ZDOTDIR") ? ENV["ZDOTDIR"] : homedir()), ".zshrc")
+    withenv("SHELL" => "zsh") do
+        @test detect_rcfile("zsh") == answer
+    end
 
-    Comonicon.withenvComonicon.("Comonicon.SHELLComonicon." => "Comonicon.zshComonicon.", "Comonicon.ZDOTDIRComonicon." => "Comonicon.zsh_dirComonicon.") Comonicon.doComonicon.
-        @Comonicon.testComonicon. Comonicon.detect_rcfileComonicon.("Comonicon.zshComonicon.") == Comonicon.joinpathComonicon.("Comonicon.zsh_dirComonicon.", ".Comonicon.zshrcComonicon.")
-    Comonicon.endComonicon.
-Comonicon.endComonicon.
+    withenv("SHELL" => "zsh", "ZDOTDIR" => "zsh_dir") do
+        @test detect_rcfile("zsh") == joinpath("zsh_dir", ".zshrc")
+    end
+end
 
-Comonicon.endComonicon. # Comonicon.TestBuilderInstallComonicon.
+end # TestBuilderInstall

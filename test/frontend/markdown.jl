@@ -1,308 +1,308 @@
-Comonicon.moduleComonicon. Comonicon.TestMarkdownComonicon.
+module TestMarkdown
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.MarkdownComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..ASTComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.:
-    Comonicon.JLArgumentComonicon.,
-    Comonicon.JLOptionComonicon.,
-    Comonicon.JLFlagComonicon.,
-    Comonicon.JLMDComonicon.,
-    Comonicon.JLMDFlagComonicon.,
-    Comonicon.JLMDOptionComonicon.,
-    Comonicon.castComonicon.,
-    Comonicon.cast_argsComonicon.,
-    Comonicon.cast_flagsComonicon.,
-    Comonicon.cast_optionsComonicon.,
-    Comonicon.default_nameComonicon.,
-    Comonicon.get_versionComonicon.,
-    Comonicon.split_leaf_commandComonicon.,
-    Comonicon.split_docstringComonicon.,
-    Comonicon.read_argumentsComonicon.,
-    Comonicon.read_introComonicon.,
-    Comonicon.read_descriptionComonicon.,
-    Comonicon.read_optionsComonicon.,
-    Comonicon.read_flagsComonicon.,
-    Comonicon.split_hintComonicon.,
-    Comonicon.split_optionComonicon.
+using Test
+using Markdown
+using Comonicon.AST
+using Comonicon
+using Comonicon:
+    JLArgument,
+    JLOption,
+    JLFlag,
+    JLMD,
+    JLMDFlag,
+    JLMDOption,
+    cast,
+    cast_args,
+    cast_flags,
+    cast_options,
+    default_name,
+    get_version,
+    split_leaf_command,
+    split_docstring,
+    read_arguments,
+    read_intro,
+    read_description,
+    read_options,
+    read_flags,
+    split_hint,
+    split_option
 
-@Comonicon.testsetComonicon. "Comonicon.read_argumentsComonicon." Comonicon.beginComonicon.
-    Comonicon.docComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-        Comonicon.commandComonicon. <Comonicon.argsComonicon.>
+@testset "read_arguments" begin
+    doc = Markdown.parse("""
+        command <args>
 
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+    description of the command.
 
-    # Comonicon.IntroComonicon.
+    # Intro
 
-    Comonicon.asdmwdsComonicon. Comonicon.dasklsamComonicon. Comonicon.xasdklqmComonicon. Comonicon.dasdmComonicon., Comonicon.qwdjiolkasjdsaComonicon.
-    Comonicon.dasklmdasComonicon. Comonicon.weqwlkjmdasComonicon. Comonicon.kljnsadlksadComonicon. Comonicon.qwlkdnasdComonicon.
-    Comonicon.dasklmdlqwoiComonicon., Comonicon.dasdasklmdComonicon. Comonicon.qwComonicon.,Comonicon.asdComonicon.. Comonicon.dasdjklnmldqwComonicon..
+    asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa
+    dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd
+    dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw.
 
-    # Comonicon.ArgsComonicon.
+    # Args
 
-    - `Comonicon.arg1Comonicon.`: Comonicon.argumentComonicon. Comonicon.1Comonicon..
-    - `Comonicon.arg2Comonicon.`: Comonicon.argumentComonicon. Comonicon.2Comonicon..
-    - `Comonicon.arg3Comonicon.`: Comonicon.argumentComonicon. Comonicon.3Comonicon..
-    - `Comonicon.arg4Comonicon.`: Comonicon.argumentComonicon. Comonicon.4Comonicon..
+    - `arg1`: argument 1.
+    - `arg2`: argument 2.
+    - `arg3`: argument 3.
+    - `arg4`: argument 4.
     """)
 
-    @Comonicon.testComonicon. Comonicon.read_descriptionComonicon.(Comonicon.docComonicon.) == "Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon.."
-    @Comonicon.testComonicon. Comonicon.read_introComonicon.(Comonicon.docComonicon.) ==
-          "Comonicon.asdmwdsComonicon. Comonicon.dasklsamComonicon. Comonicon.xasdklqmComonicon. Comonicon.dasdmComonicon., Comonicon.qwdjiolkasjdsaComonicon. " *
-          "Comonicon.dasklmdasComonicon. Comonicon.weqwlkjmdasComonicon. Comonicon.kljnsadlksadComonicon. Comonicon.qwlkdnasdComonicon. " *
-          "Comonicon.dasklmdlqwoiComonicon., Comonicon.dasdasklmdComonicon. Comonicon.qwComonicon.,Comonicon.asdComonicon.. Comonicon.dasdjklnmldqwComonicon.."
+    @test read_description(doc) == "description of the command."
+    @test read_intro(doc) ==
+          "asdmwds dasklsam xasdklqm dasdm, qwdjiolkasjdsa " *
+          "dasklmdas weqwlkjmdas kljnsadlksad qwlkdnasd " *
+          "dasklmdlqwoi, dasdasklmd qw,asd. dasdjklnmldqw."
 
-    Comonicon.argsComonicon. = Comonicon.read_argumentsComonicon.(Comonicon.docComonicon.)
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg1Comonicon."] == "Comonicon.argumentComonicon. Comonicon.1Comonicon.."
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg2Comonicon."] == "Comonicon.argumentComonicon. Comonicon.2Comonicon.."
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg3Comonicon."] == "Comonicon.argumentComonicon. Comonicon.3Comonicon.."
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg4Comonicon."] == "Comonicon.argumentComonicon. Comonicon.4Comonicon.."
+    args = read_arguments(doc)
+    @test args["arg1"] == "argument 1."
+    @test args["arg2"] == "argument 2."
+    @test args["arg3"] == "argument 3."
+    @test args["arg4"] == "argument 4."
 
-    Comonicon.docComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+    doc = Markdown.parse("""
+    description of the command.
 
-    # Comonicon.ArgumentsComonicon.
+    # Arguments
 
-    - `Comonicon.arg1Comonicon.`: Comonicon.argumentComonicon. Comonicon.1Comonicon..
-    - `Comonicon.arg2Comonicon.`: Comonicon.argumentComonicon. Comonicon.2Comonicon..
-    - `Comonicon.arg3Comonicon.`: Comonicon.argumentComonicon. Comonicon.3Comonicon..
-    - `Comonicon.arg4Comonicon.`: Comonicon.argumentComonicon. Comonicon.4Comonicon..
+    - `arg1`: argument 1.
+    - `arg2`: argument 2.
+    - `arg3`: argument 3.
+    - `arg4`: argument 4.
     """)
 
-    @Comonicon.testComonicon. Comonicon.read_descriptionComonicon.(Comonicon.docComonicon.) == "Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon.."
+    @test read_description(doc) == "description of the command."
 
-    Comonicon.argsComonicon. = Comonicon.read_argumentsComonicon.(Comonicon.docComonicon.)
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg1Comonicon."] == "Comonicon.argumentComonicon. Comonicon.1Comonicon.."
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg2Comonicon."] == "Comonicon.argumentComonicon. Comonicon.2Comonicon.."
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg3Comonicon."] == "Comonicon.argumentComonicon. Comonicon.3Comonicon.."
-    @Comonicon.testComonicon. Comonicon.argsComonicon.["Comonicon.arg4Comonicon."] == "Comonicon.argumentComonicon. Comonicon.4Comonicon.."
-Comonicon.endComonicon.
+    args = read_arguments(doc)
+    @test args["arg1"] == "argument 1."
+    @test args["arg2"] == "argument 2."
+    @test args["arg3"] == "argument 3."
+    @test args["arg4"] == "argument 4."
+end
 
-@Comonicon.testsetComonicon. "Comonicon.split_hintComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.split_hintComonicon.("Comonicon.longComonicon.") == ("Comonicon.longComonicon.", Comonicon.nothingComonicon.)
-    @Comonicon.testComonicon. Comonicon.split_hintComonicon.("Comonicon.longComonicon. <Comonicon.valueComonicon.>") == ("Comonicon.longComonicon.", "Comonicon.valueComonicon.")
-    @Comonicon.testComonicon. Comonicon.split_hintComonicon.("Comonicon.longComonicon.=<Comonicon.valueComonicon.>") == ("Comonicon.longComonicon.", "Comonicon.valueComonicon.")
-    @Comonicon.testComonicon. Comonicon.split_hintComonicon.("Comonicon.sComonicon.") == ("Comonicon.sComonicon.", Comonicon.nothingComonicon.)
-    @Comonicon.testComonicon. Comonicon.split_hintComonicon.("Comonicon.sComonicon.=<Comonicon.valueComonicon.>") == ("Comonicon.sComonicon.", "Comonicon.valueComonicon.")
-    @Comonicon.testComonicon. Comonicon.split_hintComonicon.("Comonicon.sComonicon. <Comonicon.valueComonicon.>") == ("Comonicon.sComonicon.", "Comonicon.valueComonicon.")
-    @Comonicon.test_throwsComonicon. Comonicon.MetaComonicon..Comonicon.ParseErrorComonicon. Comonicon.split_hintComonicon.("Comonicon.sComonicon.=Comonicon.sComonicon.")
-    @Comonicon.test_throwsComonicon. Comonicon.MetaComonicon..Comonicon.ParseErrorComonicon. Comonicon.split_hintComonicon.("Comonicon.sComonicon.=Comonicon.sComonicon.=Comonicon.sComonicon.")
-Comonicon.endComonicon.
+@testset "split_hint" begin
+    @test split_hint("long") == ("long", nothing)
+    @test split_hint("long <value>") == ("long", "value")
+    @test split_hint("long=<value>") == ("long", "value")
+    @test split_hint("s") == ("s", nothing)
+    @test split_hint("s=<value>") == ("s", "value")
+    @test split_hint("s <value>") == ("s", "value")
+    @test_throws Meta.ParseError split_hint("s=s")
+    @test_throws Meta.ParseError split_hint("s=s=s")
+end
 
-@Comonicon.testsetComonicon. "Comonicon.split_optionComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.split_optionComonicon.("--Comonicon.longComonicon.") == ("Comonicon.longComonicon.", Comonicon.nothingComonicon., Comonicon.nothingComonicon.)
-    @Comonicon.testComonicon. Comonicon.split_optionComonicon.("--Comonicon.longComonicon. <Comonicon.valueComonicon.>") == ("Comonicon.longComonicon.", Comonicon.nothingComonicon., "Comonicon.valueComonicon.")
-    @Comonicon.testComonicon. Comonicon.split_optionComonicon.("--Comonicon.longComonicon.=<Comonicon.valueComonicon.>") == ("Comonicon.longComonicon.", Comonicon.nothingComonicon., "Comonicon.valueComonicon.")
-    @Comonicon.testComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.sComonicon.") == ("Comonicon.shortComonicon.", "Comonicon.sComonicon.", Comonicon.nothingComonicon.)
-    @Comonicon.testComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.sComonicon. <Comonicon.valueComonicon.>") == ("Comonicon.shortComonicon.", "Comonicon.sComonicon.", "Comonicon.valueComonicon.")
-    @Comonicon.testComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.sComonicon.=<Comonicon.valueComonicon.>") == ("Comonicon.shortComonicon.", "Comonicon.sComonicon.", "Comonicon.valueComonicon.")
-    @Comonicon.test_throwsComonicon. Comonicon.MetaComonicon..Comonicon.ParseErrorComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.ssComonicon., -Comonicon.stComonicon.")
-    @Comonicon.test_throwsComonicon. Comonicon.MetaComonicon..Comonicon.ParseErrorComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.ssComonicon.")
-    @Comonicon.test_throwsComonicon. Comonicon.MetaComonicon..Comonicon.ParseErrorComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.ssComonicon.=<Comonicon.valueComonicon.>")
-    @Comonicon.test_throwsComonicon. Comonicon.MetaComonicon..Comonicon.ParseErrorComonicon. Comonicon.split_optionComonicon.("--Comonicon.shortComonicon., -Comonicon.tComonicon.=<Comonicon.valueComonicon.>")
-Comonicon.endComonicon.
+@testset "split_option" begin
+    @test split_option("--long") == ("long", nothing, nothing)
+    @test split_option("--long <value>") == ("long", nothing, "value")
+    @test split_option("--long=<value>") == ("long", nothing, "value")
+    @test split_option("--short, -s") == ("short", "s", nothing)
+    @test split_option("--short, -s <value>") == ("short", "s", "value")
+    @test split_option("--short, -s=<value>") == ("short", "s", "value")
+    @test_throws Meta.ParseError split_option("--short, -ss, -st")
+    @test_throws Meta.ParseError split_option("--short, -ss")
+    @test_throws Meta.ParseError split_option("--short, -ss=<value>")
+    @test_throws Meta.ParseError split_option("--short, -t=<value>")
+end
 
-@Comonicon.testsetComonicon. "Comonicon.read_optionsComonicon." Comonicon.beginComonicon.
-    Comonicon.docComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+@testset "read_options" begin
+    doc = Markdown.parse("""
+    description of the command.
 
-    # Comonicon.OptionsComonicon.
+    # Options
 
-    - `--Comonicon.shortComonicon., -Comonicon.sComonicon.`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.shortComonicon.-Comonicon.spaceComonicon., -Comonicon.sComonicon. <Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.shortComonicon.-Comonicon.assignComonicon., -Comonicon.sComonicon.=<Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.longComonicon.`: Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.longComonicon.-Comonicon.spaceComonicon. <Comonicon.valueComonicon.>`: Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.longComonicon.-Comonicon.assignComonicon.=<Comonicon.valueComonicon.>`: Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.short_underscoreComonicon., -Comonicon.sComonicon. <Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.withComonicon. Comonicon.underscoreComonicon..
+    - `--short, -s`: short option using default hint.
+    - `--short-space, -s <value>`: short option using given hint.
+    - `--short-assign, -s=<value>`: short option using given hint.
+    - `--long`: long option using default hint.
+    - `--long-space <value>`: long option using given hint.
+    - `--long-assign=<value>`: long option using given hint.
+    - `--short_underscore, -s <value>`: short option with underscore.
     """)
 
-    Comonicon.optionsComonicon. = Comonicon.read_optionsComonicon.(Comonicon.docComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.shortComonicon."] == Comonicon.JLMDOptionComonicon.(Comonicon.nothingComonicon., "Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..", Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.shortComonicon.-Comonicon.spaceComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..", Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.shortComonicon.-Comonicon.assignComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..", Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.longComonicon."] == Comonicon.JLMDOptionComonicon.(Comonicon.nothingComonicon., "Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..", Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.longComonicon.-Comonicon.spaceComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..", Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.longComonicon.-Comonicon.assignComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..", Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.shortComonicon.-Comonicon.underscoreComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.withComonicon. Comonicon.underscoreComonicon..", Comonicon.trueComonicon.)
-Comonicon.endComonicon.
+    options = read_options(doc)
+    @test options["short"] == JLMDOption(nothing, "short option using default hint.", true)
+    @test options["short-space"] == JLMDOption("value", "short option using given hint.", true)
+    @test options["short-assign"] == JLMDOption("value", "short option using given hint.", true)
+    @test options["long"] == JLMDOption(nothing, "long option using default hint.", false)
+    @test options["long-space"] == JLMDOption("value", "long option using given hint.", false)
+    @test options["long-assign"] == JLMDOption("value", "long option using given hint.", false)
+    @test options["short-underscore"] == JLMDOption("value", "short option with underscore.", true)
+end
 
-@Comonicon.testsetComonicon. "Comonicon.read_flagsComonicon." Comonicon.beginComonicon.
-    Comonicon.docComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+@testset "read_flags" begin
+    doc = Markdown.parse("""
+    description of the command.
 
-    # Comonicon.FlagsComonicon.
+    # Flags
 
-    - `--Comonicon.shortComonicon., -Comonicon.sComonicon.`: Comonicon.shortComonicon. Comonicon.flagComonicon..
-    - `--Comonicon.shortComonicon.-Comonicon.spaceComonicon., -Comonicon.sComonicon.`: Comonicon.shortComonicon. Comonicon.flagComonicon. Comonicon.withComonicon. Comonicon.dashComonicon..
-    - `--Comonicon.longComonicon.`: Comonicon.longComonicon. Comonicon.flagComonicon..
-    - `--Comonicon.longComonicon.-Comonicon.spaceComonicon.`: Comonicon.longComonicon. Comonicon.flagComonicon. Comonicon.withComonicon. Comonicon.dashComonicon..
+    - `--short, -s`: short flag.
+    - `--short-space, -s`: short flag with dash.
+    - `--long`: long flag.
+    - `--long-space`: long flag with dash.
     """)
 
-    Comonicon.flagsComonicon. = Comonicon.read_flagsComonicon.(Comonicon.docComonicon.)
-    @Comonicon.testComonicon. Comonicon.flagsComonicon.["Comonicon.shortComonicon."] == Comonicon.JLMDFlagComonicon.("Comonicon.shortComonicon. Comonicon.flagComonicon..", Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.flagsComonicon.["Comonicon.shortComonicon.-Comonicon.spaceComonicon."] == Comonicon.JLMDFlagComonicon.("Comonicon.shortComonicon. Comonicon.flagComonicon. Comonicon.withComonicon. Comonicon.dashComonicon..", Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.flagsComonicon.["Comonicon.longComonicon."] == Comonicon.JLMDFlagComonicon.("Comonicon.longComonicon. Comonicon.flagComonicon..", Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.flagsComonicon.["Comonicon.longComonicon.-Comonicon.spaceComonicon."] == Comonicon.JLMDFlagComonicon.("Comonicon.longComonicon. Comonicon.flagComonicon. Comonicon.withComonicon. Comonicon.dashComonicon..", Comonicon.falseComonicon.)
-Comonicon.endComonicon.
+    flags = read_flags(doc)
+    @test flags["short"] == JLMDFlag("short flag.", true)
+    @test flags["short-space"] == JLMDFlag("short flag with dash.", true)
+    @test flags["long"] == JLMDFlag("long flag.", false)
+    @test flags["long-space"] == JLMDFlag("long flag with dash.", false)
+end
 
-@Comonicon.testsetComonicon. "Comonicon.split_docstringComonicon." Comonicon.beginComonicon.
-    Comonicon.contentComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+@testset "split_docstring" begin
+    content = Markdown.parse("""
+    description of the command.
 
-    # Comonicon.ArgsComonicon.
+    # Args
 
-    - `Comonicon.arg1Comonicon.`: Comonicon.argumentComonicon. Comonicon.1Comonicon..
-    - `Comonicon.arg2Comonicon.`: Comonicon.argumentComonicon. Comonicon.2Comonicon..
-    - `Comonicon.arg3Comonicon.`: Comonicon.argumentComonicon. Comonicon.3Comonicon..
-    - `Comonicon.arg4Comonicon.`: Comonicon.argumentComonicon. Comonicon.4Comonicon..
+    - `arg1`: argument 1.
+    - `arg2`: argument 2.
+    - `arg3`: argument 3.
+    - `arg4`: argument 4.
 
-    # Comonicon.OptionsComonicon.
+    # Options
 
-    - `--Comonicon.shortComonicon., -Comonicon.sComonicon.`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.shortComonicon.-Comonicon.spaceComonicon., -Comonicon.sComonicon. <Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.shortComonicon.-Comonicon.assignComonicon., -Comonicon.sComonicon.=<Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.longComonicon.`: Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.longComonicon.-Comonicon.spaceComonicon. <Comonicon.valueComonicon.>`: Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.longComonicon.-Comonicon.assignComonicon.=<Comonicon.valueComonicon.>`: Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.givenComonicon. Comonicon.hintComonicon..
-    - `--Comonicon.short_underscoreComonicon., -Comonicon.sComonicon. <Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon. Comonicon.withComonicon. Comonicon.underscoreComonicon..
+    - `--short, -s`: short option using default hint.
+    - `--short-space, -s <value>`: short option using given hint.
+    - `--short-assign, -s=<value>`: short option using given hint.
+    - `--long`: long option using default hint.
+    - `--long-space <value>`: long option using given hint.
+    - `--long-assign=<value>`: long option using given hint.
+    - `--short_underscore, -s <value>`: short option with underscore.
 
-    # Comonicon.FlagsComonicon.
+    # Flags
 
-    - `--Comonicon.shortComonicon., -Comonicon.sComonicon.`: Comonicon.shortComonicon. Comonicon.flagComonicon..
-    - `--Comonicon.shortComonicon.-Comonicon.spaceComonicon., -Comonicon.sComonicon.`: Comonicon.shortComonicon. Comonicon.flagComonicon. Comonicon.withComonicon. Comonicon.dashComonicon..
-    - `--Comonicon.longComonicon.`: Comonicon.longComonicon. Comonicon.flagComonicon..
-    - `--Comonicon.longComonicon.-Comonicon.spaceComonicon.`: Comonicon.longComonicon. Comonicon.flagComonicon. Comonicon.withComonicon. Comonicon.dashComonicon..
+    - `--short, -s`: short flag.
+    - `--short-space, -s`: short flag with dash.
+    - `--long`: long flag.
+    - `--long-space`: long flag with dash.
     """)
 
-    Comonicon.docComonicon. = Comonicon.split_docstringComonicon.(Comonicon.contentComonicon.)
-    @Comonicon.testComonicon. Comonicon.docComonicon..Comonicon.descComonicon. == "Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon.."
-    @Comonicon.testComonicon. Comonicon.docComonicon..Comonicon.argumentsComonicon.["Comonicon.arg1Comonicon."] == "Comonicon.argumentComonicon. Comonicon.1Comonicon.."
-    @Comonicon.testComonicon. Comonicon.docComonicon..Comonicon.flagsComonicon.["Comonicon.longComonicon."] == Comonicon.JLMDFlagComonicon.("Comonicon.longComonicon. Comonicon.flagComonicon..", Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.docComonicon..Comonicon.optionsComonicon.["Comonicon.longComonicon."] == Comonicon.JLMDOptionComonicon.(Comonicon.nothingComonicon., "Comonicon.longComonicon. Comonicon.optionComonicon. Comonicon.usingComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon..", Comonicon.falseComonicon.)
+    doc = split_docstring(content)
+    @test doc.desc == "description of the command."
+    @test doc.arguments["arg1"] == "argument 1."
+    @test doc.flags["long"] == JLMDFlag("long flag.", false)
+    @test doc.options["long"] == JLMDOption(nothing, "long option using default hint.", false)
 
-    Comonicon.args_sortedComonicon. = ["Comonicon.arg1Comonicon.", "Comonicon.arg2Comonicon.", "Comonicon.arg3Comonicon.", "Comonicon.arg4Comonicon."]
-    @Comonicon.testComonicon. Comonicon.allComonicon.(Comonicon.keysComonicon.(Comonicon.docComonicon..Comonicon.argumentsComonicon.) .== Comonicon.args_sortedComonicon.)
+    args_sorted = ["arg1", "arg2", "arg3", "arg4"]
+    @test all(keys(doc.arguments) .== args_sorted)
 
-    Comonicon.opts_sortedComonicon. = [
-        "Comonicon.shortComonicon.",
-        "Comonicon.shortComonicon.-Comonicon.spaceComonicon.",
-        "Comonicon.shortComonicon.-Comonicon.assignComonicon.",
-        "Comonicon.longComonicon.",
-        "Comonicon.longComonicon.-Comonicon.spaceComonicon.",
-        "Comonicon.longComonicon.-Comonicon.assignComonicon.",
-        "Comonicon.shortComonicon.-Comonicon.underscoreComonicon.",
+    opts_sorted = [
+        "short",
+        "short-space",
+        "short-assign",
+        "long",
+        "long-space",
+        "long-assign",
+        "short-underscore",
     ]
-    @Comonicon.testComonicon. Comonicon.allComonicon.(Comonicon.keysComonicon.(Comonicon.docComonicon..Comonicon.optionsComonicon.) .== Comonicon.opts_sortedComonicon.)
+    @test all(keys(doc.options) .== opts_sorted)
 
-    Comonicon.flags_sortedComonicon. = ["Comonicon.shortComonicon.", "Comonicon.shortComonicon.-Comonicon.spaceComonicon.", "Comonicon.longComonicon.", "Comonicon.longComonicon.-Comonicon.spaceComonicon."]
-    @Comonicon.testComonicon. Comonicon.allComonicon.(Comonicon.keysComonicon.(Comonicon.docComonicon..Comonicon.flagsComonicon.) .== Comonicon.flags_sortedComonicon.)
-Comonicon.endComonicon.
+    flags_sorted = ["short", "short-space", "long", "long-space"]
+    @test all(keys(doc.flags) .== flags_sorted)
+end
 
-@Comonicon.testsetComonicon. "Comonicon.reverseComonicon. Comonicon.orderComonicon." Comonicon.beginComonicon.
-    Comonicon.contentComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+@testset "reverse order" begin
+    content = Markdown.parse("""
+    description of the command.
 
-    # Comonicon.OptionsComonicon.
+    # Options
 
-    - `-Comonicon.oComonicon., --Comonicon.optionComonicon.=<Comonicon.valueComonicon.>`: Comonicon.someComonicon. Comonicon.randomComonicon. Comonicon.optionComonicon..
-    - `-Comonicon.oComonicon.,--Comonicon.option_spaceComonicon.=<Comonicon.valueComonicon.>`: Comonicon.someComonicon. Comonicon.randomComonicon. Comonicon.optionComonicon..
+    - `-o, --option=<value>`: some random option.
+    - `-o,--option_space=<value>`: some random option.
     """)
 
-    Comonicon.docComonicon. = Comonicon.split_docstringComonicon.(Comonicon.contentComonicon.)
+    doc = split_docstring(content)
 
-    @Comonicon.testComonicon. Comonicon.docComonicon..Comonicon.optionsComonicon.["Comonicon.optionComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.someComonicon. Comonicon.randomComonicon. Comonicon.optionComonicon..", Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.docComonicon..Comonicon.optionsComonicon.["Comonicon.optionComonicon.-Comonicon.spaceComonicon."] == Comonicon.JLMDOptionComonicon.("Comonicon.valueComonicon.", "Comonicon.someComonicon. Comonicon.randomComonicon. Comonicon.optionComonicon..", Comonicon.trueComonicon.)
+    @test doc.options["option"] == JLMDOption("value", "some random option.", true)
+    @test doc.options["option-space"] == JLMDOption("value", "some random option.", true)
 
-    Comonicon.contentComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.descriptionComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.commandComonicon..
+    content = Markdown.parse("""
+    description of the command.
 
-    # Comonicon.OptionsComonicon.
+    # Options
 
-    - `-Comonicon.oComonicon., Comonicon.optionComonicon.=<Comonicon.valueComonicon.>`: Comonicon.someComonicon. Comonicon.randomComonicon. Comonicon.optionComonicon..
+    - `-o, option=<value>`: some random option.
     """)
 
-    @Comonicon.test_throwsComonicon. Comonicon.ErrorExceptionComonicon. Comonicon.split_docstringComonicon.(Comonicon.contentComonicon.)
-Comonicon.endComonicon.
+    @test_throws ErrorException split_docstring(content)
+end
 
-@Comonicon.testsetComonicon. "Comonicon.hintComonicon. Comonicon.withComonicon. Comonicon.spaceComonicon." Comonicon.beginComonicon.
-    Comonicon.docComonicon. = Comonicon.MarkdownComonicon..Comonicon.parseComonicon.("""
-    Comonicon.releaseComonicon. Comonicon.aComonicon. Comonicon.packageComonicon..
+@testset "hint with space" begin
+    doc = Markdown.parse("""
+    release a package.
 
-    # Comonicon.ArgumentsComonicon.
+    # Arguments
 
-    - `Comonicon.version_specComonicon.`: Comonicon.versionComonicon. Comonicon.numberComonicon. Comonicon.youComonicon. Comonicon.wantComonicon. Comonicon.toComonicon. Comonicon.releaseComonicon.. Comonicon.CanComonicon. Comonicon.beComonicon. Comonicon.aComonicon. Comonicon.specificComonicon. Comonicon.versionComonicon., "Comonicon.currentComonicon."
-        Comonicon.orComonicon. Comonicon.eitherComonicon. Comonicon.ofComonicon.
-    - `Comonicon.pathComonicon.`: Comonicon.pathComonicon. Comonicon.toComonicon. Comonicon.theComonicon. Comonicon.projectComonicon. Comonicon.youComonicon. Comonicon.wantComonicon. Comonicon.toComonicon. Comonicon.releaseComonicon..
+    - `version_spec`: version number you want to release. Can be a specific version, "current"
+        or either of
+    - `path`: path to the project you want to release.
 
-    # Comonicon.OptionsComonicon.
+    # Options
 
-    - `-Comonicon.rComonicon.,--Comonicon.registryComonicon. <Comonicon.registryComonicon. Comonicon.nameComonicon.>`: Comonicon.registryComonicon. Comonicon.youComonicon. Comonicon.wantComonicon. Comonicon.toComonicon. Comonicon.registerComonicon. Comonicon.theComonicon. Comonicon.packageComonicon..
-        Comonicon.IfComonicon. Comonicon.theComonicon. Comonicon.packageComonicon. Comonicon.hasComonicon. Comonicon.notComonicon. Comonicon.beenComonicon. Comonicon.registeredComonicon., Comonicon.ionComonicon. Comonicon.willComonicon. Comonicon.tryComonicon. Comonicon.toComonicon. Comonicon.registerComonicon.
-        Comonicon.theComonicon. Comonicon.packageComonicon. Comonicon.inComonicon. Comonicon.theComonicon. Comonicon.GeneralComonicon. Comonicon.registryComonicon.. Comonicon.OrComonicon. Comonicon.theComonicon. Comonicon.userComonicon. Comonicon.needsComonicon. Comonicon.toComonicon. Comonicon.specifyComonicon.
-        Comonicon.theComonicon. Comonicon.registryComonicon. Comonicon.toComonicon. Comonicon.registerComonicon. Comonicon.usingComonicon. Comonicon.thisComonicon. Comonicon.optionComonicon..
-    - `-Comonicon.bComonicon., --Comonicon.branchComonicon. <Comonicon.branchComonicon. Comonicon.nameComonicon.>`: Comonicon.branchComonicon. Comonicon.youComonicon. Comonicon.wantComonicon. Comonicon.toComonicon. Comonicon.registerComonicon..
-    - `--Comonicon.noteComonicon. <Comonicon.releaseComonicon. Comonicon.noteComonicon.>`: Comonicon.optionalComonicon., Comonicon.releaseComonicon. Comonicon.noteComonicon. Comonicon.youComonicon. Comonicon.wouldComonicon. Comonicon.likeComonicon. Comonicon.toComonicon. Comonicon.specifyComonicon..
+    - `-r,--registry <registry name>`: registry you want to register the package.
+        If the package has not been registered, ion will try to register
+        the package in the General registry. Or the user needs to specify
+        the registry to register using this option.
+    - `-b, --branch <branch name>`: branch you want to register.
+    - `--note <release note>`: optional, release note you would like to specify.
     """)
 
-    Comonicon.optionsComonicon. = Comonicon.read_optionsComonicon.(Comonicon.docComonicon.)
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.noteComonicon."].Comonicon.hintComonicon. == "Comonicon.releaseComonicon. Comonicon.noteComonicon."
-    @Comonicon.testComonicon. Comonicon.optionsComonicon.["Comonicon.registryComonicon."].Comonicon.hintComonicon. == "Comonicon.registryComonicon. Comonicon.nameComonicon."
-Comonicon.endComonicon.
+    options = read_options(doc)
+    @test options["note"].hint == "release note"
+    @test options["registry"].hint == "registry name"
+end
 
-Comonicon.moduleComonicon. Comonicon.TestEmptyDocStringComonicon.
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+module TestEmptyDocString
+using Test
+using Comonicon
 
-@Comonicon.castComonicon. Comonicon.testComonicon.() = @Comonicon.testComonicon. Comonicon.trueComonicon.
+@cast test() = @test true
 
 """
 """
-@Comonicon.mainComonicon.
+Comonicon.@main
 
-Comonicon.endComonicon. # Comonicon.TestEmptyDocStringComonicon.
+end # TestEmptyDocString
 
-@Comonicon.testsetComonicon. "Comonicon.emptyComonicon. Comonicon.docstringComonicon." Comonicon.beginComonicon.
-    Comonicon.TestEmptyDocStringComonicon..Comonicon.command_mainComonicon.(["Comonicon.testComonicon."])
-Comonicon.endComonicon.
+@testset "empty docstring" begin
+    TestEmptyDocString.command_main(["test"])
+end
 
-Comonicon.endComonicon. # Comonicon.TestMarkdownComonicon.
+end # TestMarkdown
 
-Comonicon.moduleComonicon. Comonicon.TestLazyLoadComonicon.
+module TestLazyLoad
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-Comonicon.usingComonicon. Comonicon.ExproniconLiteComonicon.
+using Test
+using Comonicon
+using ExproniconLite
 
-@Comonicon.testsetComonicon. "Comonicon.lazyloadComonicon." Comonicon.beginComonicon.
-    Comonicon.exComonicon. = @Comonicon.exprComonicon. @Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.fComonicon.() Comonicon.endComonicon.
-    Comonicon.generatedComonicon. = Comonicon.ComoniconComonicon..lazyload_mComonicon.(Comonicon.MainComonicon., Comonicon.nothingComonicon., :(Comonicon.usingComonicon. Comonicon.PkgComonicon.), Comonicon.exComonicon.)
+@testset "lazyload" begin
+    ex = @expr @cast function f() end
+    generated = Comonicon.lazyload_m(Main, nothing, :(using Pkg), ex)
 
-    @Comonicon.test_exprComonicon. Comonicon.generatedComonicon. == Comonicon.quoteComonicon.
-        Comonicon.ifComonicon. !(Comonicon.isemptyComonicon.(Comonicon.ARGSComonicon.)) && Comonicon.ARGSComonicon.[Comonicon.1Comonicon.] == "Comonicon.fComonicon."
-            Comonicon.usingComonicon. Comonicon.PkgComonicon.
-        Comonicon.endComonicon.
+    @test_expr generated == quote
+        if !(isempty(ARGS)) && ARGS[1] == "f"
+            using Pkg
+        end
 
-        Comonicon.CoreComonicon..@Comonicon.__doc__Comonicon. @Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.fComonicon.() Comonicon.endComonicon.
-    Comonicon.endComonicon.
+        Core.@__doc__ @cast function f() end
+    end
 
-    Comonicon.exComonicon. = @Comonicon.exprComonicon. @Comonicon.castComonicon. Comonicon.moduleComonicon. Comonicon.nodecmdComonicon.
-    Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-    @Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.fComonicon.() Comonicon.endComonicon.
-    Comonicon.endComonicon.
+    ex = @expr @cast module nodecmd
+    using Comonicon
+    @cast function f() end
+    end
 
-    Comonicon.generatedComonicon. = Comonicon.ComoniconComonicon..lazyload_mComonicon.(Comonicon.MainComonicon., Comonicon.nothingComonicon., :(Comonicon.usingComonicon. Comonicon.PkgComonicon.), Comonicon.exComonicon.)
-    @Comonicon.test_exprComonicon. Comonicon.generatedComonicon. == Comonicon.quoteComonicon.
-        Comonicon.ifComonicon. !(Comonicon.isemptyComonicon.(Comonicon.ARGSComonicon.)) && Comonicon.ARGSComonicon.[Comonicon.1Comonicon.] == "Comonicon.nodecmdComonicon."
-            Comonicon.usingComonicon. Comonicon.PkgComonicon.
-        Comonicon.endComonicon.
+    generated = Comonicon.lazyload_m(Main, nothing, :(using Pkg), ex)
+    @test_expr generated == quote
+        if !(isempty(ARGS)) && ARGS[1] == "nodecmd"
+            using Pkg
+        end
 
-        Comonicon.CoreComonicon..@Comonicon.__doc__Comonicon. @Comonicon.castComonicon. Comonicon.moduleComonicon. Comonicon.nodecmdComonicon.
-        Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-        @Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.fComonicon.() Comonicon.endComonicon.
-        Comonicon.endComonicon.
-    Comonicon.endComonicon.
-Comonicon.endComonicon.
+        Core.@__doc__ @cast module nodecmd
+        using Comonicon
+        @cast function f() end
+        end
+    end
+end
 
-Comonicon.endComonicon.
+end

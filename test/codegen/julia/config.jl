@@ -1,54 +1,54 @@
-Comonicon.moduleComonicon. Comonicon.TestConfigOptionComonicon.
+module TestConfigOption
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-Comonicon.usingComonicon. Comonicon.ConfigurationsComonicon.
+using Test
+using Comonicon
+using Configurations
 
-@Comonicon.optionComonicon. Comonicon.structComonicon. Comonicon.OptionAComonicon.
-    Comonicon.aComonicon.::Comonicon.IntComonicon. = Comonicon.2Comonicon.
-    Comonicon.bComonicon.::Comonicon.IntComonicon. = Comonicon.2Comonicon.
-Comonicon.endComonicon.
+@option struct OptionA
+    a::Int = 2
+    b::Int = 2
+end
 
-@Comonicon.optionComonicon. Comonicon.structComonicon. Comonicon.OptionBComonicon.
-    Comonicon.optionComonicon.::Comonicon.OptionAComonicon.
-    Comonicon.cComonicon.::Comonicon.IntComonicon.
-Comonicon.endComonicon.
+@option struct OptionB
+    option::OptionA
+    c::Int
+end
 
 """
-# Comonicon.OptionsComonicon.
+# Options
 
-- `-Comonicon.cComonicon., --Comonicon.configComonicon. <Comonicon.pathComonicon./Comonicon.toComonicon./Comonicon.optionComonicon./Comonicon.orComonicon./Comonicon.specificComonicon. Comonicon.fieldComonicon.>`: Comonicon.configComonicon..
+- `-c, --config <path/to/option/or/specific field>`: config.
 """
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.runComonicon.(; Comonicon.configComonicon.::Comonicon.OptionBComonicon.)
-    @Comonicon.testComonicon. Comonicon.configComonicon. == Comonicon.OptionBComonicon.(Comonicon.OptionAComonicon.(Comonicon.1Comonicon., Comonicon.1Comonicon.), Comonicon.1Comonicon.)
-Comonicon.endComonicon.
+@cast function run(; config::OptionB)
+    @test config == OptionB(OptionA(1, 1), 1)
+end
 
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.rundefComonicon.(; Comonicon.configComonicon.::Comonicon.OptionAComonicon. = Comonicon.OptionAComonicon.())
-    @Comonicon.testComonicon. Comonicon.configComonicon. == Comonicon.OptionAComonicon.(Comonicon.2Comonicon., Comonicon.2Comonicon.)
-Comonicon.endComonicon.
+@cast function rundef(; config::OptionA = OptionA())
+    @test config == OptionA(2, 2)
+end
 
-@Comonicon.mainComonicon.
+Comonicon.@main
 
-@Comonicon.testsetComonicon. "Comonicon.configComonicon. Comonicon.optionsComonicon." Comonicon.beginComonicon.
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.([
-        "Comonicon.runComonicon.",
-        "--Comonicon.configComonicon..Comonicon.cComonicon.=Comonicon.1Comonicon.",
-        "--Comonicon.configComonicon..Comonicon.optionComonicon..Comonicon.aComonicon.=Comonicon.1Comonicon.",
-        "--Comonicon.configComonicon..Comonicon.optionComonicon..Comonicon.bComonicon.=Comonicon.1Comonicon.",
+@testset "config options" begin
+    TestConfigOption.command_main([
+        "run",
+        "--config.c=1",
+        "--config.option.a=1",
+        "--config.option.b=1",
     ])
 
-    Comonicon.optComonicon. = Comonicon.TestConfigOptionComonicon..Comonicon.OptionBComonicon.(Comonicon.TestConfigOptionComonicon..Comonicon.OptionAComonicon.(Comonicon.1Comonicon., Comonicon.1Comonicon.), Comonicon.1Comonicon.)
-    Comonicon.to_tomlComonicon.("Comonicon.configComonicon..Comonicon.tomlComonicon.", Comonicon.optComonicon.)
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.runComonicon.", "--Comonicon.configComonicon.", "Comonicon.configComonicon..Comonicon.tomlComonicon."])
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.runComonicon.", "-Comonicon.cComonicon.", "Comonicon.configComonicon..Comonicon.tomlComonicon."])
+    opt = TestConfigOption.OptionB(TestConfigOption.OptionA(1, 1), 1)
+    to_toml("config.toml", opt)
+    TestConfigOption.command_main(["run", "--config", "config.toml"])
+    TestConfigOption.command_main(["run", "-c", "config.toml"])
 
-    Comonicon.optComonicon. = Comonicon.TestConfigOptionComonicon..Comonicon.OptionBComonicon.(Comonicon.TestConfigOptionComonicon..Comonicon.OptionAComonicon.(Comonicon.1Comonicon., Comonicon.1Comonicon.), Comonicon.2Comonicon.)
-    Comonicon.to_tomlComonicon.("Comonicon.configComonicon..Comonicon.tomlComonicon.", Comonicon.optComonicon.)
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.runComonicon.", "--Comonicon.configComonicon.", "Comonicon.configComonicon..Comonicon.tomlComonicon.", "--Comonicon.configComonicon..Comonicon.cComonicon.=Comonicon.1Comonicon."])
+    opt = TestConfigOption.OptionB(TestConfigOption.OptionA(1, 1), 2)
+    to_toml("config.toml", opt)
+    TestConfigOption.command_main(["run", "--config", "config.toml", "--config.c=1"])
 
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.rundefComonicon."])
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.rundefComonicon.", "--Comonicon.configComonicon..Comonicon.aComonicon.=Comonicon.2Comonicon."])
-    Comonicon.TestConfigOptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.rundefComonicon.", "--Comonicon.configComonicon..Comonicon.aComonicon.=Comonicon.2Comonicon.", "--Comonicon.configComonicon..Comonicon.bComonicon.=Comonicon.2Comonicon."])
-Comonicon.endComonicon.
+    TestConfigOption.command_main(["rundef"])
+    TestConfigOption.command_main(["rundef", "--config.a=2"])
+    TestConfigOption.command_main(["rundef", "--config.a=2", "--config.b=2"])
+end
 
-Comonicon.endComonicon.
+end

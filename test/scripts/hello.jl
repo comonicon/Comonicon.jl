@@ -1,25 +1,25 @@
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Test
+using Comonicon
 
 """
-Comonicon.ArgParseComonicon. Comonicon.exampleComonicon. Comonicon.implementedComonicon. Comonicon.inComonicon. Comonicon.ComoniconComonicon..
+ArgParse example implemented in Comonicon.
 
-# Comonicon.ArgumentsComonicon.
+# Arguments
 
-- `Comonicon.xComonicon.`: Comonicon.anComonicon. Comonicon.argumentComonicon., Comonicon.anComonicon. Comonicon.argumentComonicon.
+- `x`: an argument, an argument
 
-# Comonicon.OptionsComonicon.
+# Options
 
-- `--Comonicon.opt1Comonicon. <Comonicon.argComonicon.>`: Comonicon.anComonicon. Comonicon.optionComonicon.
-- `-Comonicon.oComonicon., --Comonicon.opt2Comonicon. <Comonicon.argComonicon.>`: Comonicon.anotherComonicon. Comonicon.optionComonicon.
+- `--opt1 <arg>`: an option
+- `-o, --opt2 <arg>`: another option
 
-# Comonicon.FlagsComonicon.
+# Flags
 
-- `-Comonicon.fComonicon., --Comonicon.flagComonicon.`: Comonicon.aComonicon. Comonicon.flagComonicon.
+- `-f, --flag`: a flag
 """
-@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.mainComonicon.(Comonicon.xComonicon.; Comonicon.opt1Comonicon. = Comonicon.1Comonicon., Comonicon.opt2Comonicon.::Comonicon.IntComonicon. = Comonicon.2Comonicon., Comonicon.flagComonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.)
-    Comonicon.xComonicon. == "Comonicon.argComonicon."
-    @Comonicon.testComonicon. Comonicon.flagComonicon. == Comonicon.trueComonicon.
-    @Comonicon.testComonicon. Comonicon.opt1Comonicon. == "Comonicon.2Comonicon."
-    @Comonicon.testComonicon. Comonicon.opt2Comonicon. == Comonicon.3Comonicon.
-Comonicon.endComonicon.
+Comonicon.@main function main(x; opt1 = 1, opt2::Int = 2, flag::Bool = false)
+    x == "arg"
+    @test flag == true
+    @test opt1 == "2"
+    @test opt2 == 3
+end

@@ -1,30 +1,30 @@
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Comonicon
 
-@Comonicon.lazyloadComonicon. Comonicon.usingComonicon. Comonicon.RandomComonicon. @Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.randomComonicon.()
-    Comonicon.isdefinedComonicon.(Comonicon.MainComonicon., :Comonicon.RandomComonicon.) && Comonicon.printlnComonicon.("Comonicon.RandomComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.")
-    Comonicon.isdefinedComonicon.(Comonicon.MainComonicon., :Comonicon.LinearAlgebraComonicon.) && Comonicon.printlnComonicon.("Comonicon.LinearAlgebraComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.")
-Comonicon.endComonicon.
+@lazyload using Random @cast function random()
+    isdefined(Main, :Random) && println("Random is loaded")
+    isdefined(Main, :LinearAlgebra) && println("LinearAlgebra is loaded")
+end
 
-@Comonicon.lazyloadComonicon. Comonicon.usingComonicon. Comonicon.RandomComonicon., Comonicon.LinearAlgebraComonicon. @Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.bothComonicon.()
-    Comonicon.isdefinedComonicon.(Comonicon.MainComonicon., :Comonicon.RandomComonicon.) && Comonicon.printlnComonicon.("Comonicon.RandomComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.")
-    Comonicon.isdefinedComonicon.(Comonicon.MainComonicon., :Comonicon.LinearAlgebraComonicon.) && Comonicon.printlnComonicon.("Comonicon.LinearAlgebraComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.")
-Comonicon.endComonicon.
+@lazyload using Random, LinearAlgebra @cast function both()
+    isdefined(Main, :Random) && println("Random is loaded")
+    isdefined(Main, :LinearAlgebra) && println("LinearAlgebra is loaded")
+end
 
-# Comonicon.thisComonicon. Comonicon.willComonicon. Comonicon.throwComonicon. Comonicon.anComonicon. Comonicon.errorComonicon.
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.noneComonicon.()
-    Comonicon.isdefinedComonicon.(Comonicon.MainComonicon., :Comonicon.RandomComonicon.) && Comonicon.printlnComonicon.("Comonicon.RandomComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.")
-    Comonicon.isdefinedComonicon.(Comonicon.MainComonicon., :Comonicon.LinearAlgebraComonicon.) && Comonicon.printlnComonicon.("Comonicon.LinearAlgebraComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.")
-Comonicon.endComonicon.
+# this will throw an error
+@cast function none()
+    isdefined(Main, :Random) && println("Random is loaded")
+    isdefined(Main, :LinearAlgebra) && println("LinearAlgebra is loaded")
+end
 
-@Comonicon.mainComonicon.
+Comonicon.@main
 
-# Comonicon.YouComonicon. Comonicon.willComonicon. Comonicon.seeComonicon. Comonicon.theComonicon. Comonicon.followingComonicon. Comonicon.outputComonicon. Comonicon.ifComonicon. Comonicon.youComonicon. Comonicon.runComonicon. Comonicon.thisComonicon. Comonicon.scriptComonicon..
+# You will see the following output if you run this script.
 #
-# Comonicon.shellComonicon.> Comonicon.juliaComonicon. --Comonicon.projectComonicon. Comonicon.exampleComonicon./Comonicon.lazyloadComonicon..Comonicon.jlComonicon. Comonicon.randomComonicon.
-# Comonicon.RandomComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.
+# shell> julia --project example/lazyload.jl random
+# Random is loaded
 
-# Comonicon.shellComonicon.> Comonicon.juliaComonicon. --Comonicon.projectComonicon. Comonicon.exampleComonicon./Comonicon.lazyloadComonicon..Comonicon.jlComonicon. Comonicon.bothComonicon.
-# Comonicon.RandomComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.
-# Comonicon.LinearAlgebraComonicon. Comonicon.isComonicon. Comonicon.loadedComonicon.
+# shell> julia --project example/lazyload.jl both
+# Random is loaded
+# LinearAlgebra is loaded
 
-# Comonicon.shellComonicon.> Comonicon.juliaComonicon. --Comonicon.projectComonicon. Comonicon.exampleComonicon./Comonicon.lazyloadComonicon..Comonicon.jlComonicon. Comonicon.noneComonicon.
+# shell> julia --project example/lazyload.jl none

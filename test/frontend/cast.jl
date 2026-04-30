@@ -1,266 +1,266 @@
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ExproniconLiteComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..ASTComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.:
-    Comonicon.JLArgumentComonicon.,
-    Comonicon.JLOptionComonicon.,
-    Comonicon.JLFlagComonicon.,
-    Comonicon.JLMDComonicon.,
-    Comonicon.JLMDFlagComonicon.,
-    Comonicon.JLMDOptionComonicon.,
-    Comonicon.castComonicon.,
-    Comonicon.cast_argsComonicon.,
-    Comonicon.cast_flagsComonicon.,
-    Comonicon.cast_optionsComonicon.,
-    Comonicon.default_nameComonicon.,
-    Comonicon.get_versionComonicon.,
-    Comonicon.split_leaf_commandComonicon.,
-    Comonicon.split_docstringComonicon.,
-    Comonicon.read_argumentsComonicon.,
-    Comonicon.read_descriptionComonicon.,
-    Comonicon.read_optionsComonicon.,
-    Comonicon.read_flagsComonicon.,
-    Comonicon.split_hintComonicon.,
-    Comonicon.split_optionComonicon.
+using Test
+using ExproniconLite
+using Comonicon.AST
+using Comonicon
+using Comonicon:
+    JLArgument,
+    JLOption,
+    JLFlag,
+    JLMD,
+    JLMDFlag,
+    JLMDOption,
+    cast,
+    cast_args,
+    cast_flags,
+    cast_options,
+    default_name,
+    get_version,
+    split_leaf_command,
+    split_docstring,
+    read_arguments,
+    read_description,
+    read_options,
+    read_flags,
+    split_hint,
+    split_option
 
-Comonicon.argsComonicon. = [
-    # Comonicon.nameComonicon., Comonicon.typeComonicon., Comonicon.requireComonicon., Comonicon.varargComonicon., Comonicon.defaultComonicon.
-    Comonicon.JLArgumentComonicon.(:Comonicon.arg1Comonicon., Comonicon.AnyComonicon., Comonicon.trueComonicon., Comonicon.falseComonicon., Comonicon.nothingComonicon.),
-    Comonicon.JLArgumentComonicon.(:Comonicon.arg2Comonicon., Comonicon.IntComonicon., Comonicon.falseComonicon., Comonicon.falseComonicon., "Comonicon.1Comonicon."),
-    Comonicon.JLArgumentComonicon.(:Comonicon.arg3Comonicon., Comonicon.StringComonicon., Comonicon.falseComonicon., Comonicon.falseComonicon., "Comonicon.abcComonicon."),
+args = [
+    # name, type, require, vararg, default
+    JLArgument(:arg1, Any, true, false, nothing),
+    JLArgument(:arg2, Int, false, false, "1"),
+    JLArgument(:arg3, String, false, false, "abc"),
 ]
 
-Comonicon.flagsComonicon. = [Comonicon.JLFlagComonicon.(:Comonicon.flag1Comonicon.), Comonicon.JLFlagComonicon.(:Comonicon.flag2Comonicon.)]
+flags = [JLFlag(:flag1), JLFlag(:flag2)]
 
-Comonicon.optionsComonicon. = [
-    # Comonicon.nameComonicon., Comonicon.typeComonicon., Comonicon.hintComonicon.
-    Comonicon.JLOptionComonicon.(:Comonicon.option1Comonicon., Comonicon.falseComonicon., Comonicon.AnyComonicon., "Comonicon.nothingComonicon."),
-    Comonicon.JLOptionComonicon.(:Comonicon.option2Comonicon., Comonicon.falseComonicon., Comonicon.IntComonicon., "Comonicon.1Comonicon.::Comonicon.IntComonicon."),
-    Comonicon.JLOptionComonicon.(:Comonicon.option3Comonicon., Comonicon.falseComonicon., Comonicon.StringComonicon., "Comonicon.abcComonicon.::Comonicon.StringComonicon."),
-    Comonicon.JLOptionComonicon.(:Comonicon.option4Comonicon., Comonicon.falseComonicon., Comonicon.IntComonicon., "Comonicon.1Comonicon.::Comonicon.IntComonicon."),
+options = [
+    # name, type, hint
+    JLOption(:option1, false, Any, "nothing"),
+    JLOption(:option2, false, Int, "1::Int"),
+    JLOption(:option3, false, String, "abc::String"),
+    JLOption(:option4, false, Int, "1::Int"),
 ]
 
 """
-    Comonicon.fooComonicon.(Comonicon.arg1Comonicon., Comonicon.arg2Comonicon.::Comonicon.IntComonicon., Comonicon.arg3Comonicon.::Comonicon.StringComonicon.; Comonicon.kwComonicon....)
+    foo(arg1, arg2::Int, arg3::String; kw...)
 
-Comonicon.aComonicon. Comonicon.testComonicon. Comonicon.functionComonicon..
+a test function.
 
-# Comonicon.ArgsComonicon.
+# Args
 
-- `Comonicon.arg1Comonicon.`: Comonicon.testComonicon. Comonicon.argumentComonicon..
-- `Comonicon.arg2Comonicon.`: Comonicon.testComonicon. Comonicon.argumentComonicon..
-- `Comonicon.arg3Comonicon.`: Comonicon.testComonicon. Comonicon.argumentComonicon..
+- `arg1`: test argument.
+- `arg2`: test argument.
+- `arg3`: test argument.
 
-# Comonicon.OptionsComonicon.
+# Options
 
-- `--Comonicon.option1Comonicon., -Comonicon.oComonicon.`: Comonicon.testComonicon. Comonicon.optionComonicon..
-- `--Comonicon.option2Comonicon. <Comonicon.intComonicon.>`: Comonicon.testComonicon. Comonicon.optionComonicon..
-- `--Comonicon.option3Comonicon.=<Comonicon.nameComonicon.>`: Comonicon.testComonicon. Comonicon.optionComonicon..
-- `--Comonicon.option4Comonicon.`: Comonicon.testComonicon. Comonicon.optionComonicon..
+- `--option1, -o`: test option.
+- `--option2 <int>`: test option.
+- `--option3=<name>`: test option.
+- `--option4`: test option.
 
-# Comonicon.FlagsComonicon.
-- `--Comonicon.flag1Comonicon., -Comonicon.fComonicon.`: Comonicon.testComonicon. Comonicon.flagComonicon..
-- `--Comonicon.flag2Comonicon.`: Comonicon.testComonicon. Comonicon.flagComonicon..
+# Flags
+- `--flag1, -f`: test flag.
+- `--flag2`: test flag.
 """
-Comonicon.functionComonicon. Comonicon.fooComonicon.(
-    Comonicon.arg1Comonicon.,
-    Comonicon.arg2Comonicon.::Comonicon.IntComonicon.,
-    Comonicon.arg3Comonicon.::Comonicon.StringComonicon.;
-    Comonicon.option1Comonicon. = Comonicon.nothingComonicon.,
-    Comonicon.option2Comonicon.::Comonicon.IntComonicon. = Comonicon.1Comonicon.,
-    Comonicon.option3Comonicon.::Comonicon.StringComonicon. = "Comonicon.abcComonicon.",
-    Comonicon.option4Comonicon.::Comonicon.IntComonicon. = Comonicon.1Comonicon.,
-    Comonicon.flag1Comonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.,
-    Comonicon.flag2Comonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.,
-) Comonicon.endComonicon.
+function foo(
+    arg1,
+    arg2::Int,
+    arg3::String;
+    option1 = nothing,
+    option2::Int = 1,
+    option3::String = "abc",
+    option4::Int = 1,
+    flag1::Bool = false,
+    flag2::Bool = false,
+) end
 
-@Comonicon.testsetComonicon. "Comonicon.castComonicon.(::Comonicon.FunctionComonicon., ...)" Comonicon.beginComonicon.
-    Comonicon.cmdComonicon. = Comonicon.castComonicon.(Comonicon.fooComonicon., "Comonicon.fooComonicon.", Comonicon.argsComonicon., Comonicon.optionsComonicon., Comonicon.flagsComonicon.)
+@testset "cast(::Function, ...)" begin
+    cmd = cast(foo, "foo", args, options, flags)
 
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.fnComonicon. === Comonicon.fooComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.nameComonicon. == "Comonicon.fooComonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.argsComonicon.[Comonicon.1Comonicon.].Comonicon.nameComonicon. == "Comonicon.arg1Comonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.argsComonicon.[Comonicon.1Comonicon.].Comonicon.varargComonicon. == Comonicon.falseComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.argsComonicon.[Comonicon.1Comonicon.].Comonicon.requireComonicon. == Comonicon.trueComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.argsComonicon.[Comonicon.1Comonicon.].Comonicon.defaultComonicon. === Comonicon.nothingComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.argsComonicon.[Comonicon.1Comonicon.].Comonicon.descriptionComonicon..Comonicon.briefComonicon. == "Comonicon.testComonicon. Comonicon.argumentComonicon.."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.varargComonicon. === Comonicon.nothingComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.flagsComonicon.["Comonicon.flag1Comonicon."].Comonicon.nameComonicon. == "Comonicon.flag1Comonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.flagsComonicon.["Comonicon.fComonicon."].Comonicon.nameComonicon. == "Comonicon.flag1Comonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.flagsComonicon.["Comonicon.fComonicon."].Comonicon.shortComonicon. == Comonicon.trueComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.option1Comonicon."].Comonicon.nameComonicon. == "Comonicon.option1Comonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.option2Comonicon."].Comonicon.nameComonicon. == "Comonicon.option2Comonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.oComonicon."].Comonicon.shortComonicon. == Comonicon.trueComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.oComonicon."].Comonicon.hintComonicon. === "Comonicon.nothingComonicon."
+    @test cmd.fn === foo
+    @test cmd.name == "foo"
+    @test cmd.args[1].name == "arg1"
+    @test cmd.args[1].vararg == false
+    @test cmd.args[1].require == true
+    @test cmd.args[1].default === nothing
+    @test cmd.args[1].description.brief == "test argument."
+    @test cmd.vararg === nothing
+    @test cmd.flags["flag1"].name == "flag1"
+    @test cmd.flags["f"].name == "flag1"
+    @test cmd.flags["f"].short == true
+    @test cmd.options["option1"].name == "option1"
+    @test cmd.options["option2"].name == "option2"
+    @test cmd.options["o"].short == true
+    @test cmd.options["o"].hint === "nothing"
 
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.option2Comonicon."].Comonicon.shortComonicon. == Comonicon.falseComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.option2Comonicon."].Comonicon.hintComonicon. == "Comonicon.intComonicon."
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.option2Comonicon."].Comonicon.typeComonicon. === Comonicon.IntComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.descriptionComonicon. == Comonicon.DescriptionComonicon.("Comonicon.aComonicon. Comonicon.testComonicon. Comonicon.functionComonicon..")
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.lineComonicon. == Comonicon.LineNumberNodeComonicon.(Comonicon.0Comonicon.)
+    @test cmd.options["option2"].short == false
+    @test cmd.options["option2"].hint == "int"
+    @test cmd.options["option2"].type === Int
+    @test cmd.description == Description("a test function.")
+    @test cmd.line == LineNumberNode(0)
 
-    # Comonicon.forComonicon. Comonicon.PRComonicon. #Comonicon.251Comonicon.: Comonicon.theComonicon. Comonicon.defaultComonicon. Comonicon.hintComonicon. Comonicon.shouldComonicon. Comonicon.beComonicon. Comonicon.usedComonicon. Comonicon.inComonicon. Comonicon.theComonicon. Comonicon.absenceComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.userComonicon.-Comonicon.definedComonicon. Comonicon.oneComonicon.
-    @Comonicon.testComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.option4Comonicon."].Comonicon.hintComonicon. == "Comonicon.1Comonicon.::Comonicon.IntComonicon."
+    # for PR #251: the default hint should be used in the absence of the user-defined one
+    @test cmd.options["option4"].hint == "1::Int"
 
-    @Comonicon.showComonicon. Comonicon.cmdComonicon..Comonicon.optionsComonicon.
-    @Comonicon.testComonicon. Comonicon.allComonicon.(Comonicon.keysComonicon.(Comonicon.cmdComonicon..Comonicon.optionsComonicon.) .== ["Comonicon.option1Comonicon.", "Comonicon.oComonicon.", "Comonicon.option2Comonicon.", "Comonicon.option3Comonicon.", "Comonicon.option4Comonicon."])
+    @show cmd.options
+    @test all(keys(cmd.options) .== ["option1", "o", "option2", "option3", "option4"])
 
-    @Comonicon.showComonicon. Comonicon.cmdComonicon..Comonicon.flagsComonicon.
-    @Comonicon.testComonicon. Comonicon.allComonicon.(Comonicon.keysComonicon.(Comonicon.cmdComonicon..Comonicon.flagsComonicon.) .== ["Comonicon.flag1Comonicon.", "Comonicon.fComonicon.", "Comonicon.flag2Comonicon."])
-Comonicon.endComonicon.
+    @show cmd.flags
+    @test all(keys(cmd.flags) .== ["flag1", "f", "flag2"])
+end
 
-@Comonicon.testsetComonicon. "Comonicon.split_leaf_commandComonicon." Comonicon.beginComonicon.
+@testset "split_leaf_command" begin
 
-    @Comonicon.testsetComonicon. "Comonicon.basicComonicon." Comonicon.beginComonicon.
-        Comonicon.defComonicon. = @Comonicon.exprComonicon. Comonicon.JLFunctionComonicon. Comonicon.functionComonicon. Comonicon.fooComonicon.(
-            Comonicon.arg1Comonicon.,
-            Comonicon.arg2Comonicon.::Comonicon.IntComonicon. = Comonicon.1Comonicon.,
-            Comonicon.arg3Comonicon.::Comonicon.StringComonicon. = "Comonicon.abcComonicon.";
-            Comonicon.option1Comonicon. = Comonicon.nothingComonicon.,
-            Comonicon.option2Comonicon.::Comonicon.IntComonicon. = Comonicon.1Comonicon.,
-            Comonicon.option3Comonicon.::Comonicon.StringComonicon. = "Comonicon.abcComonicon.",
-            Comonicon.option4Comonicon.::Comonicon.IntComonicon. = Comonicon.1Comonicon.,
-            Comonicon.flag1Comonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.,
-            Comonicon.flag2Comonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.,
-        ) Comonicon.endComonicon.
+    @testset "basic" begin
+        def = @expr JLFunction function foo(
+            arg1,
+            arg2::Int = 1,
+            arg3::String = "abc";
+            option1 = nothing,
+            option2::Int = 1,
+            option3::String = "abc",
+            option4::Int = 1,
+            flag1::Bool = false,
+            flag2::Bool = false,
+        ) end
 
-        Comonicon.argsComonicon.′, Comonicon.optionsComonicon.′, Comonicon.flagsComonicon.′ = Comonicon.split_leaf_commandComonicon.(Comonicon.defComonicon.)
-        Comonicon.argsComonicon.′, Comonicon.optionsComonicon.′, Comonicon.flagsComonicon.′ = Comonicon.evalComonicon.(Comonicon.argsComonicon.′), Comonicon.evalComonicon.(Comonicon.optionsComonicon.′), Comonicon.evalComonicon.(Comonicon.flagsComonicon.′)
+        args′, options′, flags′ = split_leaf_command(def)
+        args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
 
-        @Comonicon.testComonicon. Comonicon.argsComonicon.′ == Comonicon.argsComonicon.
-        @Comonicon.testComonicon. Comonicon.optionsComonicon. == Comonicon.optionsComonicon.′
-        @Comonicon.testComonicon. Comonicon.flagsComonicon. == Comonicon.flagsComonicon.′
+        @test args′ == args
+        @test options == options′
+        @test flags == flags′
 
-        Comonicon.defComonicon. = @Comonicon.exprComonicon. Comonicon.JLFunctionComonicon. Comonicon.functionComonicon. Comonicon.fooComonicon.(; Comonicon.option1Comonicon.::Comonicon.BoolComonicon. = Comonicon.trueComonicon.) Comonicon.endComonicon.
-        @Comonicon.test_throwsComonicon. Comonicon.ErrorExceptionComonicon. Comonicon.split_leaf_commandComonicon.(Comonicon.defComonicon.)
-    Comonicon.endComonicon.
+        def = @expr JLFunction function foo(; option1::Bool = true) end
+        @test_throws ErrorException split_leaf_command(def)
+    end
 
-    @Comonicon.testsetComonicon. "Comonicon.requiredComonicon. Comonicon.kwargsComonicon." Comonicon.beginComonicon.
-        Comonicon.defComonicon. = @Comonicon.exprComonicon. Comonicon.JLFunctionComonicon. Comonicon.functionComonicon. Comonicon.fooComonicon.(
-            Comonicon.arg1Comonicon.,
-            Comonicon.arg2Comonicon.::Comonicon.IntComonicon. = Comonicon.1Comonicon.,
-            Comonicon.arg3Comonicon.::Comonicon.StringComonicon. = "Comonicon.abcComonicon.";
-            Comonicon.option1Comonicon.,
-            Comonicon.option2Comonicon.::Comonicon.IntComonicon.,
-            Comonicon.option3Comonicon.::Comonicon.StringComonicon.,
-            Comonicon.flag1Comonicon.::Comonicon.BoolComonicon.,
-            Comonicon.flag2Comonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.,
-        ) Comonicon.endComonicon.
+    @testset "required kwargs" begin
+        def = @expr JLFunction function foo(
+            arg1,
+            arg2::Int = 1,
+            arg3::String = "abc";
+            option1,
+            option2::Int,
+            option3::String,
+            flag1::Bool,
+            flag2::Bool = false,
+        ) end
 
-        Comonicon.argsComonicon.′, Comonicon.optionsComonicon.′, Comonicon.flagsComonicon.′ = Comonicon.split_leaf_commandComonicon.(Comonicon.defComonicon.)
-        Comonicon.argsComonicon.′, Comonicon.optionsComonicon.′, Comonicon.flagsComonicon.′ = Comonicon.evalComonicon.(Comonicon.argsComonicon.′), Comonicon.evalComonicon.(Comonicon.optionsComonicon.′), Comonicon.evalComonicon.(Comonicon.flagsComonicon.′)
+        args′, options′, flags′ = split_leaf_command(def)
+        args′, options′, flags′ = eval(args′), eval(options′), eval(flags′)
 
-        @Comonicon.testComonicon. Comonicon.optionsComonicon.′ == [
-            Comonicon.JLOptionComonicon.(:Comonicon.option1Comonicon., Comonicon.trueComonicon., Comonicon.AnyComonicon., "Comonicon.AnyComonicon."),
-            Comonicon.JLOptionComonicon.(:Comonicon.option2Comonicon., Comonicon.trueComonicon., Comonicon.Int64Comonicon., "Comonicon.IntComonicon."),
-            Comonicon.JLOptionComonicon.(:Comonicon.option3Comonicon., Comonicon.trueComonicon., Comonicon.StringComonicon., "Comonicon.StringComonicon."),
-            Comonicon.JLOptionComonicon.(:Comonicon.flag1Comonicon., Comonicon.trueComonicon., Comonicon.BoolComonicon., "Comonicon.BoolComonicon."),
+        @test options′ == [
+            JLOption(:option1, true, Any, "Any"),
+            JLOption(:option2, true, Int64, "Int"),
+            JLOption(:option3, true, String, "String"),
+            JLOption(:flag1, true, Bool, "Bool"),
         ]
 
-        @Comonicon.testComonicon. Comonicon.flagsComonicon.′ == [Comonicon.JLFlagComonicon.(:Comonicon.flag2Comonicon.)]
-    Comonicon.endComonicon.
-Comonicon.endComonicon.
+        @test flags′ == [JLFlag(:flag2)]
+    end
+end
 
 
-@Comonicon.test_throwsComonicon. Comonicon.ErrorExceptionComonicon. Comonicon.evalComonicon.(:(Comonicon.moduleComonicon. Comonicon.TestAComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.castComonicon. Comonicon.moduleComonicon. Comonicon.FooComonicon. Comonicon.endComonicon.
-Comonicon.endComonicon.))
+@test_throws ErrorException eval(:(module TestA
+using Comonicon
+@cast module Foo end
+end))
 
-Comonicon.moduleComonicon. Comonicon.TestBComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+module TestB
+using Comonicon
 
-@Comonicon.castComonicon. Comonicon.moduleComonicon. Comonicon.FooComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.castComonicon. Comonicon.fooComonicon.(Comonicon.xComonicon.) = Comonicon.1Comonicon.
-Comonicon.endComonicon.
-Comonicon.endComonicon.
+@cast module Foo
+using Comonicon
+@cast foo(x) = 1
+end
+end
 
-@Comonicon.testsetComonicon. "Comonicon.castComonicon. Comonicon.moduleComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.TestBComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.fooComonicon."].Comonicon.nameComonicon. == "Comonicon.fooComonicon."
-    @Comonicon.testComonicon. Comonicon.TestBComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.fooComonicon."] Comonicon.isaComonicon. Comonicon.NodeCommandComonicon.
-    @Comonicon.testComonicon. Comonicon.TestBComonicon..Comonicon.FooComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.fooComonicon."].Comonicon.nameComonicon. == "Comonicon.fooComonicon."
-    @Comonicon.testComonicon. Comonicon.TestBComonicon..Comonicon.FooComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.fooComonicon."] Comonicon.isaComonicon. Comonicon.LeafCommandComonicon.
-Comonicon.endComonicon.
+@testset "cast module" begin
+    @test TestB.CASTED_COMMANDS["foo"].name == "foo"
+    @test TestB.CASTED_COMMANDS["foo"] isa NodeCommand
+    @test TestB.Foo.CASTED_COMMANDS["foo"].name == "foo"
+    @test TestB.Foo.CASTED_COMMANDS["foo"] isa LeafCommand
+end
 
-Comonicon.moduleComonicon. Comonicon.TestCComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.command_aComonicon.(Comonicon.aComonicon., Comonicon.bComonicon.::Comonicon.StringComonicon., Comonicon.cComonicon.::Comonicon.IntComonicon.; Comonicon.option_aComonicon. = "Comonicon.abcComonicon.") Comonicon.endComonicon.
-Comonicon.endComonicon.
+module TestC
+using Comonicon
+@cast function command_a(a, b::String, c::Int; option_a = "abc") end
+end
 
-@Comonicon.testsetComonicon. "Comonicon.replaceComonicon. Comonicon._Comonicon. => -" Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.haskeyComonicon.(Comonicon.TestCComonicon..Comonicon.CASTED_COMMANDSComonicon., "Comonicon.commandComonicon.-Comonicon.aComonicon.")
-    Comonicon.cmdComonicon. = Comonicon.TestCComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.commandComonicon.-Comonicon.aComonicon."]
-    @Comonicon.testComonicon. Comonicon.cmdComonicon. Comonicon.isaComonicon. Comonicon.LeafCommandComonicon.
-    Comonicon.optionComonicon. = Comonicon.cmdComonicon..Comonicon.optionsComonicon.["Comonicon.optionComonicon.-Comonicon.aComonicon."]
-    @Comonicon.testComonicon. Comonicon.optionComonicon..Comonicon.nameComonicon. == "Comonicon.optionComonicon.-Comonicon.aComonicon."
-    @Comonicon.testComonicon. Comonicon.optionComonicon..Comonicon.hintComonicon. == "Comonicon.abcComonicon."
-Comonicon.endComonicon.
+@testset "replace _ => -" begin
+    @test haskey(TestC.CASTED_COMMANDS, "command-a")
+    cmd = TestC.CASTED_COMMANDS["command-a"]
+    @test cmd isa LeafCommand
+    option = cmd.options["option-a"]
+    @test option.name == "option-a"
+    @test option.hint == "abc"
+end
 
-Comonicon.moduleComonicon. Comonicon.TestDComonicon.
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.castComonicon. Comonicon.fooComonicon.(Comonicon.aComonicon.) = Comonicon.nothingComonicon.
-@Comonicon.test_logsComonicon. (:Comonicon.warnComonicon., "Comonicon.replacingComonicon. Comonicon.commandComonicon. Comonicon.fooComonicon. Comonicon.inComonicon. Comonicon.theComonicon. Comonicon.registryComonicon.") @Comonicon.castComonicon. Comonicon.fooComonicon.(Comonicon.aComonicon.) = Comonicon.nothingComonicon.
-Comonicon.endComonicon.
+module TestD
+using Test
+using Comonicon
+@cast foo(a) = nothing
+@test_logs (:warn, "replacing command foo in the registry") @cast foo(a) = nothing
+end
 
-Comonicon.moduleComonicon. Comonicon.TestEComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-Comonicon.constComonicon. Comonicon.COMMAND_VERSIONComonicon. = Comonicon.vComonicon."Comonicon.1Comonicon..Comonicon.1Comonicon..Comonicon.1Comonicon."
+module TestE
+using Comonicon
+const COMMAND_VERSION = v"1.1.1"
 
-@Comonicon.castComonicon. Comonicon.fooComonicon.(Comonicon.aComonicon.) = Comonicon.nothingComonicon.
-@Comonicon.mainComonicon.
+@cast foo(a) = nothing
+Comonicon.@main
 
-Comonicon.endComonicon.
+end
 
-@Comonicon.testComonicon. Comonicon.TestEComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.mainComonicon."].Comonicon.versionComonicon. == Comonicon.vComonicon."Comonicon.1Comonicon..Comonicon.1Comonicon..Comonicon.1Comonicon."
+@test TestE.CASTED_COMMANDS["main"].version == v"1.1.1"
 
-Comonicon.moduleComonicon. Comonicon.TestFComonicon.
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.test_throwsComonicon. Comonicon.LoadErrorComonicon. Comonicon.evalComonicon.(:(@Comonicon.castComonicon.(Comonicon.1Comonicon. + Comonicon.1Comonicon.)))
-Comonicon.endComonicon.
+module TestF
+using Test
+using Comonicon
+@test_throws LoadError eval(:(@cast(1 + 1)))
+end
 
-Comonicon.moduleComonicon. Comonicon.TestVarargComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.castComonicon. Comonicon.test_varargComonicon.(Comonicon.xComonicon., Comonicon.xsComonicon....) = Comonicon.nothingComonicon.
-@Comonicon.castComonicon. Comonicon.test_vararg_typedComonicon.(Comonicon.xComonicon., Comonicon.xsComonicon.::Comonicon.IntComonicon....) = Comonicon.nothingComonicon.
-Comonicon.endComonicon.
+module TestVararg
+using Comonicon
+@cast test_vararg(x, xs...) = nothing
+@cast test_vararg_typed(x, xs::Int...) = nothing
+end
 
-@Comonicon.testsetComonicon. "Comonicon.testComonicon. Comonicon.varargComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.TestVarargComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.varargComonicon."].Comonicon.varargComonicon..Comonicon.nameComonicon. === "Comonicon.xsComonicon."
-    @Comonicon.testComonicon. Comonicon.TestVarargComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.varargComonicon."].Comonicon.varargComonicon..Comonicon.typeComonicon. === Comonicon.AnyComonicon.
-    @Comonicon.testComonicon. Comonicon.TestVarargComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.varargComonicon.-Comonicon.typedComonicon."].Comonicon.varargComonicon..Comonicon.nameComonicon. === "Comonicon.xsComonicon."
-    @Comonicon.testComonicon. Comonicon.TestVarargComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.varargComonicon.-Comonicon.typedComonicon."].Comonicon.varargComonicon..Comonicon.typeComonicon. === Comonicon.IntComonicon.
-Comonicon.endComonicon.
+@testset "test vararg" begin
+    @test TestVararg.CASTED_COMMANDS["test-vararg"].vararg.name === "xs"
+    @test TestVararg.CASTED_COMMANDS["test-vararg"].vararg.type === Any
+    @test TestVararg.CASTED_COMMANDS["test-vararg-typed"].vararg.name === "xs"
+    @test TestVararg.CASTED_COMMANDS["test-vararg-typed"].vararg.type === Int
+end
 
-Comonicon.moduleComonicon. Comonicon.TestOptionalArgComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-@Comonicon.castComonicon. Comonicon.test_optionalComonicon.(Comonicon.xComonicon., Comonicon.yComonicon. = Comonicon.1Comonicon.) = Comonicon.nothingComonicon.
-@Comonicon.castComonicon. Comonicon.test_optional_typedComonicon.(Comonicon.xComonicon., Comonicon.yComonicon.::Comonicon.IntComonicon. = Comonicon.2Comonicon.) = Comonicon.nothingComonicon.
-Comonicon.endComonicon.
+module TestOptionalArg
+using Comonicon
+@cast test_optional(x, y = 1) = nothing
+@cast test_optional_typed(x, y::Int = 2) = nothing
+end
 
-@Comonicon.testsetComonicon. "Comonicon.testComonicon. Comonicon.optionalComonicon. Comonicon.argComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.nameComonicon. == "Comonicon.yComonicon."
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.requireComonicon. == Comonicon.falseComonicon.
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.defaultComonicon. == "Comonicon.1Comonicon."
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.typeComonicon. === Comonicon.AnyComonicon.
+@testset "test optional arg" begin
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].name == "y"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].require == false
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].default == "1"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional"].args[2].type === Any
 
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon.-Comonicon.typedComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.nameComonicon. == "Comonicon.yComonicon."
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon.-Comonicon.typedComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.requireComonicon. == Comonicon.falseComonicon.
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon.-Comonicon.typedComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.defaultComonicon. == "Comonicon.2Comonicon."
-    @Comonicon.testComonicon. Comonicon.TestOptionalArgComonicon..Comonicon.CASTED_COMMANDSComonicon.["Comonicon.testComonicon.-Comonicon.optionalComonicon.-Comonicon.typedComonicon."].Comonicon.argsComonicon.[Comonicon.2Comonicon.].Comonicon.typeComonicon. === Comonicon.IntComonicon.
-Comonicon.endComonicon.
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].name == "y"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].require == false
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].default == "2"
+    @test TestOptionalArg.CASTED_COMMANDS["test-optional-typed"].args[2].type === Int
+end
 
-Comonicon.moduleComonicon. Comonicon.Test110Comonicon.
+module Test110
 
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Comonicon
 
-@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.mainComonicon.(; Comonicon.niterationsComonicon.::Comonicon.IntComonicon. = Comonicon.3000Comonicon., Comonicon.seedComonicon.::Comonicon.IntComonicon. = Comonicon.1234Comonicon., Comonicon.radiusComonicon.::Comonicon.Float64Comonicon. = Comonicon.1Comonicon..Comonicon.5Comonicon.) Comonicon.endComonicon.
+Comonicon.@main function main(; niterations::Int = 3000, seed::Int = 1234, radius::Float64 = 1.5) end
 
-Comonicon.endComonicon.
+end
 
-@Comonicon.testsetComonicon. "Comonicon.issueComonicon. Comonicon.110Comonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.Test110Comonicon..Comonicon.command_mainComonicon.(Comonicon.StringComonicon.[]) == Comonicon.0Comonicon.
-Comonicon.endComonicon.
+@testset "issue 110" begin
+    @test Test110.command_main(String[]) == 0
+end

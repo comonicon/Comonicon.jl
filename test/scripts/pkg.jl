@@ -1,32 +1,32 @@
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Test
+using Comonicon
 
-# Comonicon.pkgComonicon. Comonicon.activateComonicon. <Comonicon.stringComonicon.> --Comonicon.sharedComonicon.=Comonicon.falseComonicon.
+# pkg activate <string> --shared=false
 
-Comonicon.moduleComonicon. Comonicon.PkgCmdComonicon.
+module PkgCmd
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Test
+using Comonicon
 
 """
-Comonicon.activateComonicon. Comonicon.theComonicon. Comonicon.environmentComonicon. Comonicon.atComonicon. `Comonicon.pathComonicon.`.
+activate the environment at `path`.
 
 
-# Comonicon.ArgumentsComonicon.
+# Arguments
 
-- `Comonicon.pathComonicon.`: Comonicon.theComonicon. Comonicon.pathComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.environmentComonicon.
+- `path`: the path of the environment
 
-# Comonicon.FlagsComonicon.
+# Flags
 
-- `--Comonicon.sharedComonicon.`: Comonicon.whetherComonicon. Comonicon.activateComonicon. Comonicon.theComonicon. Comonicon.sharedComonicon. Comonicon.environmentComonicon.
+- `--shared`: whether activate the shared environment
 """
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.activateComonicon.(Comonicon.pathComonicon.; Comonicon.sharedComonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.pathComonicon. == "Comonicon.pathComonicon."
-    @Comonicon.testComonicon. Comonicon.sharedComonicon. == Comonicon.trueComonicon.
-Comonicon.endComonicon.
+@cast function activate(path; shared::Bool = false)
+    @test path == "path"
+    @test shared == true
+end
 
-@Comonicon.mainComonicon.
+Comonicon.@main
 
-Comonicon.endComonicon.
+end
 
-Comonicon.PkgCmdComonicon..Comonicon.command_mainComonicon.()
+PkgCmd.command_main()

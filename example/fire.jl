@@ -1,9 +1,9 @@
-Comonicon.usingComonicon. Comonicon.FireComonicon.
+using Fire
 
-@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.mainComonicon.(Comonicon.xComonicon.; Comonicon.opt1Comonicon. = Comonicon.1Comonicon., Comonicon.opt2Comonicon.::Comonicon.IntComonicon. = Comonicon.2Comonicon., Comonicon.flagComonicon. = Comonicon.falseComonicon.)
-    Comonicon.printlnComonicon.("Comonicon.ParsedComonicon. Comonicon.argsComonicon.:")
-    Comonicon.printlnComonicon.("Comonicon.flagComonicon.=>", Comonicon.flagComonicon.)
-    Comonicon.printlnComonicon.("Comonicon.argComonicon.=>", Comonicon.xComonicon.)
-    Comonicon.printlnComonicon.("Comonicon.opt1Comonicon.=>", Comonicon.opt1Comonicon.)
-    Comonicon.printlnComonicon.("Comonicon.opt2Comonicon.=>", Comonicon.opt2Comonicon.)
-Comonicon.endComonicon.
+Comonicon.@main function main(x; opt1 = 1, opt2::Int = 2, flag = false)
+    println("Parsed args:")
+    println("flag=>", flag)
+    println("arg=>", x)
+    println("opt1=>", opt1)
+    println("opt2=>", opt2)
+end

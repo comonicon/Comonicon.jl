@@ -1,22 +1,22 @@
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Comonicon
 
 """
-Comonicon.myComonicon. Comonicon.commandComonicon. Comonicon.lineComonicon. Comonicon.interfaceComonicon..
+my command line interface.
 
-# Comonicon.ArgumentsComonicon.
+# Arguments
 
-- `Comonicon.argComonicon.`: Comonicon.anComonicon. Comonicon.argumentComonicon.
+- `arg`: an argument
 
-# Comonicon.OptionsComonicon.
+# Options
 
-- `-Comonicon.oComonicon., --Comonicon.optionComonicon. <Comonicon.nameComonicon.>`: Comonicon.anComonicon. Comonicon.optionComonicon. Comonicon.thatComonicon. Comonicon.hasComonicon. Comonicon.shortComonicon. Comonicon.optionComonicon..
+- `-o, --option <name>`: an option that has short option.
 
-# Comonicon.FlagsComonicon.
+# Flags
 
-- `-Comonicon.fComonicon., --Comonicon.flagComonicon.`: Comonicon.aComonicon. Comonicon.flagComonicon. Comonicon.thatComonicon. Comonicon.hasComonicon. Comonicon.shortComonicon. Comonicon.flagComonicon..
+- `-f, --flag`: a flag that has short flag.
 """
-@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.mycmdComonicon.(Comonicon.argComonicon.; Comonicon.optionComonicon. = "Comonicon.SamComonicon.", Comonicon.flagComonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.)
-    @Comonicon.showComonicon. Comonicon.argComonicon.
-    @Comonicon.showComonicon. Comonicon.optionComonicon.
-    @Comonicon.showComonicon. Comonicon.flagComonicon.
-Comonicon.endComonicon.
+Comonicon.@main function mycmd(arg; option = "Sam", flag::Bool = false)
+    @show arg
+    @show option
+    @show flag
+end

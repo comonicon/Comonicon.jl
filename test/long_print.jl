@@ -1,11 +1,11 @@
-Comonicon.moduleComonicon. Comonicon.LongPrintComonicon.
+module LongPrint
 
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Comonicon
 
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.long_non_typedComonicon.(; Comonicon.optionComonicon. = "Comonicon.superComonicon. Comonicon.longComonicon. Comonicon.stringComonicon. Comonicon.superComonicon. Comonicon.longComonicon. Comonicon.stringComonicon. Comonicon.superComonicon. Comonicon.longComonicon. Comonicon.stringComonicon.") Comonicon.endComonicon.
+@cast function long_non_typed(; option = "super long string super long string super long string") end
 
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.long_typedComonicon.(; Comonicon.optionComonicon.::Comonicon.StringComonicon. = "Comonicon.superComonicon. Comonicon.longComonicon. Comonicon.stringComonicon. Comonicon.superComonicon. Comonicon.longComonicon. Comonicon.stringComonicon. Comonicon.superComonicon. Comonicon.longComonicon. Comonicon.stringComonicon.") Comonicon.endComonicon.
+@cast function long_typed(; option::String = "super long string super long string super long string") end
 
-@Comonicon.mainComonicon.
+Comonicon.@main
 
-Comonicon.endComonicon.
+end

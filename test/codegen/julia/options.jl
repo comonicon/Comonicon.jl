@@ -1,126 +1,126 @@
-Comonicon.moduleComonicon. Comonicon.TestLeafOptionsComonicon.
+module TestLeafOptions
 
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..ASTComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..JuliaExprComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon..JuliaExprComonicon.: Comonicon.emitComonicon., Comonicon.emit_bodyComonicon., Comonicon.emit_norm_bodyComonicon., Comonicon.emit_dash_bodyComonicon.
-Comonicon.usingComonicon. Comonicon.TestComonicon.
+using Comonicon.AST
+using Comonicon.JuliaExpr
+using Comonicon.JuliaExpr: emit, emit_body, emit_norm_body, emit_dash_body
+using Test
 
-Comonicon.constComonicon. Comonicon.test_argsComonicon. = Comonicon.RefComonicon.{Comonicon.VectorComonicon.{Comonicon.AnyComonicon.}}()
-Comonicon.constComonicon. Comonicon.test_kwargsComonicon. = Comonicon.RefComonicon.{Comonicon.DictComonicon.{Comonicon.SymbolComonicon.,Comonicon.AnyComonicon.}}()
+const test_args = Ref{Vector{Any}}()
+const test_kwargs = Ref{Dict{Symbol,Any}}()
 
-Comonicon.functionComonicon. Comonicon.fooComonicon.(; Comonicon.kwargsComonicon....)
-    Comonicon.test_kwargsComonicon.[] = Comonicon.DictComonicon.{Comonicon.SymbolComonicon.,Comonicon.AnyComonicon.}(Comonicon.kwargsComonicon.)
-Comonicon.endComonicon.
+function foo(; kwargs...)
+    test_kwargs[] = Dict{Symbol,Any}(kwargs)
+end
 
-Comonicon.cmdComonicon. = Comonicon.EntryComonicon.(;
-    Comonicon.versionComonicon. = Comonicon.vComonicon."Comonicon.1Comonicon..Comonicon.1Comonicon..Comonicon.0Comonicon.",
-    Comonicon.rootComonicon. = Comonicon.LeafCommandComonicon.(;
-        Comonicon.fnComonicon. = Comonicon.fooComonicon.,
-        Comonicon.nameComonicon. = "Comonicon.leafComonicon.",
-        Comonicon.optionsComonicon. = Comonicon.DictComonicon.(
-            "Comonicon.optionComonicon.-Comonicon.aComonicon." => Comonicon.OptionComonicon.(; Comonicon.symComonicon. = :Comonicon.option_aComonicon., Comonicon.hintComonicon. = "Comonicon.intComonicon.", Comonicon.typeComonicon. = Comonicon.IntComonicon., Comonicon.shortComonicon. = Comonicon.trueComonicon.),
-            "Comonicon.optionComonicon.-Comonicon.bComonicon." => Comonicon.OptionComonicon.(; Comonicon.symComonicon. = :Comonicon.option_bComonicon., Comonicon.hintComonicon. = "Comonicon.float64Comonicon.", Comonicon.typeComonicon. = Comonicon.Float64Comonicon.),
+cmd = Entry(;
+    version = v"1.1.0",
+    root = LeafCommand(;
+        fn = foo,
+        name = "leaf",
+        options = Dict(
+            "option-a" => Option(; sym = :option_a, hint = "int", type = Int, short = true),
+            "option-b" => Option(; sym = :option_b, hint = "float64", type = Float64),
         ),
-        Comonicon.flagsComonicon. = Comonicon.DictComonicon.(
-            "Comonicon.flagComonicon.-Comonicon.aComonicon." => Comonicon.FlagComonicon.(; Comonicon.symComonicon. = :Comonicon.flag_aComonicon., Comonicon.shortComonicon. = Comonicon.trueComonicon.),
-            "Comonicon.flagComonicon.-Comonicon.bComonicon." => Comonicon.FlagComonicon.(; Comonicon.symComonicon. = :Comonicon.flag_bComonicon.),
-        ),
-    ),
-)
-
-Comonicon.evalComonicon.(Comonicon.emitComonicon.(Comonicon.cmdComonicon.))
-
-@Comonicon.testsetComonicon. "Comonicon.testComonicon. Comonicon.leafComonicon. Comonicon.optionsComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.command_mainComonicon.(["--Comonicon.optionComonicon.-Comonicon.aComonicon.=Comonicon.3Comonicon.", "--Comonicon.optionComonicon.-Comonicon.bComonicon.", "Comonicon.1Comonicon..Comonicon.2Comonicon.", "-Comonicon.fComonicon.", "--Comonicon.flagComonicon.-Comonicon.bComonicon."]) == Comonicon.0Comonicon.
-    @Comonicon.testComonicon. Comonicon.test_kwargsComonicon.[] ==
-          Comonicon.DictComonicon.{Comonicon.SymbolComonicon.,Comonicon.AnyComonicon.}(:Comonicon.option_aComonicon. => Comonicon.3Comonicon., :Comonicon.option_bComonicon. => Comonicon.1Comonicon..Comonicon.2Comonicon., :Comonicon.flag_aComonicon. => Comonicon.trueComonicon., :Comonicon.flag_bComonicon. => Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.command_mainComonicon.(["-Comonicon.oComonicon.=Comonicon.3Comonicon.", "--Comonicon.optionComonicon.-Comonicon.bComonicon.", "Comonicon.1Comonicon..Comonicon.2Comonicon.", "-Comonicon.fComonicon.", "--Comonicon.flagComonicon.-Comonicon.bComonicon."]) == Comonicon.0Comonicon.
-    @Comonicon.testComonicon. Comonicon.test_kwargsComonicon.[] ==
-          Comonicon.DictComonicon.{Comonicon.SymbolComonicon.,Comonicon.AnyComonicon.}(:Comonicon.option_aComonicon. => Comonicon.3Comonicon., :Comonicon.option_bComonicon. => Comonicon.1Comonicon..Comonicon.2Comonicon., :Comonicon.flag_aComonicon. => Comonicon.trueComonicon., :Comonicon.flag_bComonicon. => Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.command_mainComonicon.(["-Comonicon.o3Comonicon.", "--Comonicon.optionComonicon.-Comonicon.bComonicon.", "Comonicon.1Comonicon..Comonicon.2Comonicon.", "-Comonicon.fComonicon.", "--Comonicon.flagComonicon.-Comonicon.bComonicon."]) == Comonicon.0Comonicon.
-    @Comonicon.testComonicon. Comonicon.test_kwargsComonicon.[] ==
-          Comonicon.DictComonicon.{Comonicon.SymbolComonicon.,Comonicon.AnyComonicon.}(:Comonicon.option_aComonicon. => Comonicon.3Comonicon., :Comonicon.option_bComonicon. => Comonicon.1Comonicon..Comonicon.2Comonicon., :Comonicon.flag_aComonicon. => Comonicon.trueComonicon., :Comonicon.flag_bComonicon. => Comonicon.trueComonicon.)
-    @Comonicon.testComonicon. Comonicon.command_mainComonicon.(["--Comonicon.optionComonicon.-Comonicon.aComonicon.", "--Comonicon.optionComonicon.-Comonicon.bComonicon.", "Comonicon.1Comonicon..Comonicon.2Comonicon.", "-Comonicon.fComonicon.", "--Comonicon.flagComonicon.-Comonicon.bComonicon."]) == Comonicon.1Comonicon.
-    @Comonicon.testComonicon. Comonicon.command_mainComonicon.(["-Comonicon.oComonicon.", "--Comonicon.optionComonicon.-Comonicon.bComonicon.", "Comonicon.1Comonicon..Comonicon.2Comonicon.", "-Comonicon.fComonicon.", "--Comonicon.flagComonicon.-Comonicon.bComonicon."]) == Comonicon.1Comonicon.
-Comonicon.endComonicon.
-
-
-Comonicon.cmdComonicon. = Comonicon.EntryComonicon.(;
-    Comonicon.versionComonicon. = Comonicon.vComonicon."Comonicon.1Comonicon..Comonicon.1Comonicon..Comonicon.0Comonicon.",
-    Comonicon.rootComonicon. = Comonicon.LeafCommandComonicon.(;
-        Comonicon.fnComonicon. = Comonicon.fooComonicon.,
-        Comonicon.nameComonicon. = "Comonicon.leafComonicon.",
-        Comonicon.optionsComonicon. = Comonicon.DictComonicon.(
-            "Comonicon.optionComonicon.-Comonicon.aComonicon." => Comonicon.OptionComonicon.(; Comonicon.symComonicon. = :Comonicon.option_aComonicon., Comonicon.hintComonicon. = "Comonicon.strComonicon.", Comonicon.typeComonicon. = Comonicon.StringComonicon., Comonicon.shortComonicon. = Comonicon.trueComonicon.),
-            "Comonicon.optionComonicon.-Comonicon.bComonicon." => Comonicon.OptionComonicon.(; Comonicon.symComonicon. = :Comonicon.option_bComonicon., Comonicon.hintComonicon. = "Comonicon.float64Comonicon.", Comonicon.typeComonicon. = Comonicon.Float64Comonicon.),
-        ),
-        Comonicon.flagsComonicon. = Comonicon.DictComonicon.(
-            "Comonicon.flagComonicon.-Comonicon.aComonicon." => Comonicon.FlagComonicon.(; Comonicon.symComonicon. = :Comonicon.flag_aComonicon., Comonicon.shortComonicon. = Comonicon.trueComonicon.),
-            "Comonicon.flagComonicon.-Comonicon.bComonicon." => Comonicon.FlagComonicon.(; Comonicon.symComonicon. = :Comonicon.flag_bComonicon.),
+        flags = Dict(
+            "flag-a" => Flag(; sym = :flag_a, short = true),
+            "flag-b" => Flag(; sym = :flag_b),
         ),
     ),
 )
 
-Comonicon.evalComonicon.(Comonicon.emitComonicon.(Comonicon.cmdComonicon.))
+eval(emit(cmd))
 
-Comonicon.endComonicon.
+@testset "test leaf options" begin
+    @test command_main(["--option-a=3", "--option-b", "1.2", "-f", "--flag-b"]) == 0
+    @test test_kwargs[] ==
+          Dict{Symbol,Any}(:option_a => 3, :option_b => 1.2, :flag_a => true, :flag_b => true)
+    @test command_main(["-o=3", "--option-b", "1.2", "-f", "--flag-b"]) == 0
+    @test test_kwargs[] ==
+          Dict{Symbol,Any}(:option_a => 3, :option_b => 1.2, :flag_a => true, :flag_b => true)
+    @test command_main(["-o3", "--option-b", "1.2", "-f", "--flag-b"]) == 0
+    @test test_kwargs[] ==
+          Dict{Symbol,Any}(:option_a => 3, :option_b => 1.2, :flag_a => true, :flag_b => true)
+    @test command_main(["--option-a", "--option-b", "1.2", "-f", "--flag-b"]) == 1
+    @test command_main(["-o", "--option-b", "1.2", "-f", "--flag-b"]) == 1
+end
 
-Comonicon.moduleComonicon. Comonicon.TestStringTypeComonicon.
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.buildComonicon.(Comonicon.nameComonicon.::Comonicon.StringComonicon.; Comonicon.targetComonicon.::Comonicon.StringComonicon. = Comonicon.nothingComonicon.)
-    Comonicon.ifComonicon. Comonicon.targetComonicon. == "Comonicon.notebookComonicon."
-    Comonicon.elseifComonicon. Comonicon.targetComonicon. == "Comonicon.markdownComonicon."
-    Comonicon.elseComonicon.
-    Comonicon.endComonicon.
-Comonicon.endComonicon.
+cmd = Entry(;
+    version = v"1.1.0",
+    root = LeafCommand(;
+        fn = foo,
+        name = "leaf",
+        options = Dict(
+            "option-a" => Option(; sym = :option_a, hint = "str", type = String, short = true),
+            "option-b" => Option(; sym = :option_b, hint = "float64", type = Float64),
+        ),
+        flags = Dict(
+            "flag-a" => Flag(; sym = :flag_a, short = true),
+            "flag-b" => Flag(; sym = :flag_b),
+        ),
+    ),
+)
 
-@Comonicon.mainComonicon.
+eval(emit(cmd))
 
-@Comonicon.testsetComonicon. "Comonicon.testComonicon. Comonicon.StringComonicon. Comonicon.typeComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.command_mainComonicon.(["Comonicon.buildComonicon.", "Comonicon.testComonicon.", "--Comonicon.targetComonicon.=Comonicon.aaaaComonicon."]) == Comonicon.0Comonicon.
-Comonicon.endComonicon.
-Comonicon.endComonicon.
+end
 
-Comonicon.moduleComonicon. Comonicon.TestRequireOptionsComonicon.
+module TestStringType
+using Test
+using Comonicon
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+@cast function build(name::String; target::String = nothing)
+    if target == "notebook"
+    elseif target == "markdown"
+    else
+    end
+end
+
+Comonicon.@main
+
+@testset "test String type" begin
+    @test command_main(["build", "test", "--target=aaaa"]) == 0
+end
+end
+
+module TestRequireOptions
+
+using Test
+using Comonicon
 
 """
-# Comonicon.OptionsComonicon.
+# Options
 
-- `--Comonicon.nameComonicon.=<Comonicon.stringComonicon.>`: Comonicon.nameComonicon.
+- `--name=<string>`: name
 """
-@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.runComonicon.(; Comonicon.nameComonicon.::Comonicon.StringComonicon., Comonicon.shotsComonicon.::Comonicon.IntComonicon.)
-    @Comonicon.testComonicon. Comonicon.nameComonicon. == "Comonicon.testComonicon."
-    @Comonicon.testComonicon. Comonicon.shotsComonicon. == Comonicon.2Comonicon.
-Comonicon.endComonicon.
+Comonicon.@main function run(; name::String, shots::Int)
+    @test name == "test"
+    @test shots == 2
+end
 
-@Comonicon.testsetComonicon. "Comonicon.TestRequireOptionsComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.TestRequireOptionsComonicon..Comonicon.command_mainComonicon.(["--Comonicon.nameComonicon.=Comonicon.testComonicon."]) == Comonicon.1Comonicon.
-    @Comonicon.testComonicon. Comonicon.TestRequireOptionsComonicon..Comonicon.command_mainComonicon.(["--Comonicon.nameComonicon.=Comonicon.testComonicon.", "--Comonicon.shotsComonicon.=Comonicon.2Comonicon."]) == Comonicon.0Comonicon.
-Comonicon.endComonicon.
+@testset "TestRequireOptions" begin
+    @test TestRequireOptions.command_main(["--name=test"]) == 1
+    @test TestRequireOptions.command_main(["--name=test", "--shots=2"]) == 0
+end
 
-Comonicon.endComonicon.
+end
 
-Comonicon.moduleComonicon. Comonicon.TestShortOptionsComonicon.
+module TestShortOptions
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
+using Test
+using Comonicon
 
 """
-# Comonicon.OptionsComonicon.
+# Options
 
-- `-Comonicon.eComonicon., --Comonicon.exampleComonicon. <Comonicon.valueComonicon.>`: Comonicon.shortComonicon. Comonicon.optionComonicon..
+- `-e, --example <value>`: short option.
 """
-@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.runComonicon.(; Comonicon.exampleComonicon.::Comonicon.StringComonicon.)
-    @Comonicon.testComonicon. Comonicon.exampleComonicon. == "Comonicon.demoComonicon."
-Comonicon.endComonicon.
+Comonicon.@main function run(; example::String)
+    @test example == "demo"
+end
 
-@Comonicon.testsetComonicon. "Comonicon.TestShortOptionsComonicon." Comonicon.beginComonicon.
-    @Comonicon.testComonicon. Comonicon.TestShortOptionsComonicon..Comonicon.command_mainComonicon.(["-Comonicon.eComonicon.", "Comonicon.demoComonicon."]) == Comonicon.0Comonicon.
-Comonicon.endComonicon.
+@testset "TestShortOptions" begin
+    @test TestShortOptions.command_main(["-e", "demo"]) == 0
+end
 
-Comonicon.endComonicon.
+end

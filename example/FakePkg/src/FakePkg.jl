@@ -1,51 +1,51 @@
-Comonicon.moduleComonicon. Comonicon.FakePkgComonicon.
+module FakePkg
 
-Comonicon.usingComonicon. Comonicon.TestComonicon.
-Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
-Comonicon.usingComonicon. Comonicon.PkgTemplatesComonicon.
-
-"""
-Comonicon.fakeComonicon. Comonicon.noargumentsComonicon.
+using Test
+using Comonicon
+using PkgTemplates
 
 """
-@Comonicon.castComonicon. Comonicon.noargumentsComonicon.() = @Comonicon.testComonicon. Comonicon.trueComonicon.
+fake noarguments
 
 """
-Comonicon.fakeComonicon. Comonicon.addComonicon.
-
-# Comonicon.ArgsComonicon.
-
-- `Comonicon.packageComonicon.`: Comonicon.packageComonicon. Comonicon.toComonicon. Comonicon.addComonicon..
-"""
-@Comonicon.castComonicon. Comonicon.addComonicon.(Comonicon.packageComonicon.) = @Comonicon.testComonicon. Comonicon.packageComonicon. == "Comonicon.ABCComonicon."
+@cast noarguments() = @test true
 
 """
-Comonicon.fakeComonicon. Comonicon.rmComonicon.
+fake add
 
-# Comonicon.ArgsComonicon.
+# Args
 
-- `Comonicon.packageComonicon.`: Comonicon.packageComonicon. Comonicon.toComonicon. Comonicon.addComonicon..
+- `package`: package to add.
 """
-@Comonicon.castComonicon. Comonicon.rmComonicon.(Comonicon.packageComonicon.) = @Comonicon.testComonicon. Comonicon.packageComonicon. == "Comonicon.ABCComonicon."
+@cast add(package) = @test package == "ABC"
 
 """
-Comonicon.fakeComonicon. Comonicon.activateComonicon.
+fake rm
 
-# Comonicon.ArgsComonicon.
+# Args
 
-- `Comonicon.envComonicon.`: Comonicon.environmentComonicon. Comonicon.toComonicon. Comonicon.activateComonicon..
-
-# Comonicon.FlagsComonicon.
-
-- `-Comonicon.sComonicon., --Comonicon.sharedComonicon.`: Comonicon.fakeComonicon. Comonicon.flagComonicon. Comonicon.shareComonicon..
+- `package`: package to add.
 """
-@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.activateComonicon.(Comonicon.envComonicon.; Comonicon.sharedComonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.)
-    @Comonicon.testComonicon. Comonicon.envComonicon. == "Comonicon.fakeComonicon."
-    @Comonicon.testComonicon. Comonicon.sharedComonicon. == Comonicon.trueComonicon.
-Comonicon.endComonicon.
+@cast rm(package) = @test package == "ABC"
 
-Comonicon.includeComonicon.("Comonicon.registryComonicon..Comonicon.jlComonicon.")
+"""
+fake activate
 
-@Comonicon.mainComonicon.
+# Args
 
-Comonicon.endComonicon.
+- `env`: environment to activate.
+
+# Flags
+
+- `-s, --shared`: fake flag share.
+"""
+@cast function activate(env; shared::Bool = false)
+    @test env == "fake"
+    @test shared == true
+end
+
+include("registry.jl")
+
+Comonicon.@main
+
+end
