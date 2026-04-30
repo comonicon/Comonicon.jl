@@ -1,0 +1,11 @@
+[skills]
+ion-cli = { type = "local" }
+agents-update = { type = "local" }
+
+[options]
+
+[options.targets]
+claude = ".claude/skills"
+
+[agents]
+template = "builtin:julia"

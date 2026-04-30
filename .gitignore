@@ -24,3 +24,13 @@ config.toml
 build
 *.tar.gz
 .julia
+
+# Managed by ion
+.agents/skills/ion-cli
+.claude/skills/ion-cli
+
+# Managed by ion
+.agents/templates/AGENTS.md.upstream
+CLAUDE.md
+.agents/skills/agents-update
+.claude/skills/agents-update

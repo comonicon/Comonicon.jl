@@ -1,0 +1,6 @@
+skill = []
+
+[agents]
+template = "builtin:julia"
+checksum = "sha256:b292f62661128c79f2f485110076bf42beb1168476c9e388ed1888461dbc3745"
+updated-at = "2026-04-30T01:29:46Z"
