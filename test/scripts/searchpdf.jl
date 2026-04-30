@@ -1,6 +1,6 @@
-using Test
-using Comonicon
+Comonicon.usingComonicon. Comonicon.TestComonicon.
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
-@main function search(name)
-    @test name == "Author - Year.pdf"
-end
+@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.searchComonicon.(Comonicon.nameComonicon.)
+    @Comonicon.testComonicon. Comonicon.nameComonicon. == "Comonicon.AuthorComonicon. - Comonicon.YearComonicon..Comonicon.pdfComonicon."
+Comonicon.endComonicon.

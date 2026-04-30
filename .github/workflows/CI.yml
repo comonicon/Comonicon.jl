@@ -15,7 +15,6 @@ jobs:
           # - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
         arch:
           - x64
         package:
@@ -23,6 +22,18 @@ jobs:
           - 'lib'
           - 'example'
         include:
+          - os: macOS-latest
+            arch: aarch64
+            version: '1'
+            package: 'Comonicon'
+          - os: macOS-latest
+            arch: aarch64
+            version: '1'
+            package: 'lib'
+          - os: macOS-latest
+            arch: aarch64
+            version: '1'
+            package: 'example'
           - os: windows-latest
             version: '1'
             arch: x64
@@ -47,8 +58,6 @@ jobs:
         run: |
           import Pkg; Pkg.add("TestEnv");
       - uses: julia-actions/julia-buildpkg@v1
-        with:
-          directories: src, lib/ComoniconTestUtils/src
       - name: "run test"
         run: julia --project .ci/test.jl runtest ${{ matrix.package }} --coverage
       - uses: julia-actions/julia-processcoverage@v1

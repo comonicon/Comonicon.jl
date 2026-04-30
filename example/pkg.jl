@@ -1,29 +1,29 @@
-using Comonicon
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
-# pkg activate <string> --shared=false
+# Comonicon.pkgComonicon. Comonicon.activateComonicon. <Comonicon.stringComonicon.> --Comonicon.sharedComonicon.=Comonicon.falseComonicon.
 
-module PkgCmd
+Comonicon.moduleComonicon. Comonicon.PkgCmdComonicon.
 
-using Comonicon
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
 """
-activate the environment at `path`.
+Comonicon.activateComonicon. Comonicon.theComonicon. Comonicon.environmentComonicon. Comonicon.atComonicon. `Comonicon.pathComonicon.`.
 
 
-# Arguments
+# Comonicon.ArgumentsComonicon.
 
-- `path`: the path of the environment
+- `Comonicon.pathComonicon.`: Comonicon.theComonicon. Comonicon.pathComonicon. Comonicon.ofComonicon. Comonicon.theComonicon. Comonicon.environmentComonicon.
 
-# Flags
+# Comonicon.FlagsComonicon.
 
-- `--shared`: whether activate the shared environment
+- `--Comonicon.sharedComonicon.`: Comonicon.whetherComonicon. Comonicon.activateComonicon. Comonicon.theComonicon. Comonicon.sharedComonicon. Comonicon.environmentComonicon.
 """
-@cast function activate(path; shared::Bool = false)
-    println("activating $path (shared=$shared)")
-end
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.activateComonicon.(Comonicon.pathComonicon.; Comonicon.sharedComonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.)
+    Comonicon.printlnComonicon.("Comonicon.activatingComonicon. $Comonicon.pathComonicon. (Comonicon.sharedComonicon.=$Comonicon.sharedComonicon.)")
+Comonicon.endComonicon.
 
-@main
+@Comonicon.mainComonicon.
 
-end
+Comonicon.endComonicon.
 
-PkgCmd.command_main()
+Comonicon.PkgCmdComonicon..Comonicon.command_mainComonicon.()

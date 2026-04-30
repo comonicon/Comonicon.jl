@@ -1,27 +1,27 @@
-using Test
+Comonicon.usingComonicon. Comonicon.TestComonicon.
 
-module TestException
+Comonicon.moduleComonicon. Comonicon.TestExceptionComonicon.
 
-using Comonicon
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
-@cast function throw_error()
-    cmd_error("a command error thrown", 128)
-end
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.throw_errorComonicon.()
+    Comonicon.cmd_errorComonicon.("Comonicon.aComonicon. Comonicon.commandComonicon. Comonicon.errorComonicon. Comonicon.thrownComonicon.", Comonicon.128Comonicon.)
+Comonicon.endComonicon.
 
-@cast function throw_terminate()
-    cmd_exit()
-end
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.throw_terminateComonicon.()
+    Comonicon.cmd_exitComonicon.()
+Comonicon.endComonicon.
 
-@cast function unhandled_error()
-    error("unhandled")
-end
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.unhandled_errorComonicon.()
+    Comonicon.errorComonicon.("Comonicon.unhandledComonicon.")
+Comonicon.endComonicon.
 
-@main
+@Comonicon.mainComonicon.
 
-end
+Comonicon.endComonicon.
 
-@testset "exception handling" begin
-    @test TestException.command_main(["throw-error"]) == 128
-    @test TestException.command_main(["throw-terminate"]) == 0
-    @test_throws ErrorException TestException.command_main(["unhandled-error"])
-end
+@Comonicon.testsetComonicon. "Comonicon.exceptionComonicon. Comonicon.handlingComonicon." Comonicon.beginComonicon.
+    @Comonicon.testComonicon. Comonicon.TestExceptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.throwComonicon.-Comonicon.errorComonicon."]) == Comonicon.128Comonicon.
+    @Comonicon.testComonicon. Comonicon.TestExceptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.throwComonicon.-Comonicon.terminateComonicon."]) == Comonicon.0Comonicon.
+    @Comonicon.test_throwsComonicon. Comonicon.ErrorExceptionComonicon. Comonicon.TestExceptionComonicon..Comonicon.command_mainComonicon.(["Comonicon.unhandledComonicon.-Comonicon.errorComonicon."])
+Comonicon.endComonicon.

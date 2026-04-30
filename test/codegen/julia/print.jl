@@ -1,22 +1,22 @@
-module Issue218
+Comonicon.moduleComonicon. Comonicon.Issue218Comonicon.
 
-using Test
-using Comonicon
+Comonicon.usingComonicon. Comonicon.TestComonicon.
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
-@cast function print(file)
-    @show file
-    if splitext(file)[2] == ".toml"
-        print("hhhh")
-    else
-        # An intentional error
-        error("my casted `print` is loaded!")
-    end
-end
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.printComonicon.(Comonicon.fileComonicon.)
+    @Comonicon.showComonicon. Comonicon.fileComonicon.
+    Comonicon.ifComonicon. Comonicon.splitextComonicon.(Comonicon.fileComonicon.)[Comonicon.2Comonicon.] == ".Comonicon.tomlComonicon."
+        Comonicon.printComonicon.("Comonicon.hhhhComonicon.")
+    Comonicon.elseComonicon.
+        # Comonicon.AnComonicon. Comonicon.intentionalComonicon. Comonicon.errorComonicon.
+        Comonicon.errorComonicon.("Comonicon.myComonicon. Comonicon.castedComonicon. `Comonicon.printComonicon.` Comonicon.isComonicon. Comonicon.loadedComonicon.!")
+    Comonicon.endComonicon.
+Comonicon.endComonicon.
 
-@main
+@Comonicon.mainComonicon.
 
-@testset "issue#128" begin
-    @test Issue218.command_main(["-h"]) == 0
-end
+@Comonicon.testsetComonicon. "Comonicon.issueComonicon.#Comonicon.128Comonicon." Comonicon.beginComonicon.
+    @Comonicon.testComonicon. Comonicon.Issue218Comonicon..Comonicon.command_mainComonicon.(["-Comonicon.hComonicon."]) == Comonicon.0Comonicon.
+Comonicon.endComonicon.
 
-end
+Comonicon.endComonicon.

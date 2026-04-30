@@ -1,27 +1,27 @@
-using Comonicon
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
 """
-# Intro
+# Comonicon.IntroComonicon.
 
-ArgParse example implemented in Comonicon.
+Comonicon.ArgParseComonicon. Comonicon.exampleComonicon. Comonicon.implementedComonicon. Comonicon.inComonicon. Comonicon.ComoniconComonicon..
 
-# Arguments
+# Comonicon.ArgumentsComonicon.
 
-- `x`: an argument, an argument
+- `Comonicon.xComonicon.`: Comonicon.anComonicon. Comonicon.argumentComonicon., Comonicon.anComonicon. Comonicon.argumentComonicon.
 
-# Options
+# Comonicon.OptionsComonicon.
 
-- `--opt1 <arg>`: an option
-- `-o, --opt2 <arg>`: another option
+- `--Comonicon.opt1Comonicon. <Comonicon.argComonicon.>`: Comonicon.anComonicon. Comonicon.optionComonicon.
+- `-Comonicon.oComonicon., --Comonicon.opt2Comonicon. <Comonicon.argComonicon.>`: Comonicon.anotherComonicon. Comonicon.optionComonicon.
 
-# Flags
+# Comonicon.FlagsComonicon.
 
-- `-f, --flag`: a flag
+- `-Comonicon.fComonicon., --Comonicon.flagComonicon.`: Comonicon.aComonicon. Comonicon.flagComonicon.
 """
-@main function main(x; opt1 = 1, opt2::Int = 2, flag = false)
-    println("Parsed args:")
-    println("flag=>", flag)
-    println("arg=>", x)
-    println("opt1=>", opt1)
-    println("opt2=>", opt2)
-end
+@Comonicon.mainComonicon. Comonicon.functionComonicon. Comonicon.mainComonicon.(Comonicon.xComonicon.; Comonicon.opt1Comonicon. = Comonicon.1Comonicon., Comonicon.opt2Comonicon.::Comonicon.IntComonicon. = Comonicon.2Comonicon., Comonicon.flagComonicon. = Comonicon.falseComonicon.)
+    Comonicon.printlnComonicon.("Comonicon.ParsedComonicon. Comonicon.argsComonicon.:")
+    Comonicon.printlnComonicon.("Comonicon.flagComonicon.=>", Comonicon.flagComonicon.)
+    Comonicon.printlnComonicon.("Comonicon.argComonicon.=>", Comonicon.xComonicon.)
+    Comonicon.printlnComonicon.("Comonicon.opt1Comonicon.=>", Comonicon.opt1Comonicon.)
+    Comonicon.printlnComonicon.("Comonicon.opt2Comonicon.=>", Comonicon.opt2Comonicon.)
+Comonicon.endComonicon.

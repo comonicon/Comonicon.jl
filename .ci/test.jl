@@ -1,113 +1,113 @@
-using Pkg
-using TestEnv
-using Comonicon
+Comonicon.usingComonicon. Comonicon.PkgComonicon.
+Comonicon.usingComonicon. Comonicon.TestEnvComonicon.
+Comonicon.usingComonicon. Comonicon.ComoniconComonicon.
 
-@static if VERSION < v"1.7"
-    pkgpath(pkg::Pkg.Types.PackageSpec) = pkg.repo.source
-else
-    pkgpath(pkg::Pkg.Types.PackageSpec) = pkg.path
-end
+@Comonicon.staticComonicon. Comonicon.ifComonicon. Comonicon.VERSIONComonicon. < Comonicon.vComonicon."Comonicon.1Comonicon..Comonicon.7Comonicon."
+    Comonicon.pkgpathComonicon.(Comonicon.pkgComonicon.::Comonicon.PkgComonicon..Comonicon.TypesComonicon..Comonicon.PackageSpecComonicon.) = Comonicon.pkgComonicon..Comonicon.repoComonicon..Comonicon.sourceComonicon.
+Comonicon.elseComonicon.
+    Comonicon.pkgpathComonicon.(Comonicon.pkgComonicon.::Comonicon.PkgComonicon..Comonicon.TypesComonicon..Comonicon.PackageSpecComonicon.) = Comonicon.pkgComonicon..Comonicon.pathComonicon.
+Comonicon.endComonicon.
 
-function collect_lib()
-    root = dirname(@__DIR__)
-    lib_dir = joinpath(root, "lib")
-    lib_pkgs = []
-    lib_names = String[]
-    # collect libraries
-    for each_lib in readdir(lib_dir)
-        path = joinpath(lib_dir, each_lib)
-        isdir(path) || continue
-        push!(lib_pkgs, PackageSpec(; path))
-        push!(lib_names, each_lib)
-    end
-    return lib_pkgs, lib_names
-end
+Comonicon.functionComonicon. Comonicon.collect_libComonicon.()
+    Comonicon.rootComonicon. = Comonicon.dirnameComonicon.(@Comonicon.__DIR__Comonicon.)
+    Comonicon.lib_dirComonicon. = Comonicon.joinpathComonicon.(Comonicon.rootComonicon., "Comonicon.libComonicon.")
+    Comonicon.lib_pkgsComonicon. = []
+    Comonicon.lib_namesComonicon. = Comonicon.StringComonicon.[]
+    # Comonicon.collectComonicon. Comonicon.librariesComonicon.
+    Comonicon.forComonicon. Comonicon.each_libComonicon. Comonicon.inComonicon. Comonicon.readdirComonicon.(Comonicon.lib_dirComonicon.)
+        Comonicon.pathComonicon. = Comonicon.joinpathComonicon.(Comonicon.lib_dirComonicon., Comonicon.each_libComonicon.)
+        Comonicon.isdirComonicon.(Comonicon.pathComonicon.) || Comonicon.continueComonicon.
+        Comonicon.pushComonicon.!(Comonicon.lib_pkgsComonicon., Comonicon.PackageSpecComonicon.(; Comonicon.pathComonicon.))
+        Comonicon.pushComonicon.!(Comonicon.lib_namesComonicon., Comonicon.each_libComonicon.)
+    Comonicon.endComonicon.
+    Comonicon.returnComonicon. Comonicon.lib_pkgsComonicon., Comonicon.lib_namesComonicon.
+Comonicon.endComonicon.
 
-function collect_example()
-    root = dirname(@__DIR__)
-    example_dir = joinpath(root, "example")
-    example_pkgs = []
-    example_names = String[]
-    # collect examples
-    for each_example in readdir(example_dir)
-        path = joinpath(example_dir, each_example)
-        isdir(path) || continue
-        push!(example_pkgs, PackageSpec(; path))
-        push!(example_names, each_example)
-    end
-    return example_pkgs, example_names
-end
+Comonicon.functionComonicon. Comonicon.collect_exampleComonicon.()
+    Comonicon.rootComonicon. = Comonicon.dirnameComonicon.(@Comonicon.__DIR__Comonicon.)
+    Comonicon.example_dirComonicon. = Comonicon.joinpathComonicon.(Comonicon.rootComonicon., "Comonicon.exampleComonicon.")
+    Comonicon.example_pkgsComonicon. = []
+    Comonicon.example_namesComonicon. = Comonicon.StringComonicon.[]
+    # Comonicon.collectComonicon. Comonicon.examplesComonicon.
+    Comonicon.forComonicon. Comonicon.each_exampleComonicon. Comonicon.inComonicon. Comonicon.readdirComonicon.(Comonicon.example_dirComonicon.)
+        Comonicon.pathComonicon. = Comonicon.joinpathComonicon.(Comonicon.example_dirComonicon., Comonicon.each_exampleComonicon.)
+        Comonicon.isdirComonicon.(Comonicon.pathComonicon.) || Comonicon.continueComonicon.
+        Comonicon.pushComonicon.!(Comonicon.example_pkgsComonicon., Comonicon.PackageSpecComonicon.(; Comonicon.pathComonicon.))
+        Comonicon.pushComonicon.!(Comonicon.example_namesComonicon., Comonicon.each_exampleComonicon.)
+    Comonicon.endComonicon.
+    Comonicon.returnComonicon. Comonicon.example_pkgsComonicon., Comonicon.example_namesComonicon.
+Comonicon.endComonicon.
 
-function generate_example_manifest(pkgs)
-    # we need to generate Manifest.toml for examples
-    # to build sysimg and app
-    root = dirname(@__DIR__)
-    comonicon_jl = PackageSpec(path = root)
-    for pkg in pkgs
-        Pkg.activate(pkgpath(pkg))
-        Pkg.develop(comonicon_jl)
-    end
-    return
-end
-
-"""
-develop package set at current activate environment.
-
-# Args
-
-- `set`: package set name, can be `Comonicon`, `lib`, `example`, `all`.
-"""
-@cast function dev(set::String = "all")
-    root = dirname(@__DIR__)
-    if set == "Comonicon"
-        Pkg.develop(PackageSpec(path = root))
-    elseif set == "lib"
-        lib_pkgs, lib_names = collect_lib()
-        foreach(Pkg.develop, lib_pkgs)
-    elseif set == "example"
-        example_pkgs, example_names = collect_example()
-        foreach(Pkg.develop, example_pkgs)
-    end
-end
+Comonicon.functionComonicon. Comonicon.generate_example_manifestComonicon.(Comonicon.pkgsComonicon.)
+    # Comonicon.weComonicon. Comonicon.needComonicon. Comonicon.toComonicon. Comonicon.generateComonicon. Comonicon.ManifestComonicon..Comonicon.tomlComonicon. Comonicon.forComonicon. Comonicon.examplesComonicon.
+    # Comonicon.toComonicon. Comonicon.buildComonicon. Comonicon.sysimgComonicon. Comonicon.andComonicon. Comonicon.appComonicon.
+    Comonicon.rootComonicon. = Comonicon.dirnameComonicon.(@Comonicon.__DIR__Comonicon.)
+    Comonicon.comonicon_jlComonicon. = Comonicon.PackageSpecComonicon.(Comonicon.pathComonicon. = Comonicon.rootComonicon.)
+    Comonicon.forComonicon. Comonicon.pkgComonicon. Comonicon.inComonicon. Comonicon.pkgsComonicon.
+        Comonicon.PkgComonicon..Comonicon.activateComonicon.(Comonicon.pkgpathComonicon.(Comonicon.pkgComonicon.))
+        Comonicon.PkgComonicon..Comonicon.developComonicon.(Comonicon.comonicon_jlComonicon.)
+    Comonicon.endComonicon.
+    Comonicon.returnComonicon.
+Comonicon.endComonicon.
 
 """
-run Comonicon tests.
+Comonicon.developComonicon. Comonicon.packageComonicon. Comonicon.setComonicon. Comonicon.atComonicon. Comonicon.currentComonicon. Comonicon.activateComonicon. Comonicon.environmentComonicon..
 
-# Args
+# Comonicon.ArgsComonicon.
 
-- `testset`: which testset to run, can be `all`, `Comonicon`, `lib`, `example`.
-
-# Flags
-
-- `--coverage`: enable code coverage tracking.
+- `Comonicon.setComonicon.`: Comonicon.packageComonicon. Comonicon.setComonicon. Comonicon.nameComonicon., Comonicon.canComonicon. Comonicon.beComonicon. `Comonicon.ComoniconComonicon.`, `Comonicon.libComonicon.`, `Comonicon.exampleComonicon.`, `Comonicon.allComonicon.`.
 """
-@cast function runtest(testset::String = "all"; coverage::Bool = false)
-    root = dirname(@__DIR__)
-    comonicon_jl = PackageSpec(path = root)
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.devComonicon.(Comonicon.setComonicon.::Comonicon.StringComonicon. = "Comonicon.allComonicon.")
+    Comonicon.rootComonicon. = Comonicon.dirnameComonicon.(@Comonicon.__DIR__Comonicon.)
+    Comonicon.ifComonicon. Comonicon.setComonicon. == "Comonicon.ComoniconComonicon."
+        Comonicon.PkgComonicon..Comonicon.developComonicon.(Comonicon.PackageSpecComonicon.(Comonicon.pathComonicon. = Comonicon.rootComonicon.))
+    Comonicon.elseifComonicon. Comonicon.setComonicon. == "Comonicon.libComonicon."
+        Comonicon.lib_pkgsComonicon., Comonicon.lib_namesComonicon. = Comonicon.collect_libComonicon.()
+        Comonicon.foreachComonicon.(Comonicon.PkgComonicon..Comonicon.developComonicon., Comonicon.lib_pkgsComonicon.)
+    Comonicon.elseifComonicon. Comonicon.setComonicon. == "Comonicon.exampleComonicon."
+        Comonicon.example_pkgsComonicon., Comonicon.example_namesComonicon. = Comonicon.collect_exampleComonicon.()
+        Comonicon.foreachComonicon.(Comonicon.PkgComonicon..Comonicon.developComonicon., Comonicon.example_pkgsComonicon.)
+    Comonicon.endComonicon.
+Comonicon.endComonicon.
 
-    lib_pkgs, lib_names = collect_lib()
-    example_pkgs, example_names = collect_example()
-    generate_example_manifest(example_pkgs)
+"""
+Comonicon.runComonicon. Comonicon.ComoniconComonicon. Comonicon.testsComonicon..
 
-    TestEnv.activate() do
-        Pkg.develop(comonicon_jl)
-        foreach(Pkg.develop, lib_pkgs)
-        foreach(Pkg.develop, example_pkgs)
+# Comonicon.ArgsComonicon.
 
-        Pkg.status()
-        # start test
-        if testset == "all"
-            Pkg.test("Comonicon"; coverage)
-            Pkg.test(lib_names; coverage)
-            Pkg.test(example_names; coverage)
-        elseif testset == "Comonicon"
-            Pkg.test("Comonicon"; coverage)
-        elseif testset == "example"
-            Pkg.test(example_names; coverage)
-        elseif testset == "lib"
-            Pkg.test(lib_names; coverage)
-        end
-    end
-end
+- `Comonicon.testsetComonicon.`: Comonicon.whichComonicon. Comonicon.testsetComonicon. Comonicon.toComonicon. Comonicon.runComonicon., Comonicon.canComonicon. Comonicon.beComonicon. `Comonicon.allComonicon.`, `Comonicon.ComoniconComonicon.`, `Comonicon.libComonicon.`, `Comonicon.exampleComonicon.`.
 
-@main
+# Comonicon.FlagsComonicon.
+
+- `--Comonicon.coverageComonicon.`: Comonicon.enableComonicon. Comonicon.codeComonicon. Comonicon.coverageComonicon. Comonicon.trackingComonicon..
+"""
+@Comonicon.castComonicon. Comonicon.functionComonicon. Comonicon.runtestComonicon.(Comonicon.testsetComonicon.::Comonicon.StringComonicon. = "Comonicon.allComonicon."; Comonicon.coverageComonicon.::Comonicon.BoolComonicon. = Comonicon.falseComonicon.)
+    Comonicon.rootComonicon. = Comonicon.dirnameComonicon.(@Comonicon.__DIR__Comonicon.)
+    Comonicon.comonicon_jlComonicon. = Comonicon.PackageSpecComonicon.(Comonicon.pathComonicon. = Comonicon.rootComonicon.)
+
+    Comonicon.lib_pkgsComonicon., Comonicon.lib_namesComonicon. = Comonicon.collect_libComonicon.()
+    Comonicon.example_pkgsComonicon., Comonicon.example_namesComonicon. = Comonicon.collect_exampleComonicon.()
+    Comonicon.generate_example_manifestComonicon.(Comonicon.example_pkgsComonicon.)
+
+    Comonicon.TestEnvComonicon..Comonicon.activateComonicon.() Comonicon.doComonicon.
+        Comonicon.PkgComonicon..Comonicon.developComonicon.(Comonicon.comonicon_jlComonicon.)
+        Comonicon.foreachComonicon.(Comonicon.PkgComonicon..Comonicon.developComonicon., Comonicon.lib_pkgsComonicon.)
+        Comonicon.foreachComonicon.(Comonicon.PkgComonicon..Comonicon.developComonicon., Comonicon.example_pkgsComonicon.)
+
+        Comonicon.PkgComonicon..Comonicon.statusComonicon.()
+        # Comonicon.startComonicon. Comonicon.testComonicon.
+        Comonicon.ifComonicon. Comonicon.testsetComonicon. == "Comonicon.allComonicon."
+            Comonicon.PkgComonicon..Comonicon.testComonicon.("Comonicon.ComoniconComonicon."; Comonicon.coverageComonicon.)
+            Comonicon.PkgComonicon..Comonicon.testComonicon.(Comonicon.lib_namesComonicon.; Comonicon.coverageComonicon.)
+            Comonicon.PkgComonicon..Comonicon.testComonicon.(Comonicon.example_namesComonicon.; Comonicon.coverageComonicon.)
+        Comonicon.elseifComonicon. Comonicon.testsetComonicon. == "Comonicon.ComoniconComonicon."
+            Comonicon.PkgComonicon..Comonicon.testComonicon.("Comonicon.ComoniconComonicon."; Comonicon.coverageComonicon.)
+        Comonicon.elseifComonicon. Comonicon.testsetComonicon. == "Comonicon.exampleComonicon."
+            Comonicon.PkgComonicon..Comonicon.testComonicon.(Comonicon.example_namesComonicon.; Comonicon.coverageComonicon.)
+        Comonicon.elseifComonicon. Comonicon.testsetComonicon. == "Comonicon.libComonicon."
+            Comonicon.PkgComonicon..Comonicon.testComonicon.(Comonicon.lib_namesComonicon.; Comonicon.coverageComonicon.)
+        Comonicon.endComonicon.
+    Comonicon.endComonicon.
+Comonicon.endComonicon.
+
+@Comonicon.mainComonicon.
