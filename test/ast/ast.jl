@@ -61,6 +61,23 @@ node = NodeCommand(; name = "foo", subcmds = Dict("leaf" => leaf))
     "-h, --help" in node
 end
 
+# Regression: a NodeCommand whose Description has a non-empty `brief` but an
+# empty `content` (the default) must render its brief in the intro slot of the
+# help output. Before this fix, `print_content` checked `isnothing(desc.content)`,
+# which was false for the default empty-String "", so the function returned
+# without ever consulting `desc.brief`. Symptom: the docstring directly above
+# `@main` for a multi-command entry was parsed into `brief` and silently
+# discarded, leaving 3 contiguous blank lines between the program name and the
+# `Usage` section.
+brief_only_node = NodeCommand(;
+    name = "brief_only",
+    subcmds = Dict("leaf" => leaf),
+    description = Description("a brief summary of this command tree"),
+)
+@test_show MIME"text/plain" begin
+    "a brief summary of this command tree" in brief_only_node
+end
+
 text = "registry you want to register the package. If the package has not been registered, ion will try to register the package in the General registry. Or the user needs to specify the registry to register using this option."
 
 
